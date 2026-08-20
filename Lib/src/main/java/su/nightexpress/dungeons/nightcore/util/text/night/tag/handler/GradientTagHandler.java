@@ -86,6 +86,9 @@ public class GradientTagHandler extends ClassicTagHandler {
 
     @Override
     protected void onHandleClose(@NonNull EntryGroup group) {
+        // Upstream NPE'd here when onHandleOpen bailed out (e.g. '<gradient:red>' with a single stop).
+        if (this.colorStops == null || this.colorStops.length < 2) return;
+
         AtomicInteger textLength = new AtomicInteger(0);
         List<ChildEntry> gradientEntries = new ArrayList<>();
 
