@@ -2,6 +2,10 @@ package su.nightexpress.dungeons.nightcore;
 
 import org.jspecify.annotations.NonNull;
 
+import su.nightexpress.dungeons.nightcore.commands.ArgumentRegistry;
+import su.nightexpress.dungeons.nightcore.commands.Arguments;
+import su.nightexpress.dungeons.nightcore.configuration.codec.CodecRegistry;
+import su.nightexpress.dungeons.nightcore.configuration.codec.ConfigCodecs;
 import su.nightexpress.dungeons.nightcore.core.tag.TagBootstrap;
 import su.nightexpress.dungeons.nightcore.integration.currency.CurrencyManager;
 import su.nightexpress.dungeons.nightcore.ui.UIListener;
@@ -27,6 +31,16 @@ public class CoreBootstrap {
      * Called once, before any config is read.
      */
     public static void init(@NonNull NightPlugin plugin) {
+        // Upstream NightCore initialized these static registries from its PluginBootstrap
+        // before any config was read; vendored code must do the same or FileConfig/commands
+        // throw "is not initialized yet" on enable. Guarded for /reload (statics survive).
+        if (!ConfigCodecs.isInitialized()) {
+            ConfigCodecs.init(new CodecRegistry());
+        }
+        if (!Arguments.isInitialized()) {
+            Arguments.init(new ArgumentRegistry());
+        }
+
         Plugins.detectPlugins();
         TagBootstrap.load();
     }
