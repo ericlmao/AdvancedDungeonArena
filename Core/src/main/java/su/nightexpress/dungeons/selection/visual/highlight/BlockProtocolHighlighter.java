@@ -72,7 +72,7 @@ public class BlockProtocolHighlighter extends BlockHighlighter {
     @Override
     protected void destroyEntity(@NonNull Player player, @NonNull List<FakeEntity> entities) {
         entities.forEach(fakeEntity -> {
-            String entityUID = fakeEntity.getUUID().toString();
+            String entityUID = fakeEntity.uuid().toString();
 
             PacketContainer teamPacket = new PacketContainer(PacketType.Play.Server.SCOREBOARD_TEAM);
             teamPacket.getStrings().write(0, entityUID); // Name
@@ -83,7 +83,7 @@ public class BlockProtocolHighlighter extends BlockHighlighter {
             this.manager.sendServerPacket(player, teamPacket);
         });
 
-        List<Integer> idList = entities.stream().mapToInt(FakeEntity::getId).boxed().toList();
+        List<Integer> idList = entities.stream().mapToInt(FakeEntity::id).boxed().toList();
         PacketContainer destroyPacket = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
         destroyPacket.getIntLists().write(0, idList);
         this.manager.sendServerPacket(player, destroyPacket);

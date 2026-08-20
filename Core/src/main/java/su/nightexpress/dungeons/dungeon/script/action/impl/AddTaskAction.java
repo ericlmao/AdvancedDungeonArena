@@ -10,15 +10,7 @@ import su.nightexpress.dungeons.dungeon.stage.StageTask;
 import su.nightexpress.dungeons.util.ErrorHandler;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
-public class AddTaskAction implements Action {
-
-    private final String taskId;
-    private final boolean replace;
-
-    public AddTaskAction(@NonNull String taskId, boolean replace) {
-        this.taskId = taskId;
-        this.replace = replace;
-    }
+public record AddTaskAction(@NonNull String taskId, boolean replace) implements Action {
 
     @NonNull
     public static AddTaskAction load(@NonNull FileConfig config, @NonNull String path) {

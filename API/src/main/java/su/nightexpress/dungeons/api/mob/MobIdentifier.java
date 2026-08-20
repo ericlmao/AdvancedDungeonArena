@@ -5,19 +5,9 @@ import su.nightexpress.dungeons.nightcore.config.ConfigValue;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 import su.nightexpress.dungeons.nightcore.config.Writeable;
 
-import java.util.Objects;
-
-public class MobIdentifier implements Writeable {
+public record MobIdentifier(@NonNull String providerId, @NonNull String mobId) implements Writeable {
 
     private static final String DELIMITER = ":";
-
-    private final String providerId;
-    private final String mobId;
-
-    public MobIdentifier(@NonNull String providerId, @NonNull String mobId) {
-        this.providerId = providerId;
-        this.mobId = mobId;
-    }
 
     @NonNull
     public static MobIdentifier from(@NonNull MobProvider provider, @NonNull String mobId) {
@@ -46,27 +36,5 @@ public class MobIdentifier implements Writeable {
     @NonNull
     public String serialize() {
         return this.providerId + DELIMITER + this.mobId;
-    }
-
-    @NonNull
-    public String getProviderId() {
-        return this.providerId;
-    }
-
-    @NonNull
-    public String getMobId() {
-        return this.mobId;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (!(object instanceof MobIdentifier that)) return false;
-        return Objects.equals(providerId, that.providerId) && Objects.equals(mobId, that.mobId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(providerId, mobId);
     }
 }

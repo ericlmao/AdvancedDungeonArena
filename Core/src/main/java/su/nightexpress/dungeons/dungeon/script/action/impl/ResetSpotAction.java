@@ -10,13 +10,7 @@ import su.nightexpress.dungeons.util.ErrorHandler;
 import su.nightexpress.dungeons.nightcore.config.ConfigValue;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
-public class ResetSpotAction implements Action {
-
-    private final String spotId;
-
-    public ResetSpotAction(String spotId) {
-        this.spotId = spotId;
-    }
+public record ResetSpotAction(String spotId) implements Action {
 
     @NonNull
     public static ResetSpotAction load(@NonNull FileConfig config, @NonNull String path) {

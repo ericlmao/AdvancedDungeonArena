@@ -9,13 +9,7 @@ import su.nightexpress.dungeons.nightcore.config.ConfigValue;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 import su.nightexpress.dungeons.nightcore.util.random.Rnd;
 
-public class ChanceCondition implements Condition {
-
-    private final double chance;
-
-    public ChanceCondition(double chance) {
-        this.chance = chance;
-    }
+public record ChanceCondition(double chance) implements Condition {
 
     @NonNull
     public static ChanceCondition load(@NonNull FileConfig config, @NonNull String path) {

@@ -34,7 +34,7 @@ public abstract class AbstractBoard<T> implements Board {
      * flicker at best. The reference is swapped for a new immutable map instead, so every read sees one
      * complete frame or the other.
      */
-    protected volatile Map<Integer, String> scores = Map.of();
+    private volatile Map<Integer, String> scores = Map.of();
 
     public AbstractBoard(@NonNull DungeonGamer gamer, @NonNull BoardLayout layout) {
         this.layout = layout;
@@ -123,7 +123,7 @@ public abstract class AbstractBoard<T> implements Board {
         dungeon.getTaskProgress().forEach((stageTask, progress) -> {
             TextLocale format = progress.isCompleted() ? Lang.UI_TASK_COMPLETED : Lang.UI_TASK_INCOMPLETED;
             list.add(format.text()
-                .replace(Placeholders.GENERIC_NAME, stageTask.getParams().getDisplay())
+                .replace(Placeholders.GENERIC_NAME, stageTask.getParams().display())
                 .replace(Placeholders.GENERIC_VALUE, progress.format(this.gamer.getPlayer()))
             );
         });
@@ -145,10 +145,10 @@ public abstract class AbstractBoard<T> implements Board {
     @Override
     public void update() {
         BoardLayout layout = this.getLayout();
-        String title = layout.getTitle();
+        String title = layout.title();
         List<String> lines = new ArrayList<>();
 
-        for (String line : layout.getLines()) {
+        for (String line : layout.lines()) {
             if (line.equalsIgnoreCase(Placeholders.GENERIC_TASKS)) {
                 lines.addAll(this.getFormattedTasks());
                 continue;

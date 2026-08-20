@@ -97,7 +97,7 @@ public class LootChest extends AbstractFileData<DungeonPlugin> {
         Set<Integer> freeSlots = IntStream.range(0, inventorySize).boxed().collect(Collectors.toCollection(HashSet::new));
         Map<LootItem, Double> weightMap = new HashMap<>();
         this.getItems().forEach(item -> {
-            weightMap.put(item, item.getWeight());
+            weightMap.put(item, item.weight());
         });
 
         inventory.clear();
@@ -106,7 +106,7 @@ public class LootChest extends AbstractFileData<DungeonPlugin> {
             LootItem item = Rnd.getByWeight(weightMap);
 
             int slot = Rnd.get(freeSlots);
-            inventory.setItem(slot, item.getItem().getItemStack());
+            inventory.setItem(slot, item.item().getItemStack());
 
             if (this.uniqueOnly) {
                 weightMap.remove(item);
@@ -195,6 +195,6 @@ public class LootChest extends AbstractFileData<DungeonPlugin> {
     }
 
     public void addItem(@NonNull LootItem item) {
-        this.itemByIdMap.put(item.getId(), item);
+        this.itemByIdMap.put(item.id(), item);
     }
 }

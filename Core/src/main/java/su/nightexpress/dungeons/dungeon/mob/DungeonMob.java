@@ -60,7 +60,7 @@ public class DungeonMob implements DungeonEntity {
 
     @Override
     public boolean isMob(@NonNull MobIdentifier identifier) {
-        return this.isProvider(identifier.getProviderId()) && this.isId(identifier.getMobId());
+        return this.isProvider(identifier.providerId()) && this.isId(identifier.mobId());
     }
 
     @Override

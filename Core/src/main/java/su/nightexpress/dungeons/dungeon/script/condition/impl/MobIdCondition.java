@@ -9,13 +9,7 @@ import su.nightexpress.dungeons.dungeon.script.condition.Condition;
 import su.nightexpress.dungeons.dungeon.script.condition.ConditionId;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
-public class MobIdCondition implements Condition {
-
-    private final MobIdentifier identifier;
-
-    public MobIdCondition(@NonNull MobIdentifier identifier) {
-        this.identifier = identifier;
-    }
+public record MobIdCondition(@NonNull MobIdentifier identifier) implements Condition {
 
     @NonNull
     public static MobIdCondition load(@NonNull FileConfig config, @NonNull String path) {

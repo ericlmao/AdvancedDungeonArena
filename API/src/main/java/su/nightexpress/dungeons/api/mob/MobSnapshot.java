@@ -4,21 +4,8 @@ import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.criteria.CriterionMob;
 import su.nightexpress.dungeons.api.type.MobFaction;
 
-import java.util.Objects;
-
-public class MobSnapshot implements CriterionMob {
-
-    private final String     providerId;
-    private final String     mobId;
-    private final MobFaction faction;
-    private final String     bornStageId;
-
-    public MobSnapshot(String providerId, String mobId, MobFaction faction, String bornStageId) {
-        this.providerId = providerId;
-        this.mobId = mobId;
-        this.faction = faction;
-        this.bornStageId = bornStageId;
-    }
+// Used as a HashMap key (StageStats) - equality was already structural over these four components.
+public record MobSnapshot(@NonNull String providerId, @NonNull String mobId, @NonNull MobFaction faction, @NonNull String bornStageId) implements CriterionMob {
 
     @Override
     public boolean isMob(@NonNull MobProvider provider, @NonNull String mobId) {
@@ -27,7 +14,7 @@ public class MobSnapshot implements CriterionMob {
 
     @Override
     public boolean isMob(@NonNull MobIdentifier identifier) {
-        return this.isProvider(identifier.getProviderId()) && this.isId(identifier.getMobId());
+        return this.isProvider(identifier.providerId()) && this.isId(identifier.mobId());
     }
 
     @Override
@@ -50,45 +37,26 @@ public class MobSnapshot implements CriterionMob {
         return this.faction == faction;
     }
 
-    @NonNull
-    public String getProviderId() {
+    // CriterionMob is published API and is also implemented by DungeonMob, so its getters stay as-is
+    // and delegate to the record accessors.
+
+    @Override
+    public @NonNull String getProviderId() {
         return this.providerId;
     }
 
-    @NonNull
-    public String getMobId() {
+    @Override
+    public @NonNull String getMobId() {
         return this.mobId;
     }
 
-    @NonNull
-    public MobFaction getFaction() {
+    @Override
+    public @NonNull MobFaction getFaction() {
         return this.faction;
     }
 
-    @NonNull
-    public String getBornStageId() {
+    @Override
+    public @NonNull String getBornStageId() {
         return this.bornStageId;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof MobSnapshot that)) return false;
-        return Objects.equals(providerId, that.providerId) && Objects.equals(mobId, that.mobId) && faction == that.faction && Objects.equals(bornStageId, that.bornStageId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(providerId, mobId, faction, bornStageId);
-    }
-
-    @Override
-    public String toString() {
-        return "MobSnapshot{" +
-            "providerId='" + providerId + '\'' +
-            ", mobId='" + mobId + '\'' +
-            ", faction=" + faction +
-            ", stageId='" + bornStageId + '\'' +
-            '}';
     }
 }

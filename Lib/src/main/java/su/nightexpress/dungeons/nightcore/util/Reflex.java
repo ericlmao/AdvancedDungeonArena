@@ -19,9 +19,16 @@ import java.util.List;
  */
 public class Reflex {
 
+    /**
+     * Whether a class is on the classpath, without initializing it.
+     * <p>
+     * The {@code initialize} flag matters: this is used to probe for optional soft dependencies, and the
+     * plain {@code Class.forName} would run the probed class's static initializer as a side effect of
+     * asking whether it exists.
+     */
     public static boolean classExists(@NonNull String path) {
         try {
-            Class.forName(path);
+            Class.forName(path, false, Reflex.class.getClassLoader());
             return true;
         }
         catch (ClassNotFoundException _) {

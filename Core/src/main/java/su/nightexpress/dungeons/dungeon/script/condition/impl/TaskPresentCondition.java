@@ -10,15 +10,7 @@ import su.nightexpress.dungeons.util.ErrorHandler;
 import su.nightexpress.dungeons.nightcore.config.ConfigValue;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
-public class TaskPresentCondition implements Condition {
-
-    private final String taskId;
-    private final boolean inverted;
-
-    public TaskPresentCondition(@NonNull String taskId, boolean inverted) {
-        this.taskId = taskId;
-        this.inverted = inverted;
-    }
+public record TaskPresentCondition(@NonNull String taskId, boolean inverted) implements Condition {
 
     public static TaskPresentCondition load(@NonNull FileConfig config, @NonNull String path, boolean inverted) {
         String taskId = ConfigValue.create(path + ".TaskId", "null").read(config);

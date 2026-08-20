@@ -160,8 +160,8 @@ public class Placeholders extends su.nightexpress.dungeons.nightcore.util.Placeh
                 LevelRequirement requirement = instance.getConfig().features().getLevelRequirement();
                 if (!requirement.isRequired()) return CoreLang.OTHER_ANY.text();
 
-                int min = requirement.getMinLevel();
-                int max = requirement.getMaxLevel();
+                int min = requirement.minLevel();
+                int max = requirement.maxLevel();
                 String result = Lang.UI_LEVEL_RANGE.text();
 
                 if (!requirement.hasMaxValue()) {

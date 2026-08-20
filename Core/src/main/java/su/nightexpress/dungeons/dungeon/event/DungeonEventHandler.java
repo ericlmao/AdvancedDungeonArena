@@ -113,19 +113,19 @@ public class DungeonEventHandler implements Writeable {
         this.conditions.forEach((name, info) -> {
             String conditionPath = path + ".Conditions." + name;
 
-            config.set(conditionPath + ".Type", info.getCondition().getName());
-            config.set(conditionPath + ".Cached", info.isCached());
-            config.set(conditionPath, info.getCondition());
+            config.set(conditionPath + ".Type", info.condition().getName());
+            config.set(conditionPath + ".Cached", info.cached());
+            config.set(conditionPath, info.condition());
         });
 
         config.remove(path + ".Actions");
         this.actionMap.forEach((id, action) -> {
             String actionPath = path + ".Actions." + id;
 
-            config.set(actionPath + ".Type", action.getAction().getName());
-            config.set(actionPath + ".RunIf", action.getRunIfCondition());
-            config.set(actionPath + ".Chance", action.getChance());
-            config.set(actionPath, action.getAction());
+            config.set(actionPath + ".Type", action.action().getName());
+            config.set(actionPath + ".RunIf", action.runIfCondition());
+            config.set(actionPath + ".Chance", action.chance());
+            config.set(actionPath, action.action());
         });
     }
 
@@ -134,17 +134,17 @@ public class DungeonEventHandler implements Writeable {
 
         PredicateParser parser = new PredicateParser();
         this.conditions.forEach((name, condition) -> {
-            if (condition.isCached()) {
-                boolean result = condition.getCondition().test(dungeon, event);
+            if (condition.cached()) {
+                boolean result = condition.condition().test(dungeon, event);
                 parser.register(name,  o -> result);
             }
             else {
-                parser.register(name, o -> condition.getCondition().test(dungeon, event));
+                parser.register(name, o -> condition.condition().test(dungeon, event));
             }
         });
 
         this.getActions().forEach(actionInfo -> {
-            String runIfCondition = actionInfo.getRunIfCondition();
+            String runIfCondition = actionInfo.runIfCondition();
             if (runIfCondition != null && !parser.parse(runIfCondition).test(null)) {
                 return;
             }

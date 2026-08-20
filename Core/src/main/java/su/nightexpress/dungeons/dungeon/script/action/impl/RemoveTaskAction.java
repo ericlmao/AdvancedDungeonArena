@@ -10,13 +10,7 @@ import su.nightexpress.dungeons.dungeon.stage.StageTask;
 import su.nightexpress.dungeons.util.ErrorHandler;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
-public class RemoveTaskAction implements Action {
-
-    private final String taskId;
-
-    public RemoveTaskAction(@NonNull String taskId) {
-        this.taskId = taskId;
-    }
+public record RemoveTaskAction(@NonNull String taskId) implements Action {
 
     @NonNull
     public static RemoveTaskAction load(@NonNull FileConfig config, @NonNull String path) {

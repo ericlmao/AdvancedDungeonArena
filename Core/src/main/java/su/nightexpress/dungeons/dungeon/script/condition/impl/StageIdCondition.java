@@ -9,13 +9,7 @@ import su.nightexpress.dungeons.dungeon.script.condition.ConditionId;
 import su.nightexpress.dungeons.nightcore.config.ConfigValue;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
-public class StageIdCondition implements Condition {
-
-    private final String stageId;
-
-    public StageIdCondition(@NonNull String stageId) {
-        this.stageId = stageId;
-    }
+public record StageIdCondition(@NonNull String stageId) implements Condition {
 
     @NonNull
     public static StageIdCondition load(@NonNull FileConfig config, @NonNull String path) {

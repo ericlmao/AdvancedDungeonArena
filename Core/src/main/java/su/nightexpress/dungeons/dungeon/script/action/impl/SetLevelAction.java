@@ -9,13 +9,7 @@ import su.nightexpress.dungeons.dungeon.script.action.ActionId;
 import su.nightexpress.dungeons.util.ErrorHandler;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
-public class SetLevelAction implements Action {
-
-    private final String levelId;
-
-    public SetLevelAction(@NonNull String levelId) {
-        this.levelId = levelId;
-    }
+public record SetLevelAction(@NonNull String levelId) implements Action {
 
     @NonNull
     public static SetLevelAction load(@NonNull FileConfig config, @NonNull String path) {
@@ -44,10 +38,5 @@ public class SetLevelAction implements Action {
     @Override
     public String getName() {
         return ActionId.SET_LEVEL;
-    }
-
-    @NonNull
-    public String getLevelId() {
-        return this.levelId;
     }
 }

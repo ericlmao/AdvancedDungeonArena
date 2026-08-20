@@ -12,21 +12,7 @@ import su.nightexpress.dungeons.util.ErrorHandler;
 import su.nightexpress.dungeons.nightcore.config.ConfigValue;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
-public class GiveRewardAction implements Action {
-
-    private final String        rewardId;
-    private final DungeonTarget target;
-    private final boolean       instant;
-    private final boolean       keepOnDeath;
-    private final boolean       keepOnDefeat;
-
-    public GiveRewardAction(@NonNull String rewardId, @NonNull DungeonTarget target, boolean instant, boolean keepOnDeath, boolean keepOnDefeat) {
-        this.rewardId = rewardId;
-        this.target = target;
-        this.instant = instant;
-        this.keepOnDeath = keepOnDeath;
-        this.keepOnDefeat = keepOnDefeat;
-    }
+public record GiveRewardAction(@NonNull String rewardId, @NonNull DungeonTarget target, boolean instant, boolean keepOnDeath, boolean keepOnDefeat) implements Action {
 
     @NonNull
     public static GiveRewardAction load(@NonNull FileConfig config, @NonNull String path) {

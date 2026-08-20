@@ -10,15 +10,7 @@ import su.nightexpress.dungeons.config.Lang;
 import su.nightexpress.dungeons.nightcore.config.ConfigValue;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
-public class DungeonEndAction implements Action {
-
-    private final int     countdown;
-    private final boolean completed;
-
-    public DungeonEndAction(int countdown, boolean completed) {
-        this.countdown = countdown;
-        this.completed = completed;
-    }
+public record DungeonEndAction(int countdown, boolean completed) implements Action {
 
     @NonNull
     public static DungeonEndAction load(@NonNull FileConfig config, @NonNull String path) {

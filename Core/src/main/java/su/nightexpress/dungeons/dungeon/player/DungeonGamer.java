@@ -340,11 +340,11 @@ public class DungeonGamer implements DungeonPlayer {
     }
 
     public void takeDeathRewards() {
-        this.rewards.removeIf(reward -> !reward.isKeepOnDeath());
+        this.rewards.removeIf(reward -> !reward.keepOnDeath());
     }
 
     public void takeDefeatRewards() {
-        this.rewards.removeIf(reward -> !reward.isKeepOnDefeat());
+        this.rewards.removeIf(reward -> !reward.keepOnDefeat());
     }
 
     public void clearRewards() {

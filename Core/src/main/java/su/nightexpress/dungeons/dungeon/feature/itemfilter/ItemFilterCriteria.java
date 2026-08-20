@@ -14,17 +14,7 @@ import su.nightexpress.dungeons.nightcore.util.text.night.NightMessage;
 import java.util.Collections;
 import java.util.List;
 
-public class ItemFilterCriteria implements Writeable {
-
-    private final List<String> names;
-    private final List<String> lores;
-    private final List<Material> materials;
-
-    public ItemFilterCriteria(@NonNull List<String> names, @NonNull List<String> lores, @NonNull List<Material> materials) {
-        this.names = names;
-        this.lores = lores;
-        this.materials = materials;
-    }
+public record ItemFilterCriteria(@NonNull List<String> names, @NonNull List<String> lores, @NonNull List<Material> materials) implements Writeable {
 
     @NonNull
     public static ItemFilterCriteria read(@NonNull FileConfig config, @NonNull String path) {
@@ -51,20 +41,5 @@ public class ItemFilterCriteria implements Writeable {
 
         String lore = NightMessage.stripTags(String.join("\n", ItemUtil.getLoreSerialized(itemStack)));
         return this.lores.isEmpty() || this.lores.stream().anyMatch(lore::contains);
-    }
-
-    @NonNull
-    public List<Material> getMaterials() {
-        return this.materials;
-    }
-
-    @NonNull
-    public List<String> getNames() {
-        return this.names;
-    }
-
-    @NonNull
-    public List<String> getLores() {
-        return this.lores;
     }
 }

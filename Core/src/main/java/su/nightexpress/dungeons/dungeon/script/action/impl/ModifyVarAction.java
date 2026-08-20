@@ -11,20 +11,14 @@ import su.nightexpress.dungeons.util.ErrorHandler;
 import su.nightexpress.dungeons.nightcore.config.ConfigValue;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
-public class ModifyVarAction implements Action {
-
-    private final String    varName;
-    private final Operation operation;
-    private final double    value;
+public record ModifyVarAction(@NonNull String varName, @NonNull Operation operation, double value) implements Action {
 
     public enum Operation {
         PLUS, MINUS, MULTIPLY, DIVIDE, SET
     }
 
-    public ModifyVarAction(@NonNull String varName, @NonNull Operation operation, double value) {
-        this.varName = varName.toLowerCase();
-        this.operation = operation;
-        this.value = value;
+    public ModifyVarAction {
+        varName = varName.toLowerCase();
     }
 
     @NonNull

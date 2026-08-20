@@ -12,17 +12,7 @@ import su.nightexpress.dungeons.util.ErrorHandler;
 import su.nightexpress.dungeons.nightcore.config.ConfigValue;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
-public class SpotStateCondition implements Condition {
-
-    private final String spotId;
-    private final String stateId;
-    private final boolean inverted;
-
-    public SpotStateCondition(@NonNull String spotId, @NonNull String stateId, boolean inverted) {
-        this.spotId = spotId;
-        this.stateId = stateId;
-        this.inverted = inverted;
-    }
+public record SpotStateCondition(@NonNull String spotId, @NonNull String stateId, boolean inverted) implements Condition {
 
     @NonNull
     public static SpotStateCondition load(@NonNull FileConfig config, @NonNull String path, boolean inverted) {

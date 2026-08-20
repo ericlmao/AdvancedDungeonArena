@@ -11,13 +11,7 @@ import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
 import java.util.List;
 
-public class ResetVariableAction implements Action {
-
-    private final List<String> varNames;
-
-    public ResetVariableAction(@NonNull List<String> varNames) {
-        this.varNames = varNames;
-    }
+public record ResetVariableAction(@NonNull List<String> varNames) implements Action {
 
     @NonNull
     public static ResetVariableAction load(@NonNull FileConfig config, @NonNull String path) {

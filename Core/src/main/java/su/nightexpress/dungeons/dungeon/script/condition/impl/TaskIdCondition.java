@@ -9,13 +9,7 @@ import su.nightexpress.dungeons.dungeon.script.condition.ConditionId;
 import su.nightexpress.dungeons.nightcore.config.ConfigValue;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
-public class TaskIdCondition implements Condition {
-
-    private final String taskId;
-
-    public TaskIdCondition(@NonNull String taskId) {
-        this.taskId = taskId;
-    }
+public record TaskIdCondition(@NonNull String taskId) implements Condition {
 
     @NonNull
     public static TaskIdCondition load(@NonNull FileConfig config, @NonNull String path) {

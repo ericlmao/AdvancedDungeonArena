@@ -12,15 +12,7 @@ import su.nightexpress.dungeons.nightcore.util.Lists;
 
 import java.util.List;
 
-public class RunCommandAction implements Action {
-
-    private final List<String>  commands;
-    private final DungeonTarget target;
-
-    public RunCommandAction(@NonNull List<String> commands, @NonNull DungeonTarget target) {
-        this.commands = commands;
-        this.target = target;
-    }
+public record RunCommandAction(@NonNull List<String> commands, @NonNull DungeonTarget target) implements Action {
 
     @NonNull
     public static RunCommandAction load(@NonNull FileConfig config, @NonNull String path) {

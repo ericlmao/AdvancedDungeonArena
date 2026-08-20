@@ -4,19 +4,14 @@ import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 import su.nightexpress.dungeons.nightcore.config.Writeable;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class BoardLayout implements Writeable {
+public record BoardLayout(/*@NonNull String id, */@NonNull String title, @NonNull List<String> lines) implements Writeable {
 
-    //private final String       id;
-    private final String       title;
-    private final List<String> lines;
-
-    public BoardLayout(/*@NonNull String id, */@NonNull String title, @NonNull List<String> lines) {
-        //this.id = id.toLowerCase();
-        this.title = title;
-        this.lines = lines;
+    public BoardLayout {
+        // The accessor hands the list straight out, where the old getter returned a copy. Copy on the way
+        // in instead, so a layout is genuinely immutable rather than defensive at every read.
+        lines = List.copyOf(lines);
     }
 
     @NonNull
@@ -30,20 +25,5 @@ public class BoardLayout implements Writeable {
     public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".Title", this.title);
         config.set(path + ".List", this.lines);
-    }
-
-//    @NonNull
-//    public String getId() {
-//        return id;
-//    }
-
-    @NonNull
-    public String getTitle() {
-        return title;
-    }
-
-    @NonNull
-    public List<String> getLines() {
-        return new ArrayList<>(lines);
     }
 }

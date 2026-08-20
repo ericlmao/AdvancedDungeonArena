@@ -10,15 +10,7 @@ import su.nightexpress.dungeons.nightcore.util.wrapper.UniInt;
 
 import java.util.concurrent.TimeUnit;
 
-public class RevivePlayersAction implements Action {
-
-    private final boolean checkDeathTime;
-    private final UniInt  secondsSinceDeath;
-
-    public RevivePlayersAction(boolean checkDeathTime, @NonNull UniInt secondsSinceDeath) {
-        this.checkDeathTime = checkDeathTime;
-        this.secondsSinceDeath = secondsSinceDeath;
-    }
+public record RevivePlayersAction(boolean checkDeathTime, @NonNull UniInt secondsSinceDeath) implements Action {
 
     @NonNull
     public static RevivePlayersAction load(@NonNull FileConfig config, @NonNull String path) {

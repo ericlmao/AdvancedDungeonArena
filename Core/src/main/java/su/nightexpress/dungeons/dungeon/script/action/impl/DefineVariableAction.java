@@ -14,11 +14,9 @@ import su.nightexpress.dungeons.nightcore.util.wrapper.UniDouble;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DefineVariableAction implements Action {
+public record DefineVariableAction(@NonNull List<VarDefinition> definitions) implements Action {
 
     private static final String DELIMITER = ";";
-
-    private final List<VarDefinition> definitions;
 
     public record VarDefinition(@NonNull String name, double initial, @Nullable UniDouble bounds){
 
@@ -29,10 +27,6 @@ public class DefineVariableAction implements Action {
             }
             return String.valueOf(this.initial);
         }
-    }
-
-    public DefineVariableAction(@NonNull List<VarDefinition> definitions) {
-        this.definitions = definitions;
     }
 
     @NonNull

@@ -35,9 +35,9 @@ public class MC_1_21_11 implements DungeonNMS, NbtProvider {
      * {@code References.ITEM_STACK} field name ("u"/"t") that had to be re-checked every Minecraft
      * release. The wire format is unchanged, so existing kit inventories and reward items still load.
      */
+    // jspecify's annotations are TYPE_USE, so on a qualified name they bind to the simple name.
     @Override
     @NonNull
-    // jspecify's annotations are TYPE_USE, so on a qualified name they attach to the simple name.
     public String toTagString(org.bukkit.inventory.@NonNull ItemStack itemStack) {
         net.minecraft.world.item.ItemStack nmsStack = org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(itemStack);
         net.minecraft.core.RegistryAccess registryAccess = net.minecraft.server.MinecraftServer.getServer().registryAccess();
@@ -82,10 +82,10 @@ public class MC_1_21_11 implements DungeonNMS, NbtProvider {
     public void setSchemaBlock(@NonNull World world, @NonNull SchemaBlock schemaBlock) {
         ServerLevel level = ((CraftWorld)world).getHandle();
 
-        CraftBlock craftBlock = (CraftBlock) schemaBlock.getBlockPos().toLocation(world).getBlock();
-        craftBlock.setBlockData(schemaBlock.getBlockData());
+        CraftBlock craftBlock = (CraftBlock) schemaBlock.blockPos().toLocation(world).getBlock();
+        craftBlock.setBlockData(schemaBlock.blockData());
 
-        if (schemaBlock.getNbt() instanceof CompoundTag tag) {
+        if (schemaBlock.nbt() instanceof CompoundTag tag) {
             BlockPos blockPos = craftBlock.getPosition();
             BlockEntity blockEntity = level.getBlockEntity(blockPos);
             if (blockEntity == null) return;

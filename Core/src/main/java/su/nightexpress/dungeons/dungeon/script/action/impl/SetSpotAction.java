@@ -12,15 +12,7 @@ import su.nightexpress.dungeons.util.ErrorHandler;
 import su.nightexpress.dungeons.nightcore.config.ConfigValue;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
-public class SetSpotAction implements Action {
-
-    private final String spotId;
-    private final String stateId;
-
-    public SetSpotAction(@NonNull String spotId, @NonNull String stateId) {
-        this.spotId = spotId;
-        this.stateId = stateId;
-    }
+public record SetSpotAction(@NonNull String spotId, @NonNull String stateId) implements Action {
 
     @NonNull
     public static SetSpotAction load(@NonNull FileConfig config, @NonNull String path) {

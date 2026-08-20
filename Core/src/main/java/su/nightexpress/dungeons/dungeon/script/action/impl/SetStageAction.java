@@ -9,13 +9,7 @@ import su.nightexpress.dungeons.dungeon.stage.Stage;
 import su.nightexpress.dungeons.util.ErrorHandler;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
-public class SetStageAction implements Action {
-
-    private final String stageId;
-
-    public SetStageAction(String stageId) {
-        this.stageId = stageId;
-    }
+public record SetStageAction(String stageId) implements Action {
 
     @Override
     public void perform(@NonNull DungeonInstance dungeon, @NonNull DungeonGameEvent event) {
@@ -44,10 +38,5 @@ public class SetStageAction implements Action {
     @Override
     public String getName() {
         return ActionId.SET_STAGE;
-    }
-
-    @NonNull
-    public String getStageId() {
-        return this.stageId;
     }
 }

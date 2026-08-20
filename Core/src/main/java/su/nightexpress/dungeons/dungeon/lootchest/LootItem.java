@@ -7,16 +7,10 @@ import su.nightexpress.dungeons.nightcore.config.ConfigValue;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 import su.nightexpress.dungeons.nightcore.config.Writeable;
 
-public class LootItem implements Writeable {
+public record LootItem(@NonNull String id, double weight, @NonNull AdaptedItem item) implements Writeable {
 
-    private final String id;
-    private final double weight;
-    private final AdaptedItem item;
-
-    public LootItem(@NonNull String id, double weight, @NonNull AdaptedItem item) {
-        this.id = id.toLowerCase();
-        this.weight = weight;
-        this.item = item;
+    public LootItem {
+        id = id.toLowerCase();
     }
 
     @NonNull
@@ -31,19 +25,5 @@ public class LootItem implements Writeable {
     public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".Weight", this.weight);
         config.set(path + ".Item", this.item);
-    }
-
-    @NonNull
-    public String getId() {
-        return this.id;
-    }
-
-    public double getWeight() {
-        return this.weight;
-    }
-
-    @NonNull
-    public AdaptedItem getItem() {
-        return this.item;
     }
 }

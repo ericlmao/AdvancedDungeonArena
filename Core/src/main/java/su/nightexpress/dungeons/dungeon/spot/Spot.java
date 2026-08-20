@@ -83,7 +83,7 @@ public class Spot extends AbstractFileData<DungeonPlugin> {
         Map<Long, List<SchemaBlock>> byChunk = new LinkedHashMap<>();
 
         state.getSchema().forEach(schemaBlock -> {
-            BlockPos pos = schemaBlock.getBlockPos();
+            BlockPos pos = schemaBlock.blockPos();
             long chunkKey = Chunk.getChunkKey(pos.x() >> 4, pos.z() >> 4);
             byChunk.computeIfAbsent(chunkKey, key -> new ArrayList<>()).add(schemaBlock);
         });

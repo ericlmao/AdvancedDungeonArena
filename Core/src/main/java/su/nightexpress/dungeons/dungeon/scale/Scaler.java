@@ -5,15 +5,7 @@ import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 import su.nightexpress.dungeons.nightcore.config.Writeable;
 
-public class Scaler implements Writeable {
-
-    private final double value;
-    private final ScaleType type;
-
-    public Scaler(double value, @NonNull ScaleType type) {
-        this.value = value;
-        this.type = type;
-    }
+public record Scaler(double value, @NonNull ScaleType type) implements Writeable {
 
     @NonNull
     public static Scaler read(@NonNull FileConfig config, @NonNull String path) {
@@ -37,14 +29,5 @@ public class Scaler implements Writeable {
             case MULTIPLIER -> original * (1D + this.value * base);
             case PLAIN -> original + (this.value * base);
         };
-    }
-
-    public double getValue() {
-        return this.value;
-    }
-
-    @NonNull
-    public ScaleType getType() {
-        return this.type;
     }
 }

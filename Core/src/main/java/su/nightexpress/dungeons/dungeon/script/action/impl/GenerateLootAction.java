@@ -10,28 +10,24 @@ import su.nightexpress.dungeons.util.ErrorHandler;
 import su.nightexpress.dungeons.nightcore.config.ConfigValue;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
-public class GenerateLootAction implements Action {
+import java.util.List;
 
-    private final boolean specific;
-    private final String[] lootChestIds;
-
-    public GenerateLootAction(boolean specific, String[] lootChestIds) {
-        this.specific = specific;
-        this.lootChestIds = lootChestIds;
-    }
+// The ids are a List, not the String[] the config layer hands over: an array component would give this
+// record reference equality and an unreadable toString, which is exactly the trap records exist to avoid.
+public record GenerateLootAction(boolean specific, @NonNull List<String> lootChestIds) implements Action {
 
     @NonNull
     public static GenerateLootAction load(@NonNull FileConfig config, @NonNull String path) {
         boolean specific = ConfigValue.create(path + ".Specific", false).read(config);
         String[] lootChestIds = ConfigValue.create(path + ".LootChestIds", new String[]{"null"}).read(config);
 
-        return new GenerateLootAction(specific, lootChestIds);
+        return new GenerateLootAction(specific, List.of(lootChestIds));
     }
 
     @Override
     public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".Specific", this.specific);
-        config.setStringArray(path + ".LootChestIds", this.lootChestIds);
+        config.setStringArray(path + ".LootChestIds", this.lootChestIds.toArray(String[]::new));
     }
 
     @NonNull

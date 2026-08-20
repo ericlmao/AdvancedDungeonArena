@@ -14,19 +14,7 @@ import su.nightexpress.dungeons.registry.mob.MobRegistry;
 import su.nightexpress.dungeons.util.ErrorHandler;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
-public class SpawnMobAction implements Action {
-
-    private final MobIdentifier  mobId;
-    private final String         spawnerId;
-    private final ScalableAmount amount;
-    private final ScalableAmount level;
-
-    public SpawnMobAction(@NonNull MobIdentifier mobId, @NonNull String spawnerId, @NonNull ScalableAmount amount, @NonNull ScalableAmount level) {
-        this.mobId = mobId;
-        this.spawnerId = spawnerId;
-        this.amount = amount;
-        this.level = level;
-    }
+public record SpawnMobAction(@NonNull MobIdentifier mobId, @NonNull String spawnerId, @NonNull ScalableAmount amount, @NonNull ScalableAmount level) implements Action {
 
     @NonNull
     public static SpawnMobAction load(@NonNull FileConfig config, @NonNull String path) {
@@ -60,15 +48,15 @@ public class SpawnMobAction implements Action {
             return;
         }
 
-        MobProvider provider = MobRegistry.getProviderByName(this.mobId.getProviderId());
+        MobProvider provider = MobRegistry.getProviderByName(this.mobId.providerId());
         if (provider == null) {
-            ErrorHandler.error("Invalid mob provider '" + this.mobId.getProviderId() + "'!", this, dungeon);
+            ErrorHandler.error("Invalid mob provider '" + this.mobId.providerId() + "'!", this, dungeon);
             return;
         }
 
         int amount = this.amount.getScaledInt(dungeon);
         int level = this.level.getScaledInt(dungeon);
 
-        dungeon.spawnMob(provider, this.mobId.getMobId(), MobFaction.ENEMY, spawner, level, amount);
+        dungeon.spawnMob(provider, this.mobId.mobId(), MobFaction.ENEMY, spawner, level, amount);
     }
 }

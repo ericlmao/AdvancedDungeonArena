@@ -8,16 +8,10 @@ import su.nightexpress.dungeons.nightcore.config.ConfigValue;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 import su.nightexpress.dungeons.nightcore.config.Writeable;
 
-public class LevelRequirement implements Writeable {
+public record LevelRequirement(@NonNull String provider, int minLevel, int maxLevel) implements Writeable {
 
-    private final String provider;
-    private final int minLevel;
-    private final int maxLevel;
-
-    public LevelRequirement(@NonNull String provider, int minLevel, int maxLevel) {
-        this.provider = provider.toLowerCase();
-        this.minLevel = minLevel;
-        this.maxLevel = maxLevel;
+    public LevelRequirement {
+        provider = provider.toLowerCase();
     }
 
     @NonNull
@@ -57,18 +51,5 @@ public class LevelRequirement implements Writeable {
 
     public boolean hasMaxValue() {
         return this.maxLevel > 0;
-    }
-
-    @NonNull
-    public String getProvider() {
-        return this.provider;
-    }
-
-    public int getMinLevel() {
-        return this.minLevel;
-    }
-
-    public int getMaxLevel() {
-        return this.maxLevel;
     }
 }

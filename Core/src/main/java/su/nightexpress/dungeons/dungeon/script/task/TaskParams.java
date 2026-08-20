@@ -6,19 +6,7 @@ import su.nightexpress.dungeons.nightcore.config.FileConfig;
 import su.nightexpress.dungeons.nightcore.config.Writeable;
 import su.nightexpress.dungeons.nightcore.util.wrapper.UniInt;
 
-public class TaskParams implements Writeable {
-
-    private final String display;
-    private final UniInt amount;
-    private final boolean perPlayer;
-    private final boolean autoAdd;
-
-    public TaskParams(String display, UniInt amount, boolean perPlayer, boolean autoAdd) {
-        this.display = display;
-        this.amount = amount;
-        this.perPlayer = perPlayer;
-        this.autoAdd = autoAdd;
-    }
+public record TaskParams(@NonNull String display, @NonNull UniInt amount, boolean perPlayer, boolean autoAdd) implements Writeable {
 
     @NonNull
     public static TaskParams read(@NonNull FileConfig config, @NonNull String path) {
@@ -36,23 +24,5 @@ public class TaskParams implements Writeable {
         this.amount.write(config, path + ".Amount");
         config.set(path + ".PerPlayer", this.perPlayer);
         config.set(path + ".AutoAdd", this.autoAdd);
-    }
-
-    @NonNull
-    public String getDisplay() {
-        return this.display;
-    }
-
-    @NonNull
-    public UniInt getAmount() {
-        return this.amount;
-    }
-
-    public boolean isPerPlayer() {
-        return this.perPlayer;
-    }
-
-    public boolean isAutoAdd() {
-        return this.autoAdd;
     }
 }

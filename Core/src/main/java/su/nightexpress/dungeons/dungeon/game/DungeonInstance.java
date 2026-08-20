@@ -405,7 +405,7 @@ public class DungeonInstance implements Dungeon {
             this.broadcastEvent(new DungeonTaskFinishedEvent(this, stageTask, progress));
             this.broadcast(Lang.DUNGEON_TASK_COMPLETED_INFO, replacer -> replacer
                 .replace(this.replacePlaceholders())
-                .replace(Placeholders.GENERIC_NAME, stageTask.getParams().getDisplay())
+                .replace(Placeholders.GENERIC_NAME, stageTask.getParams().display())
             );
         });
     }
@@ -458,7 +458,7 @@ public class DungeonInstance implements Dungeon {
     }
 
     public void giveReward(@NonNull DungeonGamer gamer, @NonNull GameReward gameReward, boolean instant) {
-        Reward reward = gameReward.getReward();
+        Reward reward = gameReward.reward();
         Player player = gamer.getPlayer();
 
         if (instant) reward.give(this, gamer);
@@ -759,7 +759,7 @@ public class DungeonInstance implements Dungeon {
                 }
             }
             else {
-                gamer.getRewards().forEach(reward -> reward.getReward().give(this, gamer));
+                gamer.getRewards().forEach(reward -> reward.reward().give(this, gamer));
 
                 // Set cooldown only if dungeon have been started.
                 if (!player.hasPermission(Perms.BYPASS_DUNGEON_COOLDOWN)) {
@@ -982,10 +982,10 @@ public class DungeonInstance implements Dungeon {
         MobIdentifier identifier = MobUitls.getEggAllyIdentifier(entityType);
         if (identifier == null) return false;
 
-        MobProvider provider = MobRegistry.getProviderByName(identifier.getProviderId());
+        MobProvider provider = MobRegistry.getProviderByName(identifier.providerId());
         if (provider == null) return false;
 
-        String mobId = identifier.getMobId();
+        String mobId = identifier.mobId();
         MobFaction faction = MobFaction.ALLY;
 
         this.spawnMob(provider, mobId, faction, location, level);
@@ -1114,7 +1114,7 @@ public class DungeonInstance implements Dungeon {
 
     public void addTasks(@NonNull Stage stage) {
         stage.getTasks().forEach(stageTask -> {
-            if (stageTask.getParams().isAutoAdd()) {
+            if (stageTask.getParams().autoAdd()) {
                 this.addTask(stageTask);
             }
         });
@@ -1129,11 +1129,11 @@ public class DungeonInstance implements Dungeon {
         this.taskProgress.put(stageTask, progress);
         this.stageCompleted = false;
 
-        boolean isPersonal = stageTask.getParams().isPerPlayer();
+        boolean isPersonal = stageTask.getParams().perPlayer();
 
         this.broadcast((isPersonal ? Lang.DUNGEON_TASK_CREATED_PERSONAL : Lang.DUNGEON_TASK_CREATED_GLOBAL), (player, replacer) -> replacer
             .replace(this.replacePlaceholders())
-            .replace(Placeholders.GENERIC_NAME, stageTask.getParams().getDisplay())
+            .replace(Placeholders.GENERIC_NAME, stageTask.getParams().display())
             .replace(Placeholders.GENERIC_VALUE, progress.format(isPersonal ? player : null)));
 
         this.broadcastEvent(new DungeonTaskCreatedEvent(this, stageTask, progress));

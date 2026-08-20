@@ -78,13 +78,13 @@ public class BlockPacketsHighlighter extends BlockHighlighter {
     @Override
     protected void destroyEntity(@NonNull Player player, @NonNull List<FakeEntity> idList) {
         idList.forEach(fakeEntity -> {
-            String entityUID = fakeEntity.getUUID().toString();
+            String entityUID = fakeEntity.uuid().toString();
 
             WrapperPlayServerTeams teamPacket = new WrapperPlayServerTeams(entityUID, TeamMode.REMOVE, (ScoreBoardTeamInfo) null, Lists.newList(entityUID));
             this.manager.sendPacket(player, teamPacket);
         });
 
-        WrapperPlayServerDestroyEntities destroyPacket = new WrapperPlayServerDestroyEntities(idList.stream().mapToInt(FakeEntity::getId).toArray());
+        WrapperPlayServerDestroyEntities destroyPacket = new WrapperPlayServerDestroyEntities(idList.stream().mapToInt(FakeEntity::id).toArray());
         this.manager.sendPacket(player, destroyPacket);
     }
 
