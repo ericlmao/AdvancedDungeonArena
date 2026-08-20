@@ -894,11 +894,15 @@ public class DungeonInstance implements Dungeon {
 
 
     private void eliminateDeadMobs() {
-        this.getMobs().forEach(mob -> {
-            if (mob.isDead()) {
-                this.eliminateMob(mob);
-            }
-        });
+        // isDead()/isValid() are live entity reads, so the check runs on the mob's own scheduler rather than
+        // on the instance clock. The retired branch matters as much as the check: a mob whose entity has
+        // already been removed has no scheduler left to run the check on, and without an explicit fallback
+        // it would sit in mobByIdMap forever - which is exactly the leak this sweep exists to prevent.
+        this.getMobs().forEach(mob -> this.plugin.runTask(mob.getBukkitEntity(),
+            () -> {
+                if (mob.isDead()) this.eliminateMob(mob);
+            },
+            () -> this.eliminateMob(mob)));
     }
 
     @Override

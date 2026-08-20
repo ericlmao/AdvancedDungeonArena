@@ -50,18 +50,35 @@ public abstract class AbstractManager<P extends NightPlugin> extends SimpleManag
         return menu;
     }
 
+    // -------------------------------------------------------------------------------------------------
+    // Repeating tasks.
+    //
+    // ⚠ The overloads differ in unit, not just in width: `int` means SECONDS and `long` means TICKS.
+    // `addTask(r, 1)` is once per second; `addTask(r, 1L)` is once per tick. This is inherited from
+    // upstream and is preserved exactly, so that changing a literal's type silently changes the period.
+    // Check the argument type before touching any call site.
+    //
+    // These run on the GLOBAL region scheduler (or the async pool). They are therefore only appropriate
+    // for plugin-wide state; anything that touches a world, block or entity has to reach its owning
+    // thread from inside the task - see NightPlugin#runTask's overloads.
+    // -------------------------------------------------------------------------------------------------
+
+    /** @param interval period in <b>seconds</b>. */
     protected void addTask(@NonNull Runnable runnable, int interval) {
         this.addTask(NightTask.create(plugin, runnable, interval));
     }
 
+    /** @param interval period in <b>ticks</b>. */
     protected void addTask(@NonNull Runnable runnable, long interval) {
         this.addTask(NightTask.create(plugin, runnable, interval));
     }
 
+    /** @param interval period in <b>seconds</b>. */
     protected void addAsyncTask(@NonNull Runnable runnable, int interval) {
         this.addTask(NightTask.createAsync(plugin, runnable, interval));
     }
 
+    /** @param interval period in <b>ticks</b>, converted to wall time for the async scheduler. */
     protected void addAsyncTask(@NonNull Runnable runnable, long interval) {
         this.addTask(NightTask.createAsync(plugin, runnable, interval));
     }
