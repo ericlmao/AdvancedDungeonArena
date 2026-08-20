@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.api.type.MobFaction;
 import su.nightexpress.dungeons.dungeon.DungeonManager;
-import su.nightexpress.nightcore.manager.AbstractListener;
+import su.nightexpress.dungeons.nightcore.manager.AbstractListener;
 
 import java.util.Map;
 import java.util.Set;

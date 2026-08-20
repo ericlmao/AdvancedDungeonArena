@@ -11,21 +11,21 @@ import su.nightexpress.dungeons.dungeon.config.DungeonConfig;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.module.Features;
 import su.nightexpress.dungeons.user.DungeonUser;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.config.Writeable;
-import su.nightexpress.nightcore.core.config.CoreLang;
-import su.nightexpress.nightcore.ui.menu.MenuViewer;
-import su.nightexpress.nightcore.ui.menu.data.ConfigBased;
-import su.nightexpress.nightcore.ui.menu.data.Filled;
-import su.nightexpress.nightcore.ui.menu.data.MenuFiller;
-import su.nightexpress.nightcore.ui.menu.data.MenuLoader;
-import su.nightexpress.nightcore.ui.menu.item.MenuItem;
-import su.nightexpress.nightcore.ui.menu.type.NormalMenu;
-import su.nightexpress.nightcore.util.Lists;
-import su.nightexpress.nightcore.util.bukkit.NightItem;
-import su.nightexpress.nightcore.util.time.TimeFormatType;
-import su.nightexpress.nightcore.util.time.TimeFormats;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.Writeable;
+import su.nightexpress.dungeons.nightcore.core.config.CoreLang;
+import su.nightexpress.dungeons.nightcore.ui.menu.MenuViewer;
+import su.nightexpress.dungeons.nightcore.ui.menu.data.ConfigBased;
+import su.nightexpress.dungeons.nightcore.ui.menu.data.Filled;
+import su.nightexpress.dungeons.nightcore.ui.menu.data.MenuFiller;
+import su.nightexpress.dungeons.nightcore.ui.menu.data.MenuLoader;
+import su.nightexpress.dungeons.nightcore.ui.menu.item.MenuItem;
+import su.nightexpress.dungeons.nightcore.ui.menu.type.NormalMenu;
+import su.nightexpress.dungeons.nightcore.util.Lists;
+import su.nightexpress.dungeons.nightcore.util.bukkit.NightItem;
+import su.nightexpress.dungeons.nightcore.util.time.TimeFormatType;
+import su.nightexpress.dungeons.nightcore.util.time.TimeFormats;
 
 import java.util.Comparator;
 import java.util.List;
@@ -34,7 +34,7 @@ import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
 import static su.nightexpress.dungeons.Placeholders.*;
-import static su.nightexpress.nightcore.util.text.tag.Tags.*;
+import static su.nightexpress.dungeons.nightcore.util.text.night.wrapper.TagWrappers.*;
 
 public class DungeonBrowseMenu extends NormalMenu<DungeonPlugin> implements Filled<DungeonConfig>, ConfigBased {
 

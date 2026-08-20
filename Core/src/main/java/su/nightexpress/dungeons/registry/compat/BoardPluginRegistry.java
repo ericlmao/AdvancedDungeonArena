@@ -8,7 +8,7 @@ import su.nightexpress.dungeons.api.compat.BoardPlugin;
 import su.nightexpress.dungeons.hook.HookId;
 import su.nightexpress.dungeons.hook.impl.SunLightHook;
 import su.nightexpress.dungeons.hook.impl.TABHook;
-import su.nightexpress.nightcore.util.Plugins;
+import su.nightexpress.dungeons.nightcore.util.Plugins;
 
 import java.util.HashMap;
 import java.util.HashSet;

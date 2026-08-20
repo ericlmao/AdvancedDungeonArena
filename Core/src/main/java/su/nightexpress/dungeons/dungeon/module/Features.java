@@ -6,12 +6,12 @@ import su.nightexpress.dungeons.dungeon.config.DungeonConfig;
 import su.nightexpress.dungeons.dungeon.feature.LevelRequirement;
 import su.nightexpress.dungeons.dungeon.feature.itemfilter.ItemFilterCriteria;
 import su.nightexpress.dungeons.dungeon.feature.itemfilter.ItemFilterMode;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.config.Writeable;
-import su.nightexpress.nightcore.integration.currency.CurrencyId;
-import su.nightexpress.nightcore.util.Lists;
-import su.nightexpress.nightcore.util.RankTable;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.Writeable;
+import su.nightexpress.dungeons.nightcore.integration.currency.CurrencyId;
+import su.nightexpress.dungeons.nightcore.util.Lists;
+import su.nightexpress.dungeons.nightcore.util.RankTable;
 
 import java.util.*;
 

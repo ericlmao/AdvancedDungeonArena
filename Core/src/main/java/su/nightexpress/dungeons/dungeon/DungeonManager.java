@@ -35,15 +35,15 @@ import su.nightexpress.dungeons.kit.KitUtils;
 import su.nightexpress.dungeons.kit.impl.Kit;
 import su.nightexpress.dungeons.user.DungeonUser;
 import su.nightexpress.dungeons.util.MobUitls;
-import su.nightexpress.nightcore.manager.AbstractManager;
-import su.nightexpress.nightcore.ui.UIUtils;
-import su.nightexpress.nightcore.ui.menu.confirmation.Confirmation;
-import su.nightexpress.nightcore.util.BlockUtil;
-import su.nightexpress.nightcore.util.FileUtil;
-import su.nightexpress.nightcore.util.LocationUtil;
-import su.nightexpress.nightcore.util.TimeUtil;
-import su.nightexpress.nightcore.util.geodata.Cuboid;
-import su.nightexpress.nightcore.util.geodata.pos.ChunkPos;
+import su.nightexpress.dungeons.nightcore.manager.AbstractManager;
+import su.nightexpress.dungeons.nightcore.ui.UIUtils;
+import su.nightexpress.dungeons.nightcore.ui.menu.confirmation.Confirmation;
+import su.nightexpress.dungeons.nightcore.util.BlockUtil;
+import su.nightexpress.dungeons.nightcore.util.FileUtil;
+import su.nightexpress.dungeons.nightcore.util.LocationUtil;
+import su.nightexpress.dungeons.nightcore.util.TimeUtil;
+import su.nightexpress.dungeons.nightcore.util.geodata.Cuboid;
+import su.nightexpress.dungeons.nightcore.util.geodata.pos.ChunkPos;
 
 import java.io.File;
 import java.util.*;
@@ -158,7 +158,7 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
                     .hideAllComponents()
                     .replacement(replacer -> replacer.replace(dungeon.replacePlaceholders())))
                 .onAccept((viewer, event) -> this.enterInstance(player, dungeon,null))
-                .onReturn((viewer, event) -> plugin.runTask(task -> player.closeInventory()))
+                .onReturn((viewer, event) -> plugin.runTask(() -> player.closeInventory()))
                 .build());
         }
     }

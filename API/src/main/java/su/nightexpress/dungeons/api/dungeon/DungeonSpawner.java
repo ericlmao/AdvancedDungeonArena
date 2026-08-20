@@ -1,8 +1,8 @@
 package su.nightexpress.dungeons.api.dungeon;
 
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.nightcore.config.Writeable;
-import su.nightexpress.nightcore.util.geodata.pos.BlockPos;
+import su.nightexpress.dungeons.nightcore.config.Writeable;
+import su.nightexpress.dungeons.nightcore.util.geodata.pos.BlockPos;
 
 import java.util.Set;
 

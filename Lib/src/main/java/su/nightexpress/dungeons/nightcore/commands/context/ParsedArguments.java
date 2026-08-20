@@ -38,12 +38,17 @@ public class ParsedArguments {
         return this.get(name, Integer.class);
     }
 
-    public double getFloat(@NonNull String name, float defaultValue) {
-        return this.getOr(name, Float.class, defaultValue);
+    /**
+     * Upstream looked up {@code Float.class} here, but every public {@code Arguments.decimal*} factory
+     * produces {@code Double}, so this threw {@link IllegalArgumentException} for every argument built
+     * through them. Reads the Double and narrows instead.
+     */
+    public float getFloat(@NonNull String name, float defaultValue) {
+        return (float) this.getDouble(name, defaultValue);
     }
 
-    public double getFloat(@NonNull String name) {
-        return this.get(name, Float.class);
+    public float getFloat(@NonNull String name) {
+        return (float) this.getDouble(name);
     }
 
     public double getDouble(@NonNull String name, double defaultValue) {

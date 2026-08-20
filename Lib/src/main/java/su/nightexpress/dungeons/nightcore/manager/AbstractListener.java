@@ -3,7 +3,7 @@ package su.nightexpress.dungeons.nightcore.manager;
 import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.nightcore.NightPlugin;
 
-public abstract class AbstractListener<P extends NightPlugin> implements SimpeListener {
+public abstract class AbstractListener<P extends NightPlugin> implements SimpleListener {
 
     @NonNull
     public final P plugin;

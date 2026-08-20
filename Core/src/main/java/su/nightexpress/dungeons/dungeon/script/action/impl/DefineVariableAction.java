@@ -7,9 +7,9 @@ import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.script.action.Action;
 import su.nightexpress.dungeons.dungeon.script.action.ActionId;
 import su.nightexpress.dungeons.util.ErrorHandler;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.util.NumberUtil;
-import su.nightexpress.nightcore.util.wrapper.UniDouble;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.util.NumberUtil;
+import su.nightexpress.dungeons.nightcore.util.wrapper.UniDouble;
 
 import java.util.ArrayList;
 import java.util.List;

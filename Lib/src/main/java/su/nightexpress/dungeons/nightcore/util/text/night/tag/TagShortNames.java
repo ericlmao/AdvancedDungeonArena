@@ -68,4 +68,16 @@ public class TagShortNames {
 
     public static final String LIGHT_PURPLE = "light_purple";
 
+    // Legacy `Tags.*` vocabulary. These tag names are registered by both shipped colour schemes, so
+    // user configs written against either generation keep rendering.
+    public static final String CYAN         = "cyan";
+    public static final String LIGHT_GRAY   = "lgray";
+    public static final String LIGHT_GREEN  = "lgreen";
+    public static final String LIGHT_YELLOW = "lyellow";
+    public static final String LIGHT_ORANGE = "lorange";
+    public static final String LIGHT_RED    = "lred";
+    public static final String LIGHT_BLUE   = "lblue";
+    public static final String LIGHT_CYAN   = "lcyan";
+    public static final String LIGHT_PINK   = "lpink";
+
 }

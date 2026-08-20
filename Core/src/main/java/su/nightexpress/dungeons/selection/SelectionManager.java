@@ -23,13 +23,13 @@ import su.nightexpress.dungeons.selection.visual.Tracker;
 import su.nightexpress.dungeons.selection.visual.highlight.BlockHighlighter;
 import su.nightexpress.dungeons.selection.visual.highlight.BlockPacketsHighlighter;
 import su.nightexpress.dungeons.selection.visual.highlight.BlockProtocolHighlighter;
-import su.nightexpress.nightcore.manager.AbstractManager;
-import su.nightexpress.nightcore.util.PDCUtil;
-import su.nightexpress.nightcore.util.Players;
-import su.nightexpress.nightcore.util.Plugins;
-import su.nightexpress.nightcore.util.geodata.Cuboid;
-import su.nightexpress.nightcore.util.geodata.pos.BlockPos;
-import su.nightexpress.nightcore.util.geodata.pos.ChunkPos;
+import su.nightexpress.dungeons.nightcore.manager.AbstractManager;
+import su.nightexpress.dungeons.nightcore.util.PDCUtil;
+import su.nightexpress.dungeons.nightcore.util.Players;
+import su.nightexpress.dungeons.nightcore.util.Plugins;
+import su.nightexpress.dungeons.nightcore.util.geodata.Cuboid;
+import su.nightexpress.dungeons.nightcore.util.geodata.pos.BlockPos;
+import su.nightexpress.dungeons.nightcore.util.geodata.pos.ChunkPos;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -321,7 +321,7 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
 
         selection.onSelect(player, blockPos, action);
 
-        this.plugin.runTaskAsync(task -> {
+        this.plugin.runTaskAsync(() -> {
             this.highlightSelection(player);
         });
     }

@@ -49,7 +49,7 @@ public class ConfirmMenu extends LinkedMenu<NightPlugin, Confirmation> implement
         this.iconSlot = ConfigValue.create("Settings.IconSlot", 2).read(config);
 
         loader.addDefaultItem(NightItem.asCustomHead(Placeholders.SKIN_WRONG_MARK)
-            .setDisplayName(SOFT_RED.wrap(BOLD.wrap("Cancel")))
+            .setDisplayName(LIGHT_RED.wrap(BOLD.wrap("Cancel")))
             .toMenuItem()
             .setPriority(10)
             .setSlots(0)
@@ -59,7 +59,7 @@ public class ConfirmMenu extends LinkedMenu<NightPlugin, Confirmation> implement
         );
 
         loader.addDefaultItem(NightItem.asCustomHead(Placeholders.SKIN_CHECK_MARK)
-            .setDisplayName(SOFT_GREEN.wrap(BOLD.wrap("Accept")))
+            .setDisplayName(LIGHT_GREEN.wrap(BOLD.wrap("Accept")))
             .toMenuItem()
             .setPriority(10)
             .setSlots(4)

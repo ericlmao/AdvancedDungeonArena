@@ -5,8 +5,8 @@ import org.jetbrains.annotations.Nullable;
 import su.nightexpress.dungeons.api.criteria.CriterionMob;
 import su.nightexpress.dungeons.api.type.MobFaction;
 import su.nightexpress.dungeons.dungeon.script.number.NumberComparator;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
 import java.util.function.Predicate;
 

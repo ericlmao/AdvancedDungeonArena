@@ -8,7 +8,6 @@ import su.nightexpress.dungeons.nightcore.ui.menu.data.Linked;
 
 import java.util.UUID;
 
-@Deprecated
 public class ItemHandler {
 
     public static final String RETURN        = "return";
@@ -21,8 +20,12 @@ public class ItemHandler {
     private final ItemClick   click;
     private final ItemOptions options;
 
+    /**
+     * Upstream left {@link #click} null here, which every {@code MenuItem} click path then NPE'd on.
+     * A no-op click is the intent (a decorative, named, configurable item).
+     */
     public ItemHandler(@NonNull String name) {
-        this(name, null, null);
+        this(name, (viewer, event) -> {}, null);
     }
 
     public ItemHandler(@NonNull String name, @Nullable ItemClick click) {

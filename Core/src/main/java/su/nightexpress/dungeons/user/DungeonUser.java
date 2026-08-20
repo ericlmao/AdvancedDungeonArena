@@ -3,8 +3,8 @@ package su.nightexpress.dungeons.user;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.dungeons.api.dungeon.Dungeon;
 import su.nightexpress.dungeons.kit.impl.Kit;
-import su.nightexpress.nightcore.db.AbstractUser;
-import su.nightexpress.nightcore.util.TimeUtil;
+import su.nightexpress.dungeons.nightcore.userdata.AbstractUser;
+import su.nightexpress.dungeons.nightcore.util.TimeUtil;
 
 import java.util.*;
 

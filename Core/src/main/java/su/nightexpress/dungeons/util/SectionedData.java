@@ -2,8 +2,8 @@ package su.nightexpress.dungeons.util;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nightexpress.nightcore.util.NumberUtil;
-import su.nightexpress.nightcore.util.Numbers;
+import su.nightexpress.dungeons.nightcore.util.NumberUtil;
+import su.nightexpress.dungeons.nightcore.util.Numbers;
 
 import java.util.ArrayList;
 import java.util.Arrays;

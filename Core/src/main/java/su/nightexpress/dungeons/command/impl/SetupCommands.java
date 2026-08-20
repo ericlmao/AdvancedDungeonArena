@@ -9,12 +9,12 @@ import su.nightexpress.dungeons.config.Lang;
 import su.nightexpress.dungeons.config.Perms;
 import su.nightexpress.dungeons.dungeon.config.DungeonConfig;
 import su.nightexpress.dungeons.dungeon.spot.Spot;
-import su.nightexpress.nightcore.commands.Arguments;
-import su.nightexpress.nightcore.commands.Commands;
-import su.nightexpress.nightcore.commands.builder.HubNodeBuilder;
-import su.nightexpress.nightcore.commands.context.CommandContext;
-import su.nightexpress.nightcore.commands.context.ParsedArguments;
-import su.nightexpress.nightcore.core.config.CoreLang;
+import su.nightexpress.dungeons.nightcore.commands.Arguments;
+import su.nightexpress.dungeons.nightcore.commands.Commands;
+import su.nightexpress.dungeons.nightcore.commands.builder.HubNodeBuilder;
+import su.nightexpress.dungeons.nightcore.commands.context.CommandContext;
+import su.nightexpress.dungeons.nightcore.commands.context.ParsedArguments;
+import su.nightexpress.dungeons.nightcore.core.config.CoreLang;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -31,11 +31,11 @@ import su.nightexpress.dungeons.registry.mob.MobRegistry;
 import su.nightexpress.dungeons.registry.pet.PetRegistry;
 import su.nightexpress.dungeons.selection.SelectionManager;
 import su.nightexpress.dungeons.user.UserManager;
-import su.nightexpress.nightcore.NightPlugin;
-import su.nightexpress.nightcore.commands.command.NightCommand;
-import su.nightexpress.nightcore.config.PluginDetails;
-import su.nightexpress.nightcore.util.Plugins;
-import su.nightexpress.nightcore.util.Version;
+import su.nightexpress.dungeons.nightcore.NightPlugin;
+import su.nightexpress.dungeons.nightcore.commands.command.NightCommand;
+import su.nightexpress.dungeons.nightcore.config.PluginDetails;
+import su.nightexpress.dungeons.nightcore.util.Plugins;
+import su.nightexpress.dungeons.nightcore.util.nbt.NbtBridge;
 
 public class DungeonPlugin extends NightPlugin {
 
@@ -60,11 +60,6 @@ public class DungeonPlugin extends NightPlugin {
     @Override
     protected void addRegistries() {
         this.registerLang(Lang.class);
-    }
-
-    @Override
-    protected boolean disableCommandManager() {
-        return true;
     }
 
     @Override
@@ -129,19 +124,14 @@ public class DungeonPlugin extends NightPlugin {
         BoardPluginRegistry.clear();
         Keys.clear();
         DungeonsAPI.clear();
+        NbtBridge.clear();
     }
 
     private boolean loadInternals() {
-        this.internals = switch (Version.getCurrent()) {
-            case MC_1_21_11 -> new MC_1_21_11();
-            default -> null;
-        };
-
-        if (this.internals == null) {
-            this.error("Unsupported server version.");
-            this.getPluginManager().disablePlugin(this);
-            return false;
-        }
+        // Single-version build: the module tree only contains MC_1_21_11, so there is nothing to switch on.
+        MC_1_21_11 internals = new MC_1_21_11();
+        this.internals = internals;
+        NbtBridge.register(internals);
 
         return true;
     }

@@ -27,10 +27,10 @@ import su.nightexpress.dungeons.dungeon.mob.DungeonMob;
 import su.nightexpress.dungeons.dungeon.module.GameSettings;
 import su.nightexpress.dungeons.dungeon.player.DungeonGamer;
 import su.nightexpress.dungeons.util.MobUitls;
-import su.nightexpress.nightcore.manager.AbstractListener;
-import su.nightexpress.nightcore.util.CommandUtil;
-import su.nightexpress.nightcore.util.Lists;
-import su.nightexpress.nightcore.util.placeholder.Replacer;
+import su.nightexpress.dungeons.nightcore.manager.AbstractListener;
+import su.nightexpress.dungeons.nightcore.util.CommandUtil;
+import su.nightexpress.dungeons.nightcore.util.Lists;
+import su.nightexpress.dungeons.nightcore.util.placeholder.Replacer;
 
 public class DungeonGameListener extends AbstractListener<DungeonPlugin> {
 
@@ -149,7 +149,7 @@ public class DungeonGameListener extends AbstractListener<DungeonPlugin> {
 
         dungeon.handlePlayerDeath(gamer);
 
-        this.plugin.runTask(task -> player.spigot().respawn());
+        this.plugin.runTask(() -> player.spigot().respawn());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

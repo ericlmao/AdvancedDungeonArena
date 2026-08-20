@@ -10,9 +10,9 @@ import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
 import su.nightexpress.dungeons.dungeon.event.DungeonEventHandler;
 import su.nightexpress.dungeons.dungeon.event.DungeonEventReceiver;
 import su.nightexpress.dungeons.dungeon.event.DungeonEventType;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.manager.AbstractFileData;
-import su.nightexpress.nightcore.util.geodata.pos.ExactPos;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.manager.AbstractFileData;
+import su.nightexpress.dungeons.nightcore.util.geodata.pos.ExactPos;
 
 import java.io.File;
 import java.util.HashSet;

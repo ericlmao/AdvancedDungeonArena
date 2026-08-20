@@ -7,7 +7,7 @@ import su.nightexpress.dungeons.dungeon.script.condition.Condition;
 import su.nightexpress.dungeons.dungeon.script.number.NumberComparator;
 import su.nightexpress.dungeons.dungeon.script.number.NumberComparators;
 import su.nightexpress.dungeons.util.ErrorHandler;
-import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
 public abstract class NumberCompareCondition implements Condition {
 

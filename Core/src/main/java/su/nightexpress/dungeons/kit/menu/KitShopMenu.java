@@ -13,22 +13,22 @@ import su.nightexpress.dungeons.config.Lang;
 import su.nightexpress.dungeons.user.DungeonUser;
 import su.nightexpress.dungeons.kit.KitUtils;
 import su.nightexpress.dungeons.kit.impl.Kit;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.ui.UIUtils;
-import su.nightexpress.nightcore.ui.menu.MenuViewer;
-import su.nightexpress.nightcore.ui.menu.confirmation.Confirmation;
-import su.nightexpress.nightcore.ui.menu.data.ConfigBased;
-import su.nightexpress.nightcore.ui.menu.data.Filled;
-import su.nightexpress.nightcore.ui.menu.data.MenuFiller;
-import su.nightexpress.nightcore.ui.menu.data.MenuLoader;
-import su.nightexpress.nightcore.ui.menu.item.ItemHandler;
-import su.nightexpress.nightcore.ui.menu.item.ItemOptions;
-import su.nightexpress.nightcore.ui.menu.item.MenuItem;
-import su.nightexpress.nightcore.ui.menu.type.LinkedMenu;
-import su.nightexpress.nightcore.util.Lists;
-import su.nightexpress.nightcore.util.bukkit.NightItem;
-import su.nightexpress.nightcore.util.placeholder.Replacer;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.ui.UIUtils;
+import su.nightexpress.dungeons.nightcore.ui.menu.MenuViewer;
+import su.nightexpress.dungeons.nightcore.ui.menu.confirmation.Confirmation;
+import su.nightexpress.dungeons.nightcore.ui.menu.data.ConfigBased;
+import su.nightexpress.dungeons.nightcore.ui.menu.data.Filled;
+import su.nightexpress.dungeons.nightcore.ui.menu.data.MenuFiller;
+import su.nightexpress.dungeons.nightcore.ui.menu.data.MenuLoader;
+import su.nightexpress.dungeons.nightcore.ui.menu.item.ItemHandler;
+import su.nightexpress.dungeons.nightcore.ui.menu.item.ItemOptions;
+import su.nightexpress.dungeons.nightcore.ui.menu.item.MenuItem;
+import su.nightexpress.dungeons.nightcore.ui.menu.type.LinkedMenu;
+import su.nightexpress.dungeons.nightcore.util.Lists;
+import su.nightexpress.dungeons.nightcore.util.bukkit.NightItem;
+import su.nightexpress.dungeons.nightcore.util.placeholder.Replacer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,7 +36,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static su.nightexpress.dungeons.Placeholders.*;
-import static su.nightexpress.nightcore.util.text.tag.Tags.*;
+import static su.nightexpress.dungeons.nightcore.util.text.night.wrapper.TagWrappers.*;
 
 @SuppressWarnings("UnstableApiUsage")
 public class KitShopMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> implements Filled<Kit>, ConfigBased {

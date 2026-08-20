@@ -3,7 +3,7 @@ package su.nightexpress.dungeons.dungeon.script.condition;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nightexpress.dungeons.dungeon.script.condition.impl.*;
-import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
 import java.util.HashMap;
 import java.util.Map;

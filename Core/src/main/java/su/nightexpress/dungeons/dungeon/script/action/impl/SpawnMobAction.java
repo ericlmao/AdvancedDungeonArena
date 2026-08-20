@@ -12,7 +12,7 @@ import su.nightexpress.dungeons.dungeon.script.action.Action;
 import su.nightexpress.dungeons.dungeon.script.action.ActionId;
 import su.nightexpress.dungeons.registry.mob.MobRegistry;
 import su.nightexpress.dungeons.util.ErrorHandler;
-import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
 public class SpawnMobAction implements Action {
 

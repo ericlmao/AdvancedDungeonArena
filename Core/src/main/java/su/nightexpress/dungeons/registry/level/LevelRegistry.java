@@ -6,7 +6,7 @@ import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.hook.HookId;
 import su.nightexpress.dungeons.registry.level.provider.AuroraLevelsProvider;
 import su.nightexpress.dungeons.registry.level.provider.MMOCoreLevelProvider;
-import su.nightexpress.nightcore.util.Plugins;
+import su.nightexpress.dungeons.nightcore.util.Plugins;
 
 import java.util.HashMap;
 import java.util.HashSet;

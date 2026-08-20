@@ -7,8 +7,8 @@ import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
 import su.nightexpress.dungeons.dungeon.script.action.Action;
 import su.nightexpress.dungeons.dungeon.script.action.ActionId;
 import su.nightexpress.dungeons.config.Lang;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
 public class DungeonEndAction implements Action {
 

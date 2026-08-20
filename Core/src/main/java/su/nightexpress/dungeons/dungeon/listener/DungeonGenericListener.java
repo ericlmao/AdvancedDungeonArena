@@ -8,7 +8,7 @@ import org.bukkit.event.world.WorldUnloadEvent;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.dungeon.DungeonManager;
-import su.nightexpress.nightcore.manager.AbstractListener;
+import su.nightexpress.dungeons.nightcore.manager.AbstractListener;
 
 public class DungeonGenericListener extends AbstractListener<DungeonPlugin> {
 

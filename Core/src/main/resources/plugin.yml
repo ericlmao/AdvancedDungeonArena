@@ -3,11 +3,12 @@ version: '${version}'
 name: AdvancedDungeonArena
 description: Advanced and poweful dungeon & mob arena creator.
 author: NightExpress
-depend: [ nightcore ]
 softdepend:
   - MythicMobs
   - mcMMO
   - PlaceholderAPI
   - CombatPets
+  - Vault
+  - SunLight
 
 api-version: 1.21

@@ -7,13 +7,12 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDi
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerResetScore;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerScoreboardObjective;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateScore;
-import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentSerializer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.dungeons.dungeon.player.DungeonGamer;
 import su.nightexpress.dungeons.dungeon.feature.board.AbstractBoard;
 import su.nightexpress.dungeons.dungeon.feature.board.BoardLayout;
-import su.nightexpress.nightcore.util.text.NightMessage;
+import su.nightexpress.dungeons.nightcore.util.text.night.NightMessage;
 
 import java.util.Optional;
 
@@ -35,7 +34,7 @@ public class PacketsBoard extends AbstractBoard<PacketWrapper<?>> {
         return new WrapperPlayServerScoreboardObjective(
             this.identifier,
             objectiveMode,
-            GsonComponentSerializer.gson().deserialize(NightMessage.asJson(displayName)),
+            NightMessage.parse(displayName),
             WrapperPlayServerScoreboardObjective.RenderType.INTEGER,
             ScoreFormat.blankScore()
         );
@@ -57,7 +56,7 @@ public class PacketsBoard extends AbstractBoard<PacketWrapper<?>> {
             Optional.of(score)
         );
 
-        scorePacket.setEntityDisplayName(GsonComponentSerializer.gson().deserialize(NightMessage.asJson(text)));
+        scorePacket.setEntityDisplayName(NightMessage.parse(text));
         scorePacket.setScoreFormat(ScoreFormat.blankScore());
 
         return scorePacket;

@@ -1,9 +1,9 @@
 package su.nightexpress.dungeons.api.mob;
 
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.config.Writeable;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.Writeable;
 
 import java.util.Objects;
 

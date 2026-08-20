@@ -5,7 +5,7 @@ import org.bukkit.event.block.Action;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.dungeons.config.Lang;
 import su.nightexpress.dungeons.selection.SelectionType;
-import su.nightexpress.nightcore.util.geodata.pos.BlockPos;
+import su.nightexpress.dungeons.nightcore.util.geodata.pos.BlockPos;
 
 import java.util.LinkedHashSet;
 

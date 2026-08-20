@@ -5,12 +5,12 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.dungeons.config.Lang;
-import su.nightexpress.nightcore.bridge.currency.Currency;
-import su.nightexpress.nightcore.integration.currency.EconomyBridge;
-import su.nightexpress.nightcore.language.LangAssets;
-import su.nightexpress.nightcore.locale.entry.TextLocale;
-import su.nightexpress.nightcore.util.NumberUtil;
-import su.nightexpress.nightcore.util.placeholder.Replacer;
+import su.nightexpress.dungeons.nightcore.bridge.currency.Currency;
+import su.nightexpress.dungeons.nightcore.integration.currency.EconomyBridge;
+import su.nightexpress.dungeons.nightcore.util.LangUtil;
+import su.nightexpress.dungeons.nightcore.locale.entry.TextLocale;
+import su.nightexpress.dungeons.nightcore.util.NumberUtil;
+import su.nightexpress.dungeons.nightcore.util.placeholder.Replacer;
 
 import static su.nightexpress.dungeons.Placeholders.*;
 
@@ -42,7 +42,7 @@ public class UIUtils {
     @NotNull
     public static String formatPotionEffectEntry(@NotNull PotionEffect effect) {
         return Replacer.create()
-            .replace(GENERIC_NAME, LangAssets.get(effect.getType()))
+            .replace(GENERIC_NAME, LangUtil.getSerializedName(effect.getType()))
             .replace(GENERIC_AMOUNT, NumberUtil.toRoman(effect.getAmplifier() + 1))
             .apply(Lang.UI_POTION_EFFECT_ENTRY.text());
     }

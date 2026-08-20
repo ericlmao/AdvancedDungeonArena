@@ -55,12 +55,20 @@ public abstract class AbstractCommand<N extends ExecutableNode> extends Command 
 
     @Override
     public boolean register() {
-        return CommandUtil.register(this, this.plugin.getName());
+        boolean registered = CommandUtil.register(this, this.plugin.getName());
+        // Upstream never refreshed the client-side command tree, so commands registered at runtime
+        // (i.e. on every reload) stayed invisible to tab-completion until relog.
+        if (registered) CommandUtil.syncCommands();
+
+        return registered;
     }
 
     @Override
     public boolean unregister() {
-        return CommandUtil.unregister(this);
+        boolean unregistered = CommandUtil.unregister(this);
+        if (unregistered) CommandUtil.syncCommands();
+
+        return unregistered;
     }
 
     @Override

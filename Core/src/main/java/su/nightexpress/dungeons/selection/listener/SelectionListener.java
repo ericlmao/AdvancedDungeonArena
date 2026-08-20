@@ -17,7 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.selection.SelectionManager;
-import su.nightexpress.nightcore.manager.AbstractListener;
+import su.nightexpress.dungeons.nightcore.manager.AbstractListener;
 
 import java.util.stream.Stream;
 

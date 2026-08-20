@@ -3,8 +3,8 @@ package su.nightexpress.dungeons.dungeon.game;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nightexpress.dungeons.Placeholders;
-import su.nightexpress.nightcore.util.NumberUtil;
-import su.nightexpress.nightcore.util.placeholder.Replacer;
+import su.nightexpress.dungeons.nightcore.util.NumberUtil;
+import su.nightexpress.dungeons.nightcore.util.placeholder.Replacer;
 
 import java.util.HashMap;
 import java.util.Map;

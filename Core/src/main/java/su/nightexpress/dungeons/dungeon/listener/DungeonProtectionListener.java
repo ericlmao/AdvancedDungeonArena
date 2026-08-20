@@ -19,7 +19,7 @@ import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.dungeon.DungeonManager;
-import su.nightexpress.nightcore.manager.AbstractListener;
+import su.nightexpress.dungeons.nightcore.manager.AbstractListener;
 
 public class DungeonProtectionListener extends AbstractListener<DungeonPlugin> {
 

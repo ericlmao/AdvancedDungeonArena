@@ -9,8 +9,8 @@ import su.nightexpress.dungeons.dungeon.script.task.TaskId;
 import su.nightexpress.dungeons.dungeon.script.task.type.AreaTask;
 import su.nightexpress.dungeons.dungeon.stage.StageTask;
 import su.nightexpress.dungeons.dungeon.stage.task.TaskProgress;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.util.geodata.pos.BlockPos;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.util.geodata.pos.BlockPos;
 
 public class StayInTask extends AreaTask {
 

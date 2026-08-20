@@ -6,7 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.DungeonsAPI;
-import su.nightexpress.nightcore.manager.AbstractListener;
+import su.nightexpress.dungeons.nightcore.manager.AbstractListener;
 
 public final class McMMOHook extends AbstractListener<DungeonPlugin> {
 

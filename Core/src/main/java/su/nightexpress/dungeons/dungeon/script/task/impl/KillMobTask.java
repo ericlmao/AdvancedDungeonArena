@@ -10,7 +10,7 @@ import su.nightexpress.dungeons.dungeon.script.task.Task;
 import su.nightexpress.dungeons.dungeon.script.task.TaskId;
 import su.nightexpress.dungeons.dungeon.stage.StageTask;
 import su.nightexpress.dungeons.dungeon.stage.task.TaskProgress;
-import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
 public class KillMobTask implements Task {
 

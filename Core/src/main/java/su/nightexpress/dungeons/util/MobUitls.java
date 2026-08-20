@@ -15,15 +15,14 @@ import su.nightexpress.dungeons.config.Keys;
 import su.nightexpress.dungeons.api.mob.MobIdentifier;
 import su.nightexpress.dungeons.registry.pet.PetRegistry;
 import su.nightexpress.dungeons.dungeon.feature.KillStreak;
-import su.nightexpress.nightcore.language.tag.MessageTags;
-import su.nightexpress.nightcore.util.BukkitThing;
-import su.nightexpress.nightcore.util.Lists;
-import su.nightexpress.nightcore.util.PDCUtil;
-import su.nightexpress.nightcore.util.random.Rnd;
+import su.nightexpress.dungeons.nightcore.util.BukkitThing;
+import su.nightexpress.dungeons.nightcore.util.Lists;
+import su.nightexpress.dungeons.nightcore.util.PDCUtil;
+import su.nightexpress.dungeons.nightcore.util.random.Rnd;
 
 import java.util.*;
 
-import static su.nightexpress.nightcore.util.text.tag.Tags.*;
+import static su.nightexpress.dungeons.nightcore.util.text.night.wrapper.TagWrappers.*;
 import static su.nightexpress.dungeons.Placeholders.*;
 
 public class MobUitls {
@@ -65,9 +64,10 @@ public class MobUitls {
     public static Map<String, KillStreak> getDefaultKillStreaks() {
         Map<String, KillStreak> map = new HashMap<>();
 
-        String title = MessageTags.OUTPUT.wrap(10, 50);
-        String pentaText = title + LIGHT_CYAN.wrap(BOLD.wrap("Penta Kill!")) + TAG_LINE_BREAK + LIGHT_PURPLE.wrap("(+50$)");
-        String text15 = title + YELLOW.wrap(BOLD.wrap("x" + GENERIC_AMOUNT + " Kill!")) + TAG_LINE_BREAK + LIGHT_YELLOW.wrap("(Heal)");
+        // Was MessageTags.OUTPUT.wrap(10, 50) - the legacy lang system's bracket-data prefix.
+        String title = "[type=\"title\",title_times=\"10:50:20\"]";
+        String pentaText = title + LIGHT_CYAN.wrap(BOLD.wrap("Penta Kill!")) + BR + LIGHT_PURPLE.wrap("(+50$)");
+        String text15 = title + YELLOW.wrap(BOLD.wrap("x" + GENERIC_AMOUNT + " Kill!")) + BR + LIGHT_YELLOW.wrap("(Heal)");
 
         map.put("5", new KillStreak("5", 5, false, pentaText, Lists.newList("eco give " + PLAYER_NAME + " 50")));
         map.put("15", new KillStreak("15", 15, false, text15, Lists.newList("heal " + PLAYER_NAME)));

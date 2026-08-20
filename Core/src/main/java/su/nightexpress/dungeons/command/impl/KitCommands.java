@@ -9,13 +9,13 @@ import su.nightexpress.dungeons.config.Lang;
 import su.nightexpress.dungeons.config.Perms;
 import su.nightexpress.dungeons.kit.KitUtils;
 import su.nightexpress.dungeons.kit.impl.Kit;
-import su.nightexpress.nightcore.commands.Arguments;
-import su.nightexpress.nightcore.commands.Commands;
-import su.nightexpress.nightcore.commands.builder.HubNodeBuilder;
-import su.nightexpress.nightcore.commands.context.CommandContext;
-import su.nightexpress.nightcore.commands.context.ParsedArguments;
-import su.nightexpress.nightcore.core.config.CoreLang;
-import su.nightexpress.nightcore.locale.entry.MessageLocale;
+import su.nightexpress.dungeons.nightcore.commands.Arguments;
+import su.nightexpress.dungeons.nightcore.commands.Commands;
+import su.nightexpress.dungeons.nightcore.commands.builder.HubNodeBuilder;
+import su.nightexpress.dungeons.nightcore.commands.context.CommandContext;
+import su.nightexpress.dungeons.nightcore.commands.context.ParsedArguments;
+import su.nightexpress.dungeons.nightcore.core.config.CoreLang;
+import su.nightexpress.dungeons.nightcore.locale.entry.MessageLocale;
 
 public class KitCommands {
 

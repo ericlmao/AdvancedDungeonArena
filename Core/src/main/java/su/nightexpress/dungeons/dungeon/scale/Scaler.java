@@ -2,8 +2,8 @@ package su.nightexpress.dungeons.dungeon.scale;
 
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.config.Writeable;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.Writeable;
 
 public class Scaler implements Writeable {
 

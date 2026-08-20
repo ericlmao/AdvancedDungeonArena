@@ -12,9 +12,9 @@ import org.jetbrains.annotations.Nullable;
 import su.nightexpress.dungeons.api.dungeon.DungeonPlayer;
 import su.nightexpress.dungeons.config.Config;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
-import su.nightexpress.nightcore.util.EntityUtil;
-import su.nightexpress.nightcore.util.Players;
-import su.nightexpress.nightcore.util.geodata.pos.ExactPos;
+import su.nightexpress.dungeons.nightcore.util.EntityUtil;
+import su.nightexpress.dungeons.nightcore.util.Players;
+import su.nightexpress.dungeons.nightcore.util.geodata.pos.ExactPos;
 
 import java.util.*;
 

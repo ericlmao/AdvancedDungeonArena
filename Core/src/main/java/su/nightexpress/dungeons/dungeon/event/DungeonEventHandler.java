@@ -11,9 +11,9 @@ import su.nightexpress.dungeons.dungeon.script.condition.ConditionInfo;
 import su.nightexpress.dungeons.dungeon.script.condition.ConditionRegistry;
 import su.nightexpress.dungeons.util.ErrorHandler;
 import su.nightexpress.dungeons.util.PredicateParser;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.config.Writeable;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.Writeable;
 
 import java.util.*;
 import java.util.stream.Collectors;

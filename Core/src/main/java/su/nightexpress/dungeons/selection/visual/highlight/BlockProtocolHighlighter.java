@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.selection.visual.FakeEntity;
-import su.nightexpress.nightcore.util.Lists;
+import su.nightexpress.dungeons.nightcore.util.Lists;
 
 import java.util.*;
 import java.util.function.Consumer;

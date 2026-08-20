@@ -9,9 +9,9 @@ import su.nightexpress.dungeons.config.Config;
 import su.nightexpress.dungeons.config.Lang;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.player.DungeonGamer;
-import su.nightexpress.nightcore.locale.entry.TextLocale;
-import su.nightexpress.nightcore.util.Players;
-import su.nightexpress.nightcore.util.placeholder.Replacer;
+import su.nightexpress.dungeons.nightcore.locale.entry.TextLocale;
+import su.nightexpress.dungeons.nightcore.util.Players;
+import su.nightexpress.dungeons.nightcore.util.placeholder.Replacer;
 
 import java.util.ArrayList;
 import java.util.HashMap;

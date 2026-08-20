@@ -2,7 +2,7 @@ package su.nightexpress.dungeons.dungeon.criteria;
 
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.dungeons.api.criteria.CriteriaValidator;
-import su.nightexpress.nightcore.util.Enums;
+import su.nightexpress.dungeons.nightcore.util.Enums;
 
 import java.util.function.Function;
 

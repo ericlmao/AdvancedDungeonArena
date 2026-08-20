@@ -9,9 +9,9 @@ import su.nightexpress.dungeons.api.type.MobFaction;
 import su.nightexpress.dungeons.config.Lang;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.player.DungeonGamer;
-import su.nightexpress.nightcore.core.config.CoreLang;
-import su.nightexpress.nightcore.util.NumberUtil;
-import su.nightexpress.nightcore.util.time.TimeFormats;
+import su.nightexpress.dungeons.nightcore.core.config.CoreLang;
+import su.nightexpress.dungeons.nightcore.util.NumberUtil;
+import su.nightexpress.dungeons.nightcore.util.time.TimeFormats;
 
 public class PlaceholderHook {
 

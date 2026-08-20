@@ -8,7 +8,7 @@ import su.nightexpress.dungeons.dungeon.script.action.ActionId;
 import su.nightexpress.dungeons.dungeon.stage.Stage;
 import su.nightexpress.dungeons.dungeon.stage.StageTask;
 import su.nightexpress.dungeons.util.ErrorHandler;
-import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
 public class RemoveTaskAction implements Action {
 

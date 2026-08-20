@@ -1,7 +1,7 @@
 package su.nightexpress.dungeons.dungeon.game;
 
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.nightcore.util.NumberUtil;
+import su.nightexpress.dungeons.nightcore.util.NumberUtil;
 
 import java.util.function.Function;
 

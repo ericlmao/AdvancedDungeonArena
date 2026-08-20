@@ -7,8 +7,8 @@ import org.jetbrains.annotations.Nullable;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.config.Lang;
 import su.nightexpress.dungeons.selection.SelectionType;
-import su.nightexpress.nightcore.util.geodata.Cuboid;
-import su.nightexpress.nightcore.util.geodata.pos.BlockPos;
+import su.nightexpress.dungeons.nightcore.util.geodata.Cuboid;
+import su.nightexpress.dungeons.nightcore.util.geodata.pos.BlockPos;
 
 public class CuboidSelection extends Selection {
 

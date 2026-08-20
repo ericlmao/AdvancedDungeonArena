@@ -8,12 +8,12 @@ import su.nightexpress.dungeons.config.Config;
 import su.nightexpress.dungeons.dungeon.config.DungeonConfig;
 import su.nightexpress.dungeons.dungeon.feature.board.BoardLayout;
 import su.nightexpress.dungeons.kit.impl.Kit;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.config.Writeable;
-import su.nightexpress.nightcore.util.CommandUtil;
-import su.nightexpress.nightcore.util.Lists;
-import su.nightexpress.nightcore.util.StringUtil;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.Writeable;
+import su.nightexpress.dungeons.nightcore.util.CommandUtil;
+import su.nightexpress.dungeons.nightcore.util.Lists;
+import su.nightexpress.dungeons.nightcore.util.StringUtil;
 
 import java.util.*;
 

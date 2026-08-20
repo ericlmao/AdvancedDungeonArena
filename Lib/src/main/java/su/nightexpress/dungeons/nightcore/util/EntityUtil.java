@@ -22,6 +22,21 @@ import java.util.function.Consumer;
 
 public class EntityUtil {
 
+    /**
+     * Fake (packet-only) entity ids.
+     * <p>
+     * Upstream reflected into {@code net.minecraft.world.entity.Entity#ENTITY_COUNTER}. Paper exposes no
+     * public equivalent, so this counts down from {@link Integer#MAX_VALUE} instead: the server allocates
+     * real ids upwards from 0, so the two ranges cannot realistically meet.
+     */
+    private static final java.util.concurrent.atomic.AtomicInteger FAKE_ENTITY_IDS =
+        new java.util.concurrent.atomic.AtomicInteger(Integer.MAX_VALUE);
+
+    public static int nextEntityId() {
+        return FAKE_ENTITY_IDS.decrementAndGet();
+    }
+
+
     public static final EquipmentSlot[] EQUIPMENT_SLOTS = {EquipmentSlot.HAND, EquipmentSlot.OFF_HAND, EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET
     };
 

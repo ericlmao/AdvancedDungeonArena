@@ -2,7 +2,7 @@ package su.nightexpress.dungeons.selection.visual;
 
 import org.bukkit.block.data.BlockData;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.nightcore.util.geodata.pos.BlockPos;
+import su.nightexpress.dungeons.nightcore.util.geodata.pos.BlockPos;
 
 public class BlockInfo {
 

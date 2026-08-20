@@ -11,8 +11,8 @@ import su.nightexpress.dungeons.dungeon.stage.task.GlobalProgress;
 import su.nightexpress.dungeons.dungeon.stage.task.PersonalProgress;
 import su.nightexpress.dungeons.dungeon.stage.task.TaskProgress;
 import su.nightexpress.dungeons.util.ErrorHandler;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.config.Writeable;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.Writeable;
 
 public class StageTask implements Writeable {
 

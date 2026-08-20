@@ -1,10 +1,10 @@
 package su.nightexpress.dungeons.dungeon.script.task;
 
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.config.Writeable;
-import su.nightexpress.nightcore.util.wrapper.UniInt;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.Writeable;
+import su.nightexpress.dungeons.nightcore.util.wrapper.UniInt;
 
 public class TaskParams implements Writeable {
 

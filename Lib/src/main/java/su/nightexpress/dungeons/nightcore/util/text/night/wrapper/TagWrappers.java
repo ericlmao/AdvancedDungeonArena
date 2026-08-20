@@ -146,6 +146,17 @@ public class TagWrappers {
     public static final SimpleTagWrapper PINK      = TagWrapper.simple(TagShortNames.PINK);
     public static final SimpleTagWrapper SOFT_PINK = TagWrapper.simple(TagShortNames.SOFT_PINK);
 
+    // Legacy `Tags.*` aliases, kept so the migrated call sites emit byte-identical markup.
+    public static final SimpleTagWrapper CYAN         = TagWrapper.simple(TagShortNames.CYAN);
+    public static final SimpleTagWrapper LIGHT_GRAY   = TagWrapper.simple(TagShortNames.LIGHT_GRAY);
+    public static final SimpleTagWrapper LIGHT_GREEN  = TagWrapper.simple(TagShortNames.LIGHT_GREEN);
+    public static final SimpleTagWrapper LIGHT_YELLOW = TagWrapper.simple(TagShortNames.LIGHT_YELLOW);
+    public static final SimpleTagWrapper LIGHT_ORANGE = TagWrapper.simple(TagShortNames.LIGHT_ORANGE);
+    public static final SimpleTagWrapper LIGHT_RED    = TagWrapper.simple(TagShortNames.LIGHT_RED);
+    public static final SimpleTagWrapper LIGHT_BLUE   = TagWrapper.simple(TagShortNames.LIGHT_BLUE);
+    public static final SimpleTagWrapper LIGHT_CYAN   = TagWrapper.simple(TagShortNames.LIGHT_CYAN);
+    public static final SimpleTagWrapper LIGHT_PINK   = TagWrapper.simple(TagShortNames.LIGHT_PINK);
+
 
     public interface OneArgument<T extends TagWrapper> {
 

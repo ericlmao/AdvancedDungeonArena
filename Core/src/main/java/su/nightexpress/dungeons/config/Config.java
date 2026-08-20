@@ -10,17 +10,17 @@ import su.nightexpress.dungeons.registry.mob.MobProviderId;
 import su.nightexpress.dungeons.dungeon.feature.KillStreak;
 import su.nightexpress.dungeons.util.DungeonUtils;
 import su.nightexpress.dungeons.util.MobUitls;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.util.BukkitThing;
-import su.nightexpress.nightcore.util.Lists;
-import su.nightexpress.nightcore.util.Plugins;
-import su.nightexpress.nightcore.util.bukkit.NightItem;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.util.BukkitThing;
+import su.nightexpress.dungeons.nightcore.util.Lists;
+import su.nightexpress.dungeons.nightcore.util.Plugins;
+import su.nightexpress.dungeons.nightcore.util.bukkit.NightItem;
 
 import java.util.Map;
 import java.util.Set;
 
 import static su.nightexpress.dungeons.Placeholders.*;
-import static su.nightexpress.nightcore.util.text.tag.Tags.*;
+import static su.nightexpress.dungeons.nightcore.util.text.night.wrapper.TagWrappers.*;
 
 public class Config {
 

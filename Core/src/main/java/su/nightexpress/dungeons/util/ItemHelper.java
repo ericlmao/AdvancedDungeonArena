@@ -3,16 +3,16 @@ package su.nightexpress.dungeons.util;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nightexpress.nightcore.bridge.item.AdaptedItem;
-import su.nightexpress.nightcore.bridge.item.ItemAdapter;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.integration.item.ItemBridge;
-import su.nightexpress.nightcore.integration.item.adapter.IdentifiableItemAdapter;
-import su.nightexpress.nightcore.integration.item.data.ItemIdData;
-import su.nightexpress.nightcore.integration.item.impl.AdaptedCustomStack;
-import su.nightexpress.nightcore.integration.item.impl.AdaptedItemStack;
-import su.nightexpress.nightcore.integration.item.impl.AdaptedVanillaStack;
-import su.nightexpress.nightcore.util.ItemTag;
+import su.nightexpress.dungeons.nightcore.bridge.item.AdaptedItem;
+import su.nightexpress.dungeons.nightcore.bridge.item.ItemAdapter;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.integration.item.ItemBridge;
+import su.nightexpress.dungeons.nightcore.integration.item.adapter.IdentifiableItemAdapter;
+import su.nightexpress.dungeons.nightcore.integration.item.data.ItemIdData;
+import su.nightexpress.dungeons.nightcore.integration.item.impl.AdaptedCustomStack;
+import su.nightexpress.dungeons.nightcore.integration.item.impl.AdaptedItemStack;
+import su.nightexpress.dungeons.nightcore.integration.item.impl.AdaptedVanillaStack;
+import su.nightexpress.dungeons.nightcore.util.ItemTag;
 
 import java.util.Optional;
 

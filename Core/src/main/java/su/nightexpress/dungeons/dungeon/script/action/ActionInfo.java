@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
-import su.nightexpress.nightcore.util.random.Rnd;
+import su.nightexpress.dungeons.nightcore.util.random.Rnd;
 
 public class ActionInfo {
 

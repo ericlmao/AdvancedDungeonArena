@@ -3,7 +3,7 @@ package su.nightexpress.dungeons.dungeon.script.condition.type;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.dungeons.api.mob.MobIdentifier;
 import su.nightexpress.dungeons.dungeon.script.number.NumberComparator;
-import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
 @Deprecated
 public abstract class MobAmountCondition extends NumberCompareCondition {

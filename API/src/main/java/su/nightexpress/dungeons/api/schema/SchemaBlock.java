@@ -3,7 +3,7 @@ package su.nightexpress.dungeons.api.schema;
 import org.bukkit.block.data.BlockData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import su.nightexpress.nightcore.util.geodata.pos.BlockPos;
+import su.nightexpress.dungeons.nightcore.util.geodata.pos.BlockPos;
 
 public class SchemaBlock {
 

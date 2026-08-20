@@ -17,6 +17,7 @@ import org.bukkit.craftbukkit.block.CraftBlockState;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.dungeons.api.schema.SchemaBlock;
+import su.nightexpress.dungeons.nightcore.util.nbt.NbtProvider;
 import su.nightexpress.dungeons.nms.DungeonNMS;
 
 import java.io.File;
@@ -24,7 +25,57 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MC_1_21_11 implements DungeonNMS {
+public class MC_1_21_11 implements DungeonNMS, NbtProvider {
+
+    /**
+     * ItemStack &lt;-&gt; SNBT, on mojang-mapped internals.
+     * <p>
+     * Replaces nightcore's {@code util.nbt.NbtUtil}/{@code NbtSerializer}/{@code DataFixerUtil}, which
+     * reached the same code through obfuscation-mapped reflection - including a hardcoded
+     * {@code References.ITEM_STACK} field name ("u"/"t") that had to be re-checked every Minecraft
+     * release. The wire format is unchanged, so existing kit inventories and reward items still load.
+     */
+    @Override
+    @NotNull
+    public String toTagString(@NotNull org.bukkit.inventory.ItemStack itemStack) {
+        net.minecraft.world.item.ItemStack nmsStack = org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(itemStack);
+        net.minecraft.core.RegistryAccess registryAccess = net.minecraft.server.MinecraftServer.getServer().registryAccess();
+
+        Tag tag = net.minecraft.world.item.ItemStack.CODEC
+            .encodeStart(registryAccess.createSerializationContext(NbtOps.INSTANCE), nmsStack)
+            .getOrThrow(error -> new IllegalStateException("Could not encode ItemStack into NBT: " + error));
+
+        return tag.toString();
+    }
+
+    @Override
+    public org.bukkit.inventory.ItemStack fromTagString(@NotNull String tagString, int sourceDataVersion) {
+        CompoundTag tag;
+        try {
+            tag = TagParser.parseCompoundFully(tagString);
+        }
+        catch (Exception exception) {
+            return null;
+        }
+
+        net.minecraft.core.RegistryAccess registryAccess = net.minecraft.server.MinecraftServer.getServer().registryAccess();
+        int targetVersion = net.minecraft.SharedConstants.getCurrentVersion().dataVersion().version();
+
+        Tag fixed = tag;
+        if (sourceDataVersion > 0 && sourceDataVersion < targetVersion) {
+            com.mojang.serialization.Dynamic<Tag> dynamic = new com.mojang.serialization.Dynamic<>(NbtOps.INSTANCE, tag);
+            fixed = net.minecraft.util.datafix.DataFixers.getDataFixer()
+                .update(net.minecraft.util.datafix.fixes.References.ITEM_STACK, dynamic, sourceDataVersion, targetVersion)
+                .getValue();
+        }
+
+        return net.minecraft.world.item.ItemStack.CODEC
+            .parse(registryAccess.createSerializationContext(NbtOps.INSTANCE), fixed)
+            .result()
+            .map(org.bukkit.craftbukkit.inventory.CraftItemStack::asBukkitCopy)
+            .orElse(null);
+    }
+
 
     @Override
     public void setSchemaBlock(@NotNull World world, @NotNull SchemaBlock schemaBlock) {
@@ -77,7 +128,7 @@ public class MC_1_21_11 implements DungeonNMS {
             CompoundTag nbt = blockTag.getCompound("nbt").orElse(null);
 
             CraftBlockData craftBlockData = CraftBlockData.fromData(state);
-            su.nightexpress.nightcore.util.geodata.pos.BlockPos blockPos = new su.nightexpress.nightcore.util.geodata.pos.BlockPos(pos.getX(), pos.getY(), pos.getZ());
+            su.nightexpress.dungeons.nightcore.util.geodata.pos.BlockPos blockPos = new su.nightexpress.dungeons.nightcore.util.geodata.pos.BlockPos(pos.getX(), pos.getY(), pos.getZ());
 
             schemaBlocks.add(new SchemaBlock(blockPos, craftBlockData, nbt));
         });

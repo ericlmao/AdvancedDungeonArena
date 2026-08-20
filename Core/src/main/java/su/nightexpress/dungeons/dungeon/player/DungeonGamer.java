@@ -22,7 +22,7 @@ import su.nightexpress.dungeons.kit.impl.Kit;
 import su.nightexpress.dungeons.registry.compat.BoardPluginRegistry;
 import su.nightexpress.dungeons.registry.compat.GodPluginRegistry;
 import su.nightexpress.dungeons.util.DungeonUtils;
-import su.nightexpress.nightcore.locale.entry.MessageLocale;
+import su.nightexpress.dungeons.nightcore.locale.entry.MessageLocale;
 
 import java.util.ArrayList;
 import java.util.List;

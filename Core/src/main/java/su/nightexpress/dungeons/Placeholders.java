@@ -15,19 +15,19 @@ import su.nightexpress.dungeons.dungeon.spot.SpotState;
 import su.nightexpress.dungeons.dungeon.stage.Stage;
 import su.nightexpress.dungeons.kit.impl.Kit;
 import su.nightexpress.dungeons.util.UIUtils;
-import su.nightexpress.nightcore.bridge.currency.Currency;
-import su.nightexpress.nightcore.core.config.CoreLang;
-import su.nightexpress.nightcore.integration.currency.EconomyBridge;
-import su.nightexpress.nightcore.util.NumberUtil;
-import su.nightexpress.nightcore.util.placeholder.PlaceholderList;
-import su.nightexpress.nightcore.util.time.TimeFormatType;
-import su.nightexpress.nightcore.util.time.TimeFormats;
+import su.nightexpress.dungeons.nightcore.bridge.currency.Currency;
+import su.nightexpress.dungeons.nightcore.core.config.CoreLang;
+import su.nightexpress.dungeons.nightcore.integration.currency.EconomyBridge;
+import su.nightexpress.dungeons.nightcore.util.NumberUtil;
+import su.nightexpress.dungeons.nightcore.util.placeholder.PlaceholderList;
+import su.nightexpress.dungeons.nightcore.util.time.TimeFormatType;
+import su.nightexpress.dungeons.nightcore.util.time.TimeFormats;
 
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class Placeholders extends su.nightexpress.nightcore.util.Placeholders {
+public class Placeholders extends su.nightexpress.dungeons.nightcore.util.Placeholders {
 
     public static final String LINK_WIKI         = "https://nightexpressdev.com/dungeon-arena/";
     public static final String LINK_PLACEHOLDERS = LINK_WIKI + "placeholders";

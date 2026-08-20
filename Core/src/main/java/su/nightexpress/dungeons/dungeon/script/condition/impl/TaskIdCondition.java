@@ -6,8 +6,8 @@ import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
 import su.nightexpress.dungeons.dungeon.event.game.TaskEvent;
 import su.nightexpress.dungeons.dungeon.script.condition.Condition;
 import su.nightexpress.dungeons.dungeon.script.condition.ConditionId;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
 public class TaskIdCondition implements Condition {
 

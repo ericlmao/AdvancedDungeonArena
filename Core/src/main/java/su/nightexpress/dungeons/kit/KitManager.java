@@ -16,11 +16,11 @@ import su.nightexpress.dungeons.kit.impl.Kit;
 import su.nightexpress.dungeons.kit.menu.KitPreviewMenu;
 import su.nightexpress.dungeons.kit.menu.KitSelectMenu;
 import su.nightexpress.dungeons.kit.menu.KitShopMenu;
-import su.nightexpress.nightcore.manager.AbstractManager;
-import su.nightexpress.nightcore.util.FileUtil;
-import su.nightexpress.nightcore.util.PDCUtil;
-import su.nightexpress.nightcore.util.StringUtil;
-import su.nightexpress.nightcore.util.bukkit.NightItem;
+import su.nightexpress.dungeons.nightcore.manager.AbstractManager;
+import su.nightexpress.dungeons.nightcore.util.FileUtil;
+import su.nightexpress.dungeons.nightcore.util.PDCUtil;
+import su.nightexpress.dungeons.nightcore.util.StringUtil;
+import su.nightexpress.dungeons.nightcore.util.bukkit.NightItem;
 
 import java.io.File;
 import java.util.*;

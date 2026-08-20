@@ -2,10 +2,10 @@ package su.nightexpress.dungeons.dungeon.config;
 
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.dungeons.api.dungeon.DungeonSpawner;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.util.Lists;
-import su.nightexpress.nightcore.util.geodata.pos.BlockPos;
-import su.nightexpress.nightcore.util.random.Rnd;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.util.Lists;
+import su.nightexpress.dungeons.nightcore.util.geodata.pos.BlockPos;
+import su.nightexpress.dungeons.nightcore.util.random.Rnd;
 
 import java.util.Objects;
 import java.util.Set;

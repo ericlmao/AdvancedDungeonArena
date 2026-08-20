@@ -29,15 +29,15 @@ import su.nightexpress.dungeons.dungeon.stage.Stage;
 import su.nightexpress.dungeons.dungeon.stage.StageTask;
 import su.nightexpress.dungeons.hook.HookId;
 import su.nightexpress.dungeons.registry.mob.MobProviderId;
-import su.nightexpress.nightcore.util.Lists;
-import su.nightexpress.nightcore.util.Plugins;
-import su.nightexpress.nightcore.util.bukkit.NightItem;
-import su.nightexpress.nightcore.util.wrapper.UniInt;
+import su.nightexpress.dungeons.nightcore.util.Lists;
+import su.nightexpress.dungeons.nightcore.util.Plugins;
+import su.nightexpress.dungeons.nightcore.util.bukkit.NightItem;
+import su.nightexpress.dungeons.nightcore.util.wrapper.UniInt;
 
 import java.util.*;
 
 import static su.nightexpress.dungeons.Placeholders.*;
-import static su.nightexpress.nightcore.util.text.tag.Tags.*;
+import static su.nightexpress.dungeons.nightcore.util.text.night.wrapper.TagWrappers.*;
 
 public class DungeonUtils {
 

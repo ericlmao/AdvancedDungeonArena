@@ -7,7 +7,7 @@ import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.api.mob.MobProvider;
 import su.nightexpress.dungeons.hook.HookId;
 import su.nightexpress.dungeons.registry.mob.provider.MythicMobProvider;
-import su.nightexpress.nightcore.util.Plugins;
+import su.nightexpress.dungeons.nightcore.util.Plugins;
 
 import java.util.HashMap;
 import java.util.HashSet;

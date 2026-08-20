@@ -15,7 +15,7 @@ import java.util.Set;
 
 public abstract class AbstractManager<P extends NightPlugin> extends SimpleManager<P> {
 
-    protected final Set<SimpeListener> listeners;
+    protected final Set<SimpleListener> listeners;
     @Deprecated protected final Set<Menu> menus;
     protected final List<NightTask> taskList;
 
@@ -32,12 +32,12 @@ public abstract class AbstractManager<P extends NightPlugin> extends SimpleManag
         this.taskList.clear();
         this.menus.forEach(Menu::clear);
         this.menus.clear();
-        this.listeners.forEach(SimpeListener::unregisterListeners);
+        this.listeners.forEach(SimpleListener::unregisterListeners);
         this.listeners.clear();
         super.shutdown();
     }
 
-    protected void addListener(@NonNull SimpeListener listener) {
+    protected void addListener(@NonNull SimpleListener listener) {
         if (this.listeners.add(listener)) {
             listener.registerListeners();
         }

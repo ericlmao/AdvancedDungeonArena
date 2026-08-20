@@ -3,7 +3,7 @@ package su.nightexpress.dungeons.nightcore.manager;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
-public interface SimpeListener extends Listener {
+public interface SimpleListener extends Listener {
 
     void registerListeners();
 

@@ -5,7 +5,7 @@ import su.nightexpress.dungeons.DungeonsAPI;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.script.action.Action;
 import su.nightexpress.dungeons.dungeon.script.condition.Condition;
-import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
 public class ErrorHandler {
 

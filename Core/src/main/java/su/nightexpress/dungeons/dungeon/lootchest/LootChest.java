@@ -9,11 +9,11 @@ import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.scale.ScalableAmount;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.manager.AbstractFileData;
-import su.nightexpress.nightcore.util.geodata.pos.BlockPos;
-import su.nightexpress.nightcore.util.random.Rnd;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.manager.AbstractFileData;
+import su.nightexpress.dungeons.nightcore.util.geodata.pos.BlockPos;
+import su.nightexpress.dungeons.nightcore.util.random.Rnd;
 
 import java.io.File;
 import java.util.HashMap;

@@ -1,7 +1,7 @@
 package su.nightexpress.dungeons.api.dungeon;
 
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.nightcore.util.geodata.pos.ChunkPos;
+import su.nightexpress.dungeons.nightcore.util.geodata.pos.ChunkPos;
 
 import java.util.Objects;
 

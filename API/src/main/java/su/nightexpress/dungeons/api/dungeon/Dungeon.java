@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import su.nightexpress.dungeons.api.mob.MobProvider;
 import su.nightexpress.dungeons.api.type.GameState;
 import su.nightexpress.dungeons.api.type.MobFaction;
-import su.nightexpress.nightcore.util.geodata.pos.BlockPos;
+import su.nightexpress.dungeons.nightcore.util.geodata.pos.BlockPos;
 
 import java.util.Set;
 import java.util.UUID;

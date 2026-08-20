@@ -7,8 +7,8 @@ import su.nightexpress.dungeons.dungeon.script.condition.Condition;
 import su.nightexpress.dungeons.dungeon.script.condition.ConditionId;
 import su.nightexpress.dungeons.dungeon.stage.StageTask;
 import su.nightexpress.dungeons.util.ErrorHandler;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
 public class TaskCompletedCondition implements Condition {
 

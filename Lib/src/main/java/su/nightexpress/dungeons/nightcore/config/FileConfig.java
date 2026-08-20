@@ -601,7 +601,9 @@ public class FileConfig extends YamlConfiguration {
 
 
     public <T extends Enum<T>> List<T> getEnumList(String path, Class<T> clazz) {
-        return this.getStringSet(path).stream().map(str -> Enums.parse(str, clazz).orElse(null))
+        // Upstream built this from getStringSet, which silently dropped duplicates and lost ordering
+        // despite the List return type.
+        return this.getStringList(path).stream().map(str -> Enums.parse(str, clazz).orElse(null))
             .filter(Objects::nonNull).toList();
     }
 

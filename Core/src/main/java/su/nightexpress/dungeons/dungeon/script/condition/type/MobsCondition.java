@@ -7,7 +7,7 @@ import su.nightexpress.dungeons.dungeon.criteria.CriteriaMap;
 import su.nightexpress.dungeons.dungeon.criteria.registry.CriteriaRegistry;
 import su.nightexpress.dungeons.dungeon.script.number.NumberComparator;
 import su.nightexpress.dungeons.dungeon.stage.Stage;
-import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
 public abstract class MobsCondition extends NumberCompareCondition {
 

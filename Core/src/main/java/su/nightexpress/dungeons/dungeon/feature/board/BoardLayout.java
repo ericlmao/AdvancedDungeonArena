@@ -1,8 +1,8 @@
 package su.nightexpress.dungeons.dungeon.feature.board;
 
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.config.Writeable;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.Writeable;
 
 import java.util.ArrayList;
 import java.util.List;

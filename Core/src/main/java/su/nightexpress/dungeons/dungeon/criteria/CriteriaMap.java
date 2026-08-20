@@ -4,8 +4,8 @@ import org.jetbrains.annotations.NotNull;
 import su.nightexpress.dungeons.api.criteria.CriteriaPredicate;
 import su.nightexpress.dungeons.api.criteria.CriteriaProvider;
 import su.nightexpress.dungeons.dungeon.criteria.registry.CriteriaHolder;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.config.Writeable;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.Writeable;
 
 import java.util.HashMap;
 import java.util.Map;

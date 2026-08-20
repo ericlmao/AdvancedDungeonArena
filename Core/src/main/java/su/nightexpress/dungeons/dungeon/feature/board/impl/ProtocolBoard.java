@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import su.nightexpress.dungeons.dungeon.player.DungeonGamer;
 import su.nightexpress.dungeons.dungeon.feature.board.AbstractBoard;
 import su.nightexpress.dungeons.dungeon.feature.board.BoardLayout;
-import su.nightexpress.nightcore.util.text.NightMessage;
+import su.nightexpress.dungeons.nightcore.util.text.night.NightMessage;
 
 import java.util.Optional;
 

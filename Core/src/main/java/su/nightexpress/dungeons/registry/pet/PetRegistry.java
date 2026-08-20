@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.hook.HookId;
 import su.nightexpress.dungeons.registry.pet.provider.CombatPetsProvider;
-import su.nightexpress.nightcore.util.Plugins;
+import su.nightexpress.dungeons.nightcore.util.Plugins;
 
 import java.util.*;
 import java.util.function.Supplier;

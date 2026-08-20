@@ -51,18 +51,18 @@ import su.nightexpress.dungeons.user.DungeonUser;
 import su.nightexpress.dungeons.util.DungeonUtils;
 import su.nightexpress.dungeons.util.ErrorHandler;
 import su.nightexpress.dungeons.util.MobUitls;
-import su.nightexpress.nightcore.integration.currency.EconomyBridge;
-import su.nightexpress.nightcore.locale.entry.MessageLocale;
-import su.nightexpress.nightcore.locale.message.LangMessage;
-import su.nightexpress.nightcore.util.EntityUtil;
-import su.nightexpress.nightcore.util.ItemUtil;
-import su.nightexpress.nightcore.util.Players;
-import su.nightexpress.nightcore.util.geodata.pos.BlockPos;
-import su.nightexpress.nightcore.util.placeholder.Replacer;
-import su.nightexpress.nightcore.util.random.Rnd;
-import su.nightexpress.nightcore.util.time.TimeFormatType;
-import su.nightexpress.nightcore.util.time.TimeFormats;
-import su.nightexpress.nightcore.util.wrapper.UniParticle;
+import su.nightexpress.dungeons.nightcore.integration.currency.EconomyBridge;
+import su.nightexpress.dungeons.nightcore.locale.entry.MessageLocale;
+import su.nightexpress.dungeons.nightcore.locale.message.LangMessage;
+import su.nightexpress.dungeons.nightcore.util.EntityUtil;
+import su.nightexpress.dungeons.nightcore.util.ItemUtil;
+import su.nightexpress.dungeons.nightcore.util.Players;
+import su.nightexpress.dungeons.nightcore.util.geodata.pos.BlockPos;
+import su.nightexpress.dungeons.nightcore.util.placeholder.Replacer;
+import su.nightexpress.dungeons.nightcore.util.random.Rnd;
+import su.nightexpress.dungeons.nightcore.util.time.TimeFormatType;
+import su.nightexpress.dungeons.nightcore.util.time.TimeFormats;
+import su.nightexpress.dungeons.nightcore.util.wrapper.UniParticle;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -717,7 +717,7 @@ public class DungeonInstance implements Dungeon {
         gamer.handleDeath();
 
         if (!hasExtraLives && this.config.gameSettings().isLeaveOnDeath()) {
-            this.plugin.runTask(task -> this.leavePlayer(gamer));
+            this.plugin.runTask(() -> this.leavePlayer(gamer));
         }
 
         DungeonPlayerDeathEvent event = new DungeonPlayerDeathEvent(this, gamer);

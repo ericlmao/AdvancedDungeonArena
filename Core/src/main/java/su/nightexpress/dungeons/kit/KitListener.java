@@ -12,7 +12,7 @@ import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.api.type.GameState;
 import su.nightexpress.dungeons.dungeon.player.DungeonGamer;
 import su.nightexpress.dungeons.kit.impl.Kit;
-import su.nightexpress.nightcore.manager.AbstractListener;
+import su.nightexpress.dungeons.nightcore.manager.AbstractListener;
 
 public class KitListener extends AbstractListener<DungeonPlugin> {
 

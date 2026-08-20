@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.selection.visual.FakeEntity;
-import su.nightexpress.nightcore.util.EntityUtil;
+import su.nightexpress.dungeons.nightcore.util.EntityUtil;
 
 import java.util.*;
 

@@ -5,8 +5,8 @@ import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
 import su.nightexpress.dungeons.dungeon.script.action.Action;
 import su.nightexpress.dungeons.dungeon.script.action.ActionId;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.util.wrapper.UniInt;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.util.wrapper.UniInt;
 
 import java.util.concurrent.TimeUnit;
 

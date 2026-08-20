@@ -5,12 +5,13 @@ import org.jetbrains.annotations.NotNull;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.player.DungeonGamer;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.config.Writeable;
-import su.nightexpress.nightcore.language.message.LangMessage;
-import su.nightexpress.nightcore.util.Players;
-import su.nightexpress.nightcore.util.placeholder.Replacer;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.Writeable;
+import su.nightexpress.dungeons.nightcore.locale.message.LangMessage;
+import su.nightexpress.dungeons.nightcore.locale.message.MessageData;
+import su.nightexpress.dungeons.nightcore.util.Players;
+import su.nightexpress.dungeons.nightcore.util.placeholder.Replacer;
 
 import java.util.List;
 
@@ -29,7 +30,11 @@ public class KillStreak implements Writeable {
         this.kills = kills;
         this.repeatable = repeatable;
         this.rawMessage = rawMessage;
-        this.message = LangMessage.parse(rawMessage, null);
+        // Was the legacy language system's LangMessage.parse(raw, null); the modern equivalent splits
+        // the '[...]' bracket-data prefix off the text first.
+        MessageData.Builder builder = MessageData.chat();
+        String text = MessageData.extractAndParse(rawMessage, builder);
+        this.message = LangMessage.createFromData(text, builder.build());
         this.commands = commands;
     }
 
