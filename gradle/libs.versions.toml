@@ -8,7 +8,7 @@ shadow = "9.6.1"
 paperweight = "2.0.0-beta.22"
 
 # Libraries
-nightcore = "2.16.4"
+vault = "1.7.1"
 annotations = "26.0.2"
 sunlight = "3.17.0"
 mythic = "5.10.0"
@@ -27,7 +27,7 @@ aurora = "2.1.6"
 [libraries]
 paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper" }
 
-nightcore = { module = "su.nightexpress.nightcore:main", version.ref = "nightcore" }
+vault-api = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }
 annotations = { module = "org.jetbrains:annotations", version.ref = "annotations" }
 
 sunlight-core = { module = "su.nightexpress.sunlight:Core", version.ref = "sunlight" }

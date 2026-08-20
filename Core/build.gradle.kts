@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     // Project modules - these are the only artifacts bundled into the final jar.
+    implementation(project(":Lib"))
     implementation(project(":API"))
     implementation(project(":NMS"))
     implementation(project(":MC_1_21_11"))
@@ -11,7 +12,6 @@ dependencies {
     implementation(libs.annotations)
 
     compileOnly(libs.paper.api)
-    compileOnly(libs.nightcore)
 
     compileOnly(libs.sunlight.core)
     compileOnly(libs.sunlight.api)

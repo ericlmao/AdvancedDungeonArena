@@ -1,0 +1,38 @@
+package su.nightexpress.dungeons.nightcore.commands.tree;
+
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+import su.nightexpress.dungeons.nightcore.commands.CommandRequirement;
+import su.nightexpress.dungeons.nightcore.commands.NodeExecutor;
+import su.nightexpress.dungeons.nightcore.commands.context.CommandContext;
+import su.nightexpress.dungeons.nightcore.commands.exceptions.CommandSyntaxException;
+
+import java.util.List;
+
+public abstract class ExecutableNode extends CommandNode {
+
+    protected final String       description;
+    protected final NodeExecutor executor;
+
+    public ExecutableNode(@NonNull String name,
+                          @NonNull String description,
+                          @Nullable String permission,
+                          @NonNull List<CommandRequirement> requirements,
+                          @Nullable NodeExecutor executor) {
+        super(name, permission, requirements);
+        this.description = description;
+        this.executor = executor;
+    }
+
+    public abstract boolean run(@NonNull CommandContext context) throws CommandSyntaxException;
+
+    @NonNull
+    public String getDescription() {
+        return this.description;
+    }
+
+    @Nullable
+    public NodeExecutor getExecutor() {
+        return this.executor;
+    }
+}

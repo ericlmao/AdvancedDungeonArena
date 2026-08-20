@@ -10,7 +10,6 @@ dependencies {
 
     api(project(":NMS"))
 
-    compileOnly(libs.nightcore)
     compileOnly(libs.annotations)
 }
 

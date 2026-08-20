@@ -11,6 +11,7 @@ plugins {
 
 rootProject.name = "AdvancedDungeonArena"
 
+include("Lib")
 include("API")
 include("Core")
 include("NMS")

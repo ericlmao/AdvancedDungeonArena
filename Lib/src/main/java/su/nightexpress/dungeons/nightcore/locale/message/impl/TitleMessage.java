@@ -1,0 +1,50 @@
+package su.nightexpress.dungeons.nightcore.locale.message.impl;
+
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.jspecify.annotations.NonNull;
+import su.nightexpress.dungeons.nightcore.locale.message.LangMessage;
+import su.nightexpress.dungeons.nightcore.locale.message.MessageData;
+import su.nightexpress.dungeons.nightcore.util.Players;
+import net.kyori.adventure.text.Component;
+import su.nightexpress.dungeons.nightcore.util.text.night.NightMessage;
+import su.nightexpress.dungeons.nightcore.util.text.night.ParserUtils;
+
+import java.util.Collection;
+
+public class TitleMessage extends LangMessage {
+
+    private final int fadeIn;
+    private final int stay;
+    private final int fadeOut;
+
+    public TitleMessage(@NonNull String text, @NonNull MessageData data) {
+        super(text, data);
+
+        int[] titleTimes = data.titleTimes();
+        this.fadeIn = titleTimes != null && titleTimes.length >= 1 ? titleTimes[0] : 20;
+        this.stay = titleTimes != null && titleTimes.length >= 2 ? titleTimes[1] : 60;
+        this.fadeOut = titleTimes != null && titleTimes.length >= 3 ? titleTimes[2] : 20;
+    }
+
+    @Override
+    public boolean isSilent() {
+        return false;
+    }
+
+    @Override
+    protected void send(@NonNull Collection<? extends CommandSender> receivers, @NonNull String text) {
+        String[] split = ParserUtils.breakDownLineSplitters(text);
+
+        String title = split[0];
+        String subTitle = split.length >= 2 ? split[1] : "";
+
+        Component titleComp = NightMessage.parse(title);
+        Component subtitleComp = NightMessage.parse(subTitle);
+
+        receivers.forEach(sender -> {
+            if (sender instanceof Player player) Players.sendTitles(player, titleComp, subtitleComp, this.fadeIn,
+                this.stay, this.fadeOut);
+        });
+    }
+}
