@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.api.mob;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.nightcore.config.ConfigValue;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 import su.nightexpress.dungeons.nightcore.config.Writeable;
@@ -14,46 +14,46 @@ public class MobIdentifier implements Writeable {
     private final String providerId;
     private final String mobId;
 
-    public MobIdentifier(@NotNull String providerId, @NotNull String mobId) {
+    public MobIdentifier(@NonNull String providerId, @NonNull String mobId) {
         this.providerId = providerId;
         this.mobId = mobId;
     }
 
-    @NotNull
-    public static MobIdentifier from(@NotNull MobProvider provider, @NotNull String mobId) {
+    @NonNull
+    public static MobIdentifier from(@NonNull MobProvider provider, @NonNull String mobId) {
         return new MobIdentifier(provider.getName(), mobId);
     }
 
-    @NotNull
-    public static MobIdentifier read(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static MobIdentifier read(@NonNull FileConfig config, @NonNull String path) {
         String string = ConfigValue.create(path, "null" + DELIMITER + "null").read(config);
         return deserialize(string);
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path, this.serialize());
     }
 
-    @NotNull
-    public static MobIdentifier deserialize(@NotNull String string) {
+    @NonNull
+    public static MobIdentifier deserialize(@NonNull String string) {
         String[] split = string.split(DELIMITER);
         if (split.length < 2) throw new IllegalStateException("String " + string + " does not have required params!");
 
         return new MobIdentifier(split[0], split[1]);
     }
 
-    @NotNull
+    @NonNull
     public String serialize() {
         return this.providerId + DELIMITER + this.mobId;
     }
 
-    @NotNull
+    @NonNull
     public String getProviderId() {
         return this.providerId;
     }
 
-    @NotNull
+    @NonNull
     public String getMobId() {
         return this.mobId;
     }

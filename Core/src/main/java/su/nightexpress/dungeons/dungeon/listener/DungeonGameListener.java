@@ -14,7 +14,7 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.api.type.GameState;
@@ -36,7 +36,7 @@ public class DungeonGameListener extends AbstractListener<DungeonPlugin> {
 
     private final DungeonManager manager;
 
-    public DungeonGameListener(@NotNull DungeonPlugin plugin, @NotNull DungeonManager manager) {
+    public DungeonGameListener(@NonNull DungeonPlugin plugin, @NonNull DungeonManager manager) {
         super(plugin);
         this.manager = manager;
     }

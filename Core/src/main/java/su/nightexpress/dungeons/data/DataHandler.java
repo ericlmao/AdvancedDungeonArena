@@ -15,8 +15,8 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.data.DatabaseSettings.DatabaseType;
@@ -52,7 +52,7 @@ public class DataHandler extends SimpleManager<DungeonPlugin> implements UserDat
     private String           tableUsers;
     private Connection       sqliteConnection;
 
-    public DataHandler(@NotNull DungeonPlugin plugin) {
+    public DataHandler(@NonNull DungeonPlugin plugin) {
         super(plugin);
     }
 
@@ -87,7 +87,7 @@ public class DataHandler extends SimpleManager<DungeonPlugin> implements UserDat
         return this.settings.getType() == DatabaseType.SQLITE;
     }
 
-    @NotNull
+    @NonNull
     private Connection openConnection() throws SQLException {
         String url = this.settings.getJdbcUrl(this.plugin);
 
@@ -115,7 +115,7 @@ public class DataHandler extends SimpleManager<DungeonPlugin> implements UserDat
         }
     }
 
-    private void execute(@NotNull String sql) {
+    private void execute(@NonNull String sql) {
         Connection connection = null;
         try {
             connection = this.openConnection();
@@ -190,16 +190,16 @@ public class DataHandler extends SimpleManager<DungeonPlugin> implements UserDat
     }
 
     @Override
-    public boolean isUserExists(@NotNull UUID uuid) {
+    public boolean isUserExists(@NonNull UUID uuid) {
         return this.exists("`" + COLUMN_USER_ID + "` = ?", uuid.toString());
     }
 
     @Override
-    public boolean isUserExists(@NotNull String name) {
+    public boolean isUserExists(@NonNull String name) {
         return this.exists("LOWER(`" + COLUMN_USER_NAME + "`) = ?", name.toLowerCase());
     }
 
-    private boolean exists(@NotNull String where, @NotNull String value) {
+    private boolean exists(@NonNull String where, @NonNull String value) {
         Connection connection = null;
         try {
             connection = this.openConnection();
@@ -222,18 +222,18 @@ public class DataHandler extends SimpleManager<DungeonPlugin> implements UserDat
 
     @Override
     @Nullable
-    public DungeonUser getUser(@NotNull UUID uuid) {
+    public DungeonUser getUser(@NonNull UUID uuid) {
         return this.selectFirst("`" + COLUMN_USER_ID + "` = ?", uuid.toString());
     }
 
     @Override
     @Nullable
-    public DungeonUser getUser(@NotNull String name) {
+    public DungeonUser getUser(@NonNull String name) {
         return this.selectFirst("LOWER(`" + COLUMN_USER_NAME + "`) = ?", name.toLowerCase());
     }
 
     @Nullable
-    private DungeonUser selectFirst(@NotNull String where, @NotNull String value) {
+    private DungeonUser selectFirst(@NonNull String where, @NonNull String value) {
         Connection connection = null;
         try {
             connection = this.openConnection();
@@ -255,7 +255,7 @@ public class DataHandler extends SimpleManager<DungeonPlugin> implements UserDat
     }
 
     @Override
-    @NotNull
+    @NonNull
     public List<DungeonUser> getUsers() {
         List<DungeonUser> users = new ArrayList<>();
 
@@ -281,7 +281,7 @@ public class DataHandler extends SimpleManager<DungeonPlugin> implements UserDat
     }
 
     @Override
-    public void insertUser(@NotNull DungeonUser user) {
+    public void insertUser(@NonNull DungeonUser user) {
         Connection connection = null;
         try {
             connection = this.openConnection();
@@ -308,16 +308,16 @@ public class DataHandler extends SimpleManager<DungeonPlugin> implements UserDat
     }
 
     @Override
-    public void saveUsersCommons(@NotNull Collection<DungeonUser> users) {
+    public void saveUsersCommons(@NonNull Collection<DungeonUser> users) {
         this.update(users, false);
     }
 
     @Override
-    public void saveUsersFully(@NotNull Collection<DungeonUser> users) {
+    public void saveUsersFully(@NonNull Collection<DungeonUser> users) {
         this.update(users, true);
     }
 
-    private void update(@NotNull Collection<DungeonUser> users, boolean full) {
+    private void update(@NonNull Collection<DungeonUser> users, boolean full) {
         if (users.isEmpty()) return;
 
         String sql = "UPDATE " + this.tableUsers + " SET `" + COLUMN_USER_NAME + "` = ?, `"
@@ -354,7 +354,7 @@ public class DataHandler extends SimpleManager<DungeonPlugin> implements UserDat
     /**
      * Exposed for tooling/debug; the plugin itself never mutates arbitrary rows.
      */
-    @NotNull
+    @NonNull
     public Map<String, String> describeSchema() {
         return Map.of("table", this.tableUsers, "type", this.settings.getType().name());
     }

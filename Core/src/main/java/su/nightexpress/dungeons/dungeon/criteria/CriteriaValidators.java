@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.criteria;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.criteria.CriteriaValidator;
 import su.nightexpress.dungeons.nightcore.util.Enums;
 
@@ -12,22 +12,22 @@ public class CriteriaValidators {
 
     public static final CriteriaValidator<String> STRING = create(string -> string, string -> string);
 
-    public static <E extends Enum<E>> CriteriaValidator<E> forEnum(@NotNull Class<E> clazz) {
+    public static <E extends Enum<E>> CriteriaValidator<E> forEnum(@NonNull Class<E> clazz) {
         return create(string -> Enums.parse(string, clazz).orElseThrow(), Enum::name);
     }
 
-    @NotNull
-    private static <T> CriteriaValidator<T> create(@NotNull Function<String, T> deserializer, @NotNull Function<T, String> serializer) {
+    @NonNull
+    private static <T> CriteriaValidator<T> create(@NonNull Function<String, T> deserializer, @NonNull Function<T, String> serializer) {
         return new CriteriaValidator<>() {
-            @NotNull
+            @NonNull
             @Override
-            public T deserialize(@NotNull String string) {
+            public T deserialize(@NonNull String string) {
                 return deserializer.apply(string);
             }
 
-            @NotNull
+            @NonNull
             @Override
-            public String serialize(@NotNull T value) {
+            public String serialize(@NonNull T value) {
                 return serializer.apply(value);
             }
         };

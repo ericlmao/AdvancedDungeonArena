@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.script.condition.impl;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
 import su.nightexpress.dungeons.dungeon.script.condition.Condition;
@@ -17,26 +17,26 @@ public class ChanceCondition implements Condition {
         this.chance = chance;
     }
 
-    @NotNull
-    public static ChanceCondition load(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static ChanceCondition load(@NonNull FileConfig config, @NonNull String path) {
         double chance = ConfigValue.create(path + ".Chance", 50D).read(config);
 
         return new ChanceCondition(chance);
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".Chance", this.chance);
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return ConditionId.CHANCE;
     }
 
     @Override
-    public boolean test(@NotNull DungeonInstance dungeon, @NotNull DungeonGameEvent event) {
+    public boolean test(@NonNull DungeonInstance dungeon, @NonNull DungeonGameEvent event) {
         return Rnd.chance(this.chance);
     }
 }

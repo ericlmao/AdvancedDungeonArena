@@ -13,7 +13,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.config.Config;
 import su.nightexpress.dungeons.config.Keys;
 import su.nightexpress.dungeons.kit.impl.Kit;
@@ -46,19 +46,19 @@ public class KitUtils {
         return !Config.KITS_PREVENT_ITEM_SHARE.get();
     }
 
-    @NotNull
-    public static ItemStack assignKit(@NotNull Kit kit, @NotNull ItemStack itemStack) {
+    @NonNull
+    public static ItemStack assignKit(@NonNull Kit kit, @NonNull ItemStack itemStack) {
         ItemUtil.editMeta(itemStack, meta -> {
             PDCUtil.set(meta, Keys.kitItem, kit.getId());
         });
         return itemStack;
     }
 
-    public static boolean isKitItem(@NotNull ItemStack itemStack) {
+    public static boolean isKitItem(@NonNull ItemStack itemStack) {
         return PDCUtil.getString(itemStack, Keys.kitItem).isPresent();
     }
 
-    public static void setKitContent(@NotNull Kit kit, @NotNull PlayerInventory inventory) {
+    public static void setKitContent(@NonNull Kit kit, @NonNull PlayerInventory inventory) {
         kit.setItems(inventory.getStorageContents());
 
         for (EquipmentSlot slot : KitUtils.ARMOR_SLOTS) {
@@ -66,7 +66,7 @@ public class KitUtils {
         }
     }
 
-    public static void setWarriorKit(@NotNull Kit kit) {
+    public static void setWarriorKit(@NonNull Kit kit) {
         kit.setDescription(Lists.newList(
 
         ));
@@ -119,7 +119,7 @@ public class KitUtils {
         kit.setItems(items);
     }
 
-    public static void setTankKit(@NotNull Kit kit) {
+    public static void setTankKit(@NonNull Kit kit) {
         kit.setDescription(Lists.newList(
 
         ));
@@ -183,7 +183,7 @@ public class KitUtils {
         kit.setCost(CurrencyId.VAULT, 500);
     }
 
-    public static void setArcherKit(@NotNull Kit kit) {
+    public static void setArcherKit(@NonNull Kit kit) {
         kit.setDescription(Lists.newList(
 
         ));
@@ -249,7 +249,7 @@ public class KitUtils {
         kit.setCost(CurrencyId.VAULT, 1500);
     }
 
-    public static void setAssasinKit(@NotNull Kit kit) {
+    public static void setAssasinKit(@NonNull Kit kit) {
         kit.setDescription(Lists.newList(
 
         ));
@@ -313,7 +313,7 @@ public class KitUtils {
         kit.setCost(CurrencyId.VAULT, 3500);
     }
 
-    public static void setSupportKit(@NotNull Kit kit) {
+    public static void setSupportKit(@NonNull Kit kit) {
         kit.setDescription(Lists.newList(
 
         ));
@@ -397,7 +397,7 @@ public class KitUtils {
         kit.setCost(CurrencyId.VAULT, 2500);
     }
 
-    public static void setPriestKit(@NotNull Kit kit) {
+    public static void setPriestKit(@NonNull Kit kit) {
         kit.setDescription(Lists.newList(
 
         ));
@@ -495,7 +495,7 @@ public class KitUtils {
         kit.setCost(CurrencyId.VAULT, 4500);
     }
 
-    public static void setPyroKit(@NotNull Kit kit) {
+    public static void setPyroKit(@NonNull Kit kit) {
         kit.setDescription(Lists.newList(
 
         ));
@@ -548,7 +548,7 @@ public class KitUtils {
         kit.setCost(CurrencyId.VAULT, 5000);
     }
 
-    public static void setBomberKit(@NotNull Kit kit) {
+    public static void setBomberKit(@NonNull Kit kit) {
         kit.setDescription(Lists.newList(
 
         ));

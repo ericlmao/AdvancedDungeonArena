@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.criteria.registry.mob;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.criteria.registry.CriteriaHolder;
 import su.nightexpress.dungeons.dungeon.criteria.registry.mob.impl.MobFactionCriteria;
 import su.nightexpress.dungeons.dungeon.criteria.registry.mob.impl.MobIdCriteria;
@@ -14,7 +14,7 @@ public class MobCriterias {
     public static final MobFactionCriteria  FACTION    = new MobFactionCriteria("faction");
     public static final MobStageCriteria    BORN_STAGE = new MobStageCriteria("born_stage");
 
-    public static void setup(@NotNull CriteriaHolder<MobCriteria<?>> holder) {
+    public static void setup(@NonNull CriteriaHolder<MobCriteria<?>> holder) {
         holder.register(ID);
         holder.register(PROVIER);
         holder.register(FACTION);

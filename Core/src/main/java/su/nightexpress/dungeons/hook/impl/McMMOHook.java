@@ -3,7 +3,7 @@ package su.nightexpress.dungeons.hook.impl;
 import com.gmail.nossr50.events.experience.McMMOPlayerXpGainEvent;
 import com.gmail.nossr50.events.skills.abilities.McMMOPlayerAbilityActivateEvent;
 import org.bukkit.event.EventHandler;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.DungeonsAPI;
 import su.nightexpress.dungeons.nightcore.manager.AbstractListener;
@@ -12,7 +12,7 @@ public final class McMMOHook extends AbstractListener<DungeonPlugin> {
 
     private static McMMOHook instance;
 
-    private McMMOHook(@NotNull DungeonPlugin plugin) {
+    private McMMOHook(@NonNull DungeonPlugin plugin) {
         super(plugin);
         this.registerListeners();
     }

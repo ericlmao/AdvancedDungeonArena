@@ -15,7 +15,7 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.craftbukkit.block.CraftBlockState;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.schema.SchemaBlock;
 import su.nightexpress.dungeons.nightcore.util.nbt.NbtProvider;
 import su.nightexpress.dungeons.nms.DungeonNMS;
@@ -36,8 +36,9 @@ public class MC_1_21_11 implements DungeonNMS, NbtProvider {
      * release. The wire format is unchanged, so existing kit inventories and reward items still load.
      */
     @Override
-    @NotNull
-    public String toTagString(@NotNull org.bukkit.inventory.ItemStack itemStack) {
+    @NonNull
+    // jspecify's annotations are TYPE_USE, so on a qualified name they attach to the simple name.
+    public String toTagString(org.bukkit.inventory.@NonNull ItemStack itemStack) {
         net.minecraft.world.item.ItemStack nmsStack = org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(itemStack);
         net.minecraft.core.RegistryAccess registryAccess = net.minecraft.server.MinecraftServer.getServer().registryAccess();
 
@@ -49,7 +50,7 @@ public class MC_1_21_11 implements DungeonNMS, NbtProvider {
     }
 
     @Override
-    public org.bukkit.inventory.ItemStack fromTagString(@NotNull String tagString, int sourceDataVersion) {
+    public org.bukkit.inventory.ItemStack fromTagString(@NonNull String tagString, int sourceDataVersion) {
         CompoundTag tag;
         try {
             tag = TagParser.parseCompoundFully(tagString);
@@ -78,7 +79,7 @@ public class MC_1_21_11 implements DungeonNMS, NbtProvider {
 
 
     @Override
-    public void setSchemaBlock(@NotNull World world, @NotNull SchemaBlock schemaBlock) {
+    public void setSchemaBlock(@NonNull World world, @NonNull SchemaBlock schemaBlock) {
         ServerLevel level = ((CraftWorld)world).getHandle();
 
         CraftBlock craftBlock = (CraftBlock) schemaBlock.getBlockPos().toLocation(world).getBlock();
@@ -99,9 +100,9 @@ public class MC_1_21_11 implements DungeonNMS, NbtProvider {
         }
     }
 
-    @NotNull
+    @NonNull
     @Override
-    public List<SchemaBlock> loadSchema(@NotNull File file, boolean compressed) {
+    public List<SchemaBlock> loadSchema(@NonNull File file, boolean compressed) {
         List<SchemaBlock> schemaBlocks = new ArrayList<>();
         CompoundTag schemTag;
 
@@ -137,7 +138,7 @@ public class MC_1_21_11 implements DungeonNMS, NbtProvider {
     }
 
     @Override
-    public void saveSchema(@NotNull World world, @NotNull List<Block> blocks, @NotNull File file) {
+    public void saveSchema(@NonNull World world, @NonNull List<Block> blocks, @NonNull File file) {
         ServerLevel level = ((CraftWorld) world).getHandle();
 
         CompoundTag root = new CompoundTag();
@@ -169,7 +170,7 @@ public class MC_1_21_11 implements DungeonNMS, NbtProvider {
         }
     }
 
-    @NotNull
+    @NonNull
     private ListTag newIntegerList(int... arr) {
         ListTag tag = new ListTag();
 

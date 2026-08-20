@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.script.condition.type;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
 import su.nightexpress.dungeons.dungeon.script.condition.Condition;
@@ -14,15 +14,15 @@ public abstract class NumberCompareCondition implements Condition {
     protected final NumberComparator comparator;
     protected final double compareValue;
 
-    public NumberCompareCondition(@NotNull NumberComparator comparator, double compareValue) {
+    public NumberCompareCondition(@NonNull NumberComparator comparator, double compareValue) {
         this.comparator = comparator;
         this.compareValue = compareValue;
     }
 
     public record NumberData(NumberComparator comparator, double compareValue){}
 
-    @NotNull
-    public static NumberData readNumberData(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static NumberData readNumberData(@NonNull FileConfig config, @NonNull String path) {
         String operatorStr = config.getString(path + ".Operator", "null");
         NumberComparator comparator = NumberComparators.getComparator(operatorStr);
         if (comparator == null) {
@@ -36,20 +36,20 @@ public abstract class NumberCompareCondition implements Condition {
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".Operator", this.comparator.getName());
         config.set(path + ".Value", this.compareValue);
         this.writeAdditional(config, path);
     }
 
-    protected abstract void writeAdditional(@NotNull FileConfig config, @NotNull String path);
+    protected abstract void writeAdditional(@NonNull FileConfig config, @NonNull String path);
 
     @Override
-    public boolean test(@NotNull DungeonInstance dungeon, @NotNull DungeonGameEvent event) {
+    public boolean test(@NonNull DungeonInstance dungeon, @NonNull DungeonGameEvent event) {
         double dungeonValue = this.getDungeonValue(dungeon);
 
         return this.comparator.test(dungeonValue, this.compareValue);
     }
 
-    protected abstract double getDungeonValue(@NotNull DungeonInstance dungeon);
+    protected abstract double getDungeonValue(@NonNull DungeonInstance dungeon);
 }

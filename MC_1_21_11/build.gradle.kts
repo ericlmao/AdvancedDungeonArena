@@ -10,7 +10,7 @@ dependencies {
 
     api(project(":NMS"))
 
-    compileOnly(libs.annotations)
+    compileOnly(libs.jspecify)
 }
 
 // Paper 1.20.5+ runs mojang-mapped at runtime; we target Paper/Folia only, so publish

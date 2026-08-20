@@ -2,7 +2,7 @@ package su.nightexpress.dungeons.dungeon.level;
 
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
@@ -29,13 +29,13 @@ public class Level extends AbstractFileData<DungeonPlugin> implements DungeonEve
     private String   description;
     private ExactPos spawnPos;
 
-    public Level(@NotNull DungeonPlugin plugin, @NotNull File file) {
+    public Level(@NonNull DungeonPlugin plugin, @NonNull File file) {
         super(plugin, file);
         this.eventHandlers = new LinkedHashMap<>();
     }
 
     @Override
-    protected boolean onLoad(@NotNull FileConfig config) {
+    protected boolean onLoad(@NonNull FileConfig config) {
         this.setDisplayName(config.getString("Name", "null"));
         this.setDescription(config.getString("Description", ""));
 
@@ -50,7 +50,7 @@ public class Level extends AbstractFileData<DungeonPlugin> implements DungeonEve
     }
 
     @Override
-    protected void onSave(@NotNull FileConfig config) {
+    protected void onSave(@NonNull FileConfig config) {
         config.set("Name", this.displayName);
         config.set("Description", this.description);
         this.spawnPos.write(config, "SpawnPos");
@@ -60,12 +60,12 @@ public class Level extends AbstractFileData<DungeonPlugin> implements DungeonEve
     }
 
     @Override
-    public void addHandler(@NotNull DungeonEventHandler handler) {
+    public void addHandler(@NonNull DungeonEventHandler handler) {
         this.eventHandlers.put(handler.getId(), handler);
     }
 
     @Override
-    public boolean onDungeonEventBroadcastReceive(@NotNull DungeonGameEvent event, @NotNull DungeonEventType eventType, @NotNull DungeonInstance dungeon) {
+    public boolean onDungeonEventBroadcastReceive(@NonNull DungeonGameEvent event, @NonNull DungeonEventType eventType, @NonNull DungeonInstance dungeon) {
         if (!dungeon.isLevel(this)) return false;
 
         //System.out.println("Level event received: " + this.getDisplayName() +" / " + eventType.name());
@@ -73,50 +73,50 @@ public class Level extends AbstractFileData<DungeonPlugin> implements DungeonEve
         return true;
     }
 
-    @NotNull
+    @NonNull
     public UnaryOperator<String> replacePlaceholders() {
         return Placeholders.LEVEL.replacer(this);
     }
 
-    @NotNull
-    public Location getSpawnLocation(@NotNull World world) {
+    @NonNull
+    public Location getSpawnLocation(@NonNull World world) {
         return this.spawnPos.toLocation(world);
     }
 
-    @NotNull
+    @NonNull
     public Set<DungeonEventHandler> getEventHandlers() {
         return new HashSet<>(this.eventHandlers.values());
     }
 
-    @NotNull
+    @NonNull
     public Map<String, DungeonEventHandler> getEventHandlerMap() {
         return this.eventHandlers;
     }
 
-    @NotNull
+    @NonNull
     public String getDisplayName() {
         return this.displayName;
     }
 
-    public void setDisplayName(@NotNull String displayName) {
+    public void setDisplayName(@NonNull String displayName) {
         this.displayName = displayName;
     }
 
-    @NotNull
+    @NonNull
     public String getDescription() {
         return this.description;
     }
 
-    public void setDescription(@NotNull String description) {
+    public void setDescription(@NonNull String description) {
         this.description = description;
     }
 
-    @NotNull
+    @NonNull
     public ExactPos getSpawnPos() {
         return this.spawnPos;
     }
 
-    public void setSpawnPos(@NotNull ExactPos spawnPos) {
+    public void setSpawnPos(@NonNull ExactPos spawnPos) {
         this.spawnPos = spawnPos;
     }
 }

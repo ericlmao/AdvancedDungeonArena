@@ -2,8 +2,8 @@ package su.nightexpress.dungeons.hook.impl;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.api.type.MobFaction;
 import su.nightexpress.dungeons.config.Lang;
@@ -19,7 +19,7 @@ public class PlaceholderHook {
 
     private static Expansion expansion;
 
-    public static void setup(@NotNull DungeonPlugin plugin) {
+    public static void setup(@NonNull DungeonPlugin plugin) {
         if (expansion == null) {
             expansion = new Expansion(plugin);
             expansion.register();
@@ -37,24 +37,24 @@ public class PlaceholderHook {
 
         private final DungeonPlugin plugin;
 
-        public Expansion(@NotNull DungeonPlugin plugin) {
+        public Expansion(@NonNull DungeonPlugin plugin) {
             this.plugin = plugin;
         }
 
         @Override
-        @NotNull
+        @NonNull
         public String getAuthor() {
             return plugin.getDescription().getAuthors().getFirst();
         }
 
         @Override
-        @NotNull
+        @NonNull
         public String getIdentifier() {
             return ID;
         }
 
         @Override
-        @NotNull
+        @NonNull
         public String getVersion() {
             return plugin.getDescription().getVersion();
         }
@@ -109,7 +109,7 @@ public class PlaceholderHook {
         }
 
         @Nullable
-        public String forDungeon(@NotNull DungeonInstance dungeon, @NotNull String var) {
+        public String forDungeon(@NonNull DungeonInstance dungeon, @NonNull String var) {
             if (var.equalsIgnoreCase("name")) {
                 return dungeon.getConfig().getName();
             }

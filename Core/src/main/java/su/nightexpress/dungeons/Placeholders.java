@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.config.Lang;
 import su.nightexpress.dungeons.dungeon.config.DungeonConfig;
 import su.nightexpress.dungeons.dungeon.feature.LevelRequirement;
@@ -118,13 +118,13 @@ public class Placeholders extends su.nightexpress.dungeons.nightcore.util.Placeh
     public static final String LEVEL_NAME        = "%level_name%";
     public static final String LEVEL_DESCRIPTION = "%level_description%";
 
-    @NotNull
+    @NonNull
     public static final PlaceholderList<DungeonConfig> DUNGEON_CONFIG = PlaceholderList.create(list -> list
         .add(DUNGEON_ID, DungeonConfig::getId)
         .add(DUNGEON_NAME, DungeonConfig::getName)
     );
 
-    @NotNull
+    @NonNull
     public static final PlaceholderList<DungeonInstance> DUNGEON_INSTANCE = PlaceholderList.create(list -> list
             .add(DUNGEON_ID, DungeonInstance::getId)
             .add(DUNGEON_ACTIVE, instance -> CoreLang.STATE_YES_NO.get(instance.isActive()))

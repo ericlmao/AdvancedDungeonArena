@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.script.action.impl;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
 import su.nightexpress.dungeons.dungeon.lootchest.LootChest;
@@ -20,8 +20,8 @@ public class GenerateLootAction implements Action {
         this.lootChestIds = lootChestIds;
     }
 
-    @NotNull
-    public static GenerateLootAction load(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static GenerateLootAction load(@NonNull FileConfig config, @NonNull String path) {
         boolean specific = ConfigValue.create(path + ".Specific", false).read(config);
         String[] lootChestIds = ConfigValue.create(path + ".LootChestIds", new String[]{"null"}).read(config);
 
@@ -29,19 +29,19 @@ public class GenerateLootAction implements Action {
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".Specific", this.specific);
         config.setStringArray(path + ".LootChestIds", this.lootChestIds);
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return ActionId.GENERATE_LOOT;
     }
 
     @Override
-    public void perform(@NotNull DungeonInstance dungeon, @NotNull DungeonGameEvent event) {
+    public void perform(@NonNull DungeonInstance dungeon, @NonNull DungeonGameEvent event) {
         if (!this.specific) {
             dungeon.refillLootChests();
             return;

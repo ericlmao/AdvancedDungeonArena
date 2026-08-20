@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.script.condition.type;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.criteria.CriteriaProvider;
 import su.nightexpress.dungeons.api.criteria.CriterionMob;
 import su.nightexpress.dungeons.dungeon.criteria.CriteriaMap;
@@ -16,17 +16,17 @@ public abstract class MobsCondition extends NumberCompareCondition {
 
     public record CriteriaData(CriteriaProvider<CriterionMob> mobCriterias, CriteriaProvider<Stage> stageCriterias) {}
 
-    public MobsCondition(@NotNull NumberComparator comparator,
+    public MobsCondition(@NonNull NumberComparator comparator,
                          double compareValue,
-                               @NotNull CriteriaProvider<CriterionMob> mobCriterias,
-                               @NotNull CriteriaProvider<Stage> stageCriterias) {
+                               @NonNull CriteriaProvider<CriterionMob> mobCriterias,
+                               @NonNull CriteriaProvider<Stage> stageCriterias) {
         super(comparator, compareValue);
         this.mobCriterias = mobCriterias;
         this.stageCriterias = stageCriterias;
     }
 
-    @NotNull
-    public static CriteriaData readCriteriaData(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static CriteriaData readCriteriaData(@NonNull FileConfig config, @NonNull String path) {
         var mobCriterias = CriteriaMap.read(config, path + ".MobCriteria", CriteriaRegistry.MOB);
         var stageCriterias = CriteriaMap.read(config, path + ".StageCriteria", CriteriaRegistry.STAGE);
 
@@ -34,7 +34,7 @@ public abstract class MobsCondition extends NumberCompareCondition {
     }
 
     @Override
-    protected void writeAdditional(@NotNull FileConfig config, @NotNull String path) {
+    protected void writeAdditional(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".MobCriteria", this.mobCriterias);
         config.set(path + ".StageCriteria", this.stageCriterias);
     }

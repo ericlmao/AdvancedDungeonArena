@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.script.action.impl;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.dungeon.DungeonTarget;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
@@ -17,13 +17,13 @@ public class RunCommandAction implements Action {
     private final List<String>  commands;
     private final DungeonTarget target;
 
-    public RunCommandAction(@NotNull List<String> commands, @NotNull DungeonTarget target) {
+    public RunCommandAction(@NonNull List<String> commands, @NonNull DungeonTarget target) {
         this.commands = commands;
         this.target = target;
     }
 
-    @NotNull
-    public static RunCommandAction load(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static RunCommandAction load(@NonNull FileConfig config, @NonNull String path) {
         List<String> commands = ConfigValue.create(path + ".Commands", Lists.newList()).read(config);
         DungeonTarget target = ConfigValue.create(path + ".Target", DungeonTarget.class, DungeonTarget.GLOBAL).read(config);
 
@@ -31,19 +31,19 @@ public class RunCommandAction implements Action {
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".Commands", this.commands);
         config.set(path + ".Target", this.target.name());
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return ActionId.RUN_COMMAND;
     }
 
     @Override
-    public void perform(@NotNull DungeonInstance dungeon, @NotNull DungeonGameEvent event) {
+    public void perform(@NonNull DungeonInstance dungeon, @NonNull DungeonGameEvent event) {
         dungeon.runCommand(this.commands, this.target, event);
     }
 }

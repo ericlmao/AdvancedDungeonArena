@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.api.criteria;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.Predicate;
 
@@ -9,28 +9,28 @@ public class CriteriaPredicate<T, E> implements Predicate<E> {
     private final Criteria<T, E> criteria;
     private final T              value;
 
-    public CriteriaPredicate(@NotNull Criteria<T, E> criteria, @NotNull T value) {
+    public CriteriaPredicate(@NonNull Criteria<T, E> criteria, @NonNull T value) {
         this.criteria = criteria;
         this.value = value;
     }
 
-    @NotNull
+    @NonNull
     public Criteria<T, E> getCriteria() {
         return this.criteria;
     }
 
-    @NotNull
+    @NonNull
     public T getValue() {
         return this.value;
     }
 
-    @NotNull
+    @NonNull
     public String getRawValue() {
         return this.criteria.getValidator().serialize(this.value);
     }
 
     @Override
-    public boolean test(@NotNull E entity) {
+    public boolean test(@NonNull E entity) {
         return this.criteria.test(entity, this.value);
     }
 }

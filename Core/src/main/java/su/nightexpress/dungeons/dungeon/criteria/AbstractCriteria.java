@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.criteria;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.criteria.Criteria;
 import su.nightexpress.dungeons.api.criteria.CriteriaPredicate;
 import su.nightexpress.dungeons.api.criteria.CriteriaValidator;
@@ -10,32 +10,32 @@ public abstract class AbstractCriteria<T, E> implements Criteria<T, E> {
     protected final CriteriaValidator<T> validator;
     protected final String               name;
 
-    public AbstractCriteria(@NotNull CriteriaValidator<T> validator, @NotNull String name) {
+    public AbstractCriteria(@NonNull CriteriaValidator<T> validator, @NonNull String name) {
         this.validator = validator;
         this.name = name;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public CriteriaValidator<T> getValidator() {
         return this.validator;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return this.name;
     }
 
-    @NotNull
+    @NonNull
     @Override
-    public CriteriaPredicate<T, E> validate(@NotNull String string) {
+    public CriteriaPredicate<T, E> validate(@NonNull String string) {
         return this.predicate(this.validator.deserialize(string));
     }
 
-    @NotNull
+    @NonNull
     @Override
-    public CriteriaPredicate<T, E> predicate(@NotNull T value) {
+    public CriteriaPredicate<T, E> predicate(@NonNull T value) {
         return new CriteriaPredicate<>(this, value);
     }
 }

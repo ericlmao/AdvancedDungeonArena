@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.google.gson.reflect.TypeToken;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import su.nightexpress.dungeons.user.DungeonUser;
 

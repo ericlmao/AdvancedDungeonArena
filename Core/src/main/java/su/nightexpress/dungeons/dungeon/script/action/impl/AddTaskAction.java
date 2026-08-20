@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.script.action.impl;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
 import su.nightexpress.dungeons.dungeon.script.action.Action;
@@ -15,13 +15,13 @@ public class AddTaskAction implements Action {
     private final String taskId;
     private final boolean replace;
 
-    public AddTaskAction(@NotNull String taskId, boolean replace) {
+    public AddTaskAction(@NonNull String taskId, boolean replace) {
         this.taskId = taskId;
         this.replace = replace;
     }
 
-    @NotNull
-    public static AddTaskAction load(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static AddTaskAction load(@NonNull FileConfig config, @NonNull String path) {
         String taskId = config.getString(path + ".TaskId", "null");
         boolean replace = config.getBoolean(path + ".Replace", false);
 
@@ -29,13 +29,13 @@ public class AddTaskAction implements Action {
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".TaskId", this.taskId);
         config.set(path + ".Replace", this.replace);
     }
 
     @Override
-    public void perform(@NotNull DungeonInstance dungeon, @NotNull DungeonGameEvent event) {
+    public void perform(@NonNull DungeonInstance dungeon, @NonNull DungeonGameEvent event) {
         Stage stage = dungeon.getStage();
         StageTask stageTask = stage.getTaskById(this.taskId);
         if (stageTask == null) {
@@ -48,7 +48,7 @@ public class AddTaskAction implements Action {
         }
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return ActionId.ADD_TASK;

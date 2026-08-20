@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.reward;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public class GameReward {
 
@@ -8,13 +8,13 @@ public class GameReward {
     private final boolean keepOnDeath;
     private final boolean keepOnDefeat;
 
-    public GameReward(@NotNull Reward reward, boolean keepOnDeath, boolean keepOnDefeat) {
+    public GameReward(@NonNull Reward reward, boolean keepOnDeath, boolean keepOnDefeat) {
         this.reward = reward;
         this.keepOnDeath = keepOnDeath;
         this.keepOnDefeat = keepOnDefeat;
     }
 
-    @NotNull
+    @NonNull
     public Reward getReward() {
         return this.reward;
     }

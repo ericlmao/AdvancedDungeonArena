@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.script.action.impl;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
 import su.nightexpress.dungeons.dungeon.script.action.Action;
@@ -15,13 +15,13 @@ public class RevivePlayersAction implements Action {
     private final boolean checkDeathTime;
     private final UniInt  secondsSinceDeath;
 
-    public RevivePlayersAction(boolean checkDeathTime, @NotNull UniInt secondsSinceDeath) {
+    public RevivePlayersAction(boolean checkDeathTime, @NonNull UniInt secondsSinceDeath) {
         this.checkDeathTime = checkDeathTime;
         this.secondsSinceDeath = secondsSinceDeath;
     }
 
-    @NotNull
-    public static RevivePlayersAction load(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static RevivePlayersAction load(@NonNull FileConfig config, @NonNull String path) {
         boolean checkDeathTime = config.getBoolean(path + ".Check_Death_Time", false);
         UniInt secondsSinceDeath = UniInt.read(config, path + ".Seconds_Since_Death");
 
@@ -29,19 +29,19 @@ public class RevivePlayersAction implements Action {
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".Check_Death_Time", this.checkDeathTime);
         this.secondsSinceDeath.write(config, path + ".Seconds_Since_Death");
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return ActionId.REVIVE_PLAYERS;
     }
 
     @Override
-    public void perform(@NotNull DungeonInstance dungeon, @NotNull DungeonGameEvent event) {
+    public void perform(@NonNull DungeonInstance dungeon, @NonNull DungeonGameEvent event) {
         if (dungeon.isAboutToEnd()) return;
 
         dungeon.getDeadPlayers().forEach(gamer -> {

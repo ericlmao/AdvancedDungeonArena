@@ -8,8 +8,8 @@ import org.bukkit.entity.*;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.api.criteria.CriterionMob;
@@ -105,7 +105,7 @@ public class DungeonInstance implements Dungeon {
     private volatile Stage stage;
     private boolean stageCompleted;
 
-    public DungeonInstance(@NotNull DungeonPlugin plugin, @NotNull DungeonConfig config) {
+    public DungeonInstance(@NonNull DungeonPlugin plugin, @NonNull DungeonConfig config) {
         this.plugin = plugin;
         this.config = config;
         this.stats = new DungeonStats(this);
@@ -126,12 +126,12 @@ public class DungeonInstance implements Dungeon {
         this.prefix = this.replacePlaceholders().apply(config.getPrefix());
     }
 
-    @NotNull
+    @NonNull
     public UnaryOperator<String> replacePlaceholders() {
         return str -> Placeholders.DUNGEON_INSTANCE.replacer(this).apply(this.replaceVariables().apply(str));
     }
 
-    @NotNull
+    @NonNull
     public UnaryOperator<String> replaceVariables() {
         return this.variables.replacePlaceholders();
     }
@@ -186,14 +186,14 @@ public class DungeonInstance implements Dungeon {
         return true;
     }
 
-    public void activate(@NotNull World world) {
+    public void activate(@NonNull World world) {
         if (this.config.getWorldName().equalsIgnoreCase(world.getName())) {
             this.world = world;
             this.plugin.debug("Dungeon " + this.getId() + " activated.");
         }
     }
 
-    public void deactivate(@NotNull World world) {
+    public void deactivate(@NonNull World world) {
         if (this.config.getWorldName().equalsIgnoreCase(world.getName())) {
             this.deactivate();
         }
@@ -207,7 +207,7 @@ public class DungeonInstance implements Dungeon {
     }
 
     @Override
-    @NotNull
+    @NonNull
     public World getWorld() {
         if (this.world == null) throw new IllegalStateException("Dungeon world is not loaded! You must check Dungeon#isActive before calling this method.");
 
@@ -218,7 +218,7 @@ public class DungeonInstance implements Dungeon {
         return this.world != null && !this.config.isBroken();
     }
 
-    @NotNull
+    @NonNull
     public DungeonPlugin getPlugin() {
         return this.plugin;
     }
@@ -374,7 +374,7 @@ public class DungeonInstance implements Dungeon {
         });
     }
 
-    private void broadcastEvent(@NotNull DungeonGameEvent event) {
+    private void broadcastEvent(@NonNull DungeonGameEvent event) {
         this.plugin.getPluginManager().callEvent(event);
         if (event instanceof Cancellable cancellable && cancellable.isCancelled()) return;
 
@@ -412,26 +412,26 @@ public class DungeonInstance implements Dungeon {
     // can resolve PAPI placeholders (arbitrary third-party code) against the recipient. Every recipient is
     // therefore messaged from their own scheduler rather than from whichever thread called broadcast.
 
-    public void broadcast(@NotNull MessageLocale locale, @NotNull Consumer<Replacer> consumer) {
+    public void broadcast(@NonNull MessageLocale locale, @NonNull Consumer<Replacer> consumer) {
         this.getPlayers().forEach(gamer -> this.plugin.runTask(gamer.getPlayer(),
             () -> this.getPrefixed(locale).send(gamer.getPlayer(), consumer)));
     }
 
-    public void broadcast(@NotNull MessageLocale locale, @NotNull BiConsumer<Player, Replacer> consumer) {
+    public void broadcast(@NonNull MessageLocale locale, @NonNull BiConsumer<Player, Replacer> consumer) {
         this.getPlayers().forEach(gamer -> this.plugin.runTask(gamer.getPlayer(),
             () -> this.getPrefixed(locale).send(gamer.getPlayer(), replacer -> consumer.accept(gamer.getPlayer(), replacer))));
     }
 
-    public void broadcast(@NotNull String message) {
+    public void broadcast(@NonNull String message) {
         this.getPlayers().forEach(gamer -> this.plugin.runTask(gamer.getPlayer(),
             () -> Players.sendMessage(gamer.getPlayer(), message)));
     }
 
-    public void sendMessage(@NotNull Player player, @NotNull MessageLocale locale, @NotNull Consumer<Replacer> consumer) {
+    public void sendMessage(@NonNull Player player, @NonNull MessageLocale locale, @NonNull Consumer<Replacer> consumer) {
         this.getPrefixed(locale).send(player, consumer);
     }
 
-    public void runCommand(@NotNull List<String> commands, @NotNull DungeonTarget target, @Nullable DungeonGameEvent event) {
+    public void runCommand(@NonNull List<String> commands, @NonNull DungeonTarget target, @Nullable DungeonGameEvent event) {
         if (target == DungeonTarget.GLOBAL) {
             // Console dispatch is global-region work: the command has no owning entity or location, and many
             // command implementations assume they are on the "main" thread, which on Folia means global.
@@ -446,7 +446,7 @@ public class DungeonInstance implements Dungeon {
             this.plugin.runTask(gamer.getPlayer(), () -> Players.dispatchCommands(gamer.getPlayer(), commands)));
     }
 
-    public void giveReward(@NotNull GameReward reward, boolean instant, @NotNull DungeonTarget target, @Nullable DungeonGameEvent event) {
+    public void giveReward(@NonNull GameReward reward, boolean instant, @NonNull DungeonTarget target, @Nullable DungeonGameEvent event) {
         if (target == DungeonTarget.GLOBAL) {
             ErrorHandler.error("Reward must have player-specific target, not " + target.name() + ".", this);
             return;
@@ -455,7 +455,7 @@ public class DungeonInstance implements Dungeon {
         this.runForPlayers(target, event, gamer -> this.giveReward(gamer, reward, instant));
     }
 
-    public void giveReward(@NotNull DungeonGamer gamer, @NotNull GameReward gameReward, boolean instant) {
+    public void giveReward(@NonNull DungeonGamer gamer, @NonNull GameReward gameReward, boolean instant) {
         Reward reward = gameReward.getReward();
         Player player = gamer.getPlayer();
 
@@ -465,7 +465,7 @@ public class DungeonInstance implements Dungeon {
         this.sendMessage(player, Lang.DUNGEON_GAME_REWARD_RECEIVED, replacer -> replacer.replace(this.replacePlaceholders()).replace(reward.replacePlaceholders()));
     }
 
-    private void runForPlayers(@NotNull DungeonTarget target, @Nullable DungeonGameEvent event, @NotNull Consumer<DungeonGamer> consumer) {
+    private void runForPlayers(@NonNull DungeonTarget target, @Nullable DungeonGameEvent event, @NonNull Consumer<DungeonGamer> consumer) {
         if (target == DungeonTarget.EVENT_PLAYER) {
             if (!(event instanceof GamerEvent gamerEvent)) return;
 
@@ -483,8 +483,8 @@ public class DungeonInstance implements Dungeon {
         });
     }
 
-    @NotNull
-    private LangMessage getPrefixed(@NotNull MessageLocale locale) {
+    @NonNull
+    private LangMessage getPrefixed(@NonNull MessageLocale locale) {
         return locale.withPrefix(this.prefix);
     }
 
@@ -508,7 +508,7 @@ public class DungeonInstance implements Dungeon {
         }
     }
 
-    private void spawnPlayer(@NotNull DungeonGamer gamer) {
+    private void spawnPlayer(@NonNull DungeonGamer gamer) {
         Player player = gamer.getPlayer();
         Kit kit = gamer.getKit();
 
@@ -532,42 +532,42 @@ public class DungeonInstance implements Dungeon {
         this.taskProgress.forEach((stageTask, progress) -> progress.onPlayerJoined(gamer)); // Adjust task progress for new players amount.
     }
 
-    private void leavePlayer(@NotNull DungeonPlayer gamer) {
+    private void leavePlayer(@NonNull DungeonPlayer gamer) {
         this.plugin.getDungeonManager().leaveInstance((DungeonGamer) gamer);
     }
 
-    public boolean hasPermission(@NotNull Player player) {
+    public boolean hasPermission(@NonNull Player player) {
         if (!this.config.features().isPermissionRequired()) return true;
 
         return player.hasPermission(Perms.PREFIX_DUNGEON + this.getId()) || player.hasPermission(Perms.DUNGEON_ALL);
     }
 
-    public boolean canAffordEntrance(@NotNull Player player) {
+    public boolean canAffordEntrance(@NonNull Player player) {
         if (!this.config.features().hasEntranceCost()) return true;
 
         return this.config.features().getEntranceCostMap().entrySet().stream().allMatch(entry -> EconomyBridge.hasEnough(player, entry.getKey(), entry.getValue()));
     }
 
-    public boolean hasGoodLevel(@NotNull Player player) {
+    public boolean hasGoodLevel(@NonNull Player player) {
         LevelRequirement requirement = this.config.features().getLevelRequirement();
         if (!requirement.isRequired()) return true;
 
         return requirement.isGoodLevel(player);
     }
 
-    public void payEntrance(@NotNull Player player) {
+    public void payEntrance(@NonNull Player player) {
         this.config.features().getEntranceCostMap().forEach((id, price) -> {
             EconomyBridge.withdraw(player, id, price);
         });
     }
 
-    public void refundEntrance(@NotNull Player player) {
+    public void refundEntrance(@NonNull Player player) {
         this.config.features().getEntranceCostMap().forEach((id, price) -> {
             EconomyBridge.deposit(player, id, price);
         });
     }
 
-    public void confiscateBadItems(@NotNull Player player, @NotNull List<ItemStack> confiscate) {
+    public void confiscateBadItems(@NonNull Player player, @NonNull List<ItemStack> confiscate) {
         ItemFilterMode mode = this.config.features().getItemFilterMode();
         if (mode == ItemFilterMode.NONE) return;
 
@@ -593,7 +593,7 @@ public class DungeonInstance implements Dungeon {
         }
     }
 
-    public boolean canJoin(@NotNull Player player, boolean force, boolean notify) {
+    public boolean canJoin(@NonNull Player player, boolean force, boolean notify) {
         if (!this.isActive()) {
             if (notify) this.sendMessage(player, Lang.DUNGEON_ENTER_ERROR_INACTIVE, replacer -> replacer.replace(this.replacePlaceholders()));
             return false;
@@ -650,12 +650,12 @@ public class DungeonInstance implements Dungeon {
     }
 
     @Override
-    public void handlePlayerJoin(@NotNull DungeonPlayer dungeonPlayer, boolean forced) {
+    public void handlePlayerJoin(@NonNull DungeonPlayer dungeonPlayer, boolean forced) {
         this.handlePlayerJoin(dungeonPlayer, forced, () -> {});
     }
 
     @Override
-    public void handlePlayerJoin(@NotNull DungeonPlayer dungeonPlayer, boolean forced, @NotNull Runnable onArrival) {
+    public void handlePlayerJoin(@NonNull DungeonPlayer dungeonPlayer, boolean forced, @NonNull Runnable onArrival) {
         Player player = dungeonPlayer.getPlayer();
         DungeonGamer gamer = (DungeonGamer) dungeonPlayer;
         Kit kit = gamer.getKit();
@@ -716,7 +716,7 @@ public class DungeonInstance implements Dungeon {
     }
 
     @Override
-    public void handlePlayerLeave(@NotNull DungeonPlayer dungeonPlayer) {
+    public void handlePlayerLeave(@NonNull DungeonPlayer dungeonPlayer) {
         DungeonGamer gamer = (DungeonGamer) dungeonPlayer;
         Player player = gamer.getPlayer();
 
@@ -771,7 +771,7 @@ public class DungeonInstance implements Dungeon {
         });
     }
 
-    public void handlePlayerDeath(@NotNull DungeonGamer gamer) {
+    public void handlePlayerDeath(@NonNull DungeonGamer gamer) {
         boolean hasExtraLives = gamer.hasExtraLives();
 
         gamer.handleDeath();
@@ -789,7 +789,7 @@ public class DungeonInstance implements Dungeon {
         this.broadcastEvent(event);
     }
 
-    public void handleMobDeath(@NotNull DungeonEntity mob, @NotNull EntityDeathEvent event) {
+    public void handleMobDeath(@NonNull DungeonEntity mob, @NonNull EntityDeathEvent event) {
         if (!this.config.gameSettings().isMobsDropLoot()) {
             event.getDrops().clear();
         }
@@ -822,7 +822,7 @@ public class DungeonInstance implements Dungeon {
         this.eliminateMob(mob);
     }
 
-    public void handleMobSpawn(@NotNull LivingEntity entity) {
+    public void handleMobSpawn(@NonNull LivingEntity entity) {
         if (MobUitls.isPet(entity)) {
             if (!this.config.gameSettings().isPetsAllowed()) {
                 entity.remove();
@@ -863,7 +863,7 @@ public class DungeonInstance implements Dungeon {
         return this.countPlayers() >= this.config.gameSettings().getMinPlayers();
     }
 
-    public void setLevel(@NotNull Level level) {
+    public void setLevel(@NonNull Level level) {
         if (this.isLevel(level)) return;
 
         this.level = level;
@@ -872,11 +872,11 @@ public class DungeonInstance implements Dungeon {
         this.broadcast(Lang.DUNGEON_GAME_LEVEL_CHANGED, replacer -> replacer.replace(this.replacePlaceholders()).replace(level.replacePlaceholders()));
     }
 
-    public boolean isLevel(@NotNull Level level) {
+    public boolean isLevel(@NonNull Level level) {
         return this.level == level;
     }
 
-    public void setStage(@NotNull Stage stage) {
+    public void setStage(@NonNull Stage stage) {
         if (this.isStage(stage)) return;
 
         this.removeTasks();
@@ -888,7 +888,7 @@ public class DungeonInstance implements Dungeon {
         this.broadcast(Lang.DUNGEON_GAME_STAGE_CHANGED, replacer -> replacer.replace(this.replacePlaceholders()).replace(stage.replacePlaceholders()));
     }
 
-    public boolean isStage(@NotNull Stage stage) {
+    public boolean isStage(@NonNull Stage stage) {
         return this.stage == stage;
     }
 
@@ -921,12 +921,12 @@ public class DungeonInstance implements Dungeon {
     }
 
     @Override
-    public boolean isAllyMob(@NotNull LivingEntity entity) {
+    public boolean isAllyMob(@NonNull LivingEntity entity) {
         return this.getMobFaction(entity) == MobFaction.ALLY;
     }
 
     @Override
-    public boolean isEnemyMob(@NotNull LivingEntity entity) {
+    public boolean isEnemyMob(@NonNull LivingEntity entity) {
         return this.getMobFaction(entity) == MobFaction.ENEMY;
     }
 
@@ -941,19 +941,19 @@ public class DungeonInstance implements Dungeon {
     }
 
     @Override
-    public boolean hasMobsOfFaction(@NotNull MobFaction faction) {
+    public boolean hasMobsOfFaction(@NonNull MobFaction faction) {
         return this.getMobs().stream().anyMatch(mob -> mob.isFaction(faction));
     }
 
     @Override
     @Nullable
-    public MobFaction getMobFaction(@NotNull LivingEntity entity) {
+    public MobFaction getMobFaction(@NonNull LivingEntity entity) {
         DungeonMob mob = this.getMob(entity);
         return mob == null ? null : mob.getFaction();
     }
 
     @Override
-    public void eliminateMob(@NotNull DungeonEntity mob) {
+    public void eliminateMob(@NonNull DungeonEntity mob) {
         LivingEntity entity = mob.getBukkitEntity();
 
         // Was: `getLocation().getChunk()` - a synchronous chunk load whose only purpose was to force the
@@ -976,7 +976,7 @@ public class DungeonInstance implements Dungeon {
         this.plugin.runTask(() -> this.broadcastEvent(new DungeonMobEliminatedEvent(this, mob)));
     }
 
-    public boolean spawnAllyMob(@NotNull EntityType entityType, @NotNull Location location, int level) {
+    public boolean spawnAllyMob(@NonNull EntityType entityType, @NonNull Location location, int level) {
         MobIdentifier identifier = MobUitls.getEggAllyIdentifier(entityType);
         if (identifier == null) return false;
 
@@ -991,7 +991,7 @@ public class DungeonInstance implements Dungeon {
     }
 
     @Override
-    public void spawnMob(@NotNull MobProvider provider, @NotNull String mobId, @NotNull MobFaction faction, @NotNull DungeonSpawner spawner, int level, int amount) {
+    public void spawnMob(@NonNull MobProvider provider, @NonNull String mobId, @NonNull MobFaction faction, @NonNull DungeonSpawner spawner, int level, int amount) {
         if (spawner.isEmpty()) {
             ErrorHandler.error("Could not spawn mob '" + provider.getName() + ":" + mobId + "' at empty spawner '" + spawner.getId() + "'!", this);
             return;
@@ -1006,7 +1006,7 @@ public class DungeonInstance implements Dungeon {
     }
 
     @Override
-    public void spawnMob(@NotNull MobProvider provider, @NotNull String mobId, @NotNull MobFaction faction, @NotNull Location location, int level) {
+    public void spawnMob(@NonNull MobProvider provider, @NonNull String mobId, @NonNull MobFaction faction, @NonNull Location location, int level) {
         // Spawning is world mutation: it has to happen on the region that owns the spawn point, which for a
         // dungeon spanning several regions is not necessarily the one running the instance clock.
         this.plugin.runTask(location, () -> {
@@ -1032,7 +1032,7 @@ public class DungeonInstance implements Dungeon {
     }
 
     @Override
-    public void addMob(@NotNull DungeonEntity mob) {
+    public void addMob(@NonNull DungeonEntity mob) {
         this.mobByIdMap.put(mob.getUniqueId(), (DungeonMob) mob);
         this.stats.addMobSpawn(mob);
 
@@ -1045,72 +1045,72 @@ public class DungeonInstance implements Dungeon {
     }
 
     @Override
-    public void removeMob(@NotNull DungeonEntity mob) {
+    public void removeMob(@NonNull DungeonEntity mob) {
         this.removeMob(mob.getUniqueId());
     }
 
     @Override
-    public void removeMob(@NotNull UUID mobId) {
+    public void removeMob(@NonNull UUID mobId) {
         this.mobByIdMap.remove(mobId);
     }
 
     @Override
-    public boolean hasMob(@NotNull UUID mobId) {
+    public boolean hasMob(@NonNull UUID mobId) {
         return this.mobByIdMap.containsKey(mobId);
     }
 
     @Override
     @Nullable
-    public DungeonMob getMob(@NotNull LivingEntity entity) {
+    public DungeonMob getMob(@NonNull LivingEntity entity) {
         return this.getMobById(entity.getUniqueId());
     }
 
     @Override
     @Nullable
-    public DungeonMob getMobById(@NotNull UUID mobId) {
+    public DungeonMob getMobById(@NonNull UUID mobId) {
         return this.mobByIdMap.get(mobId);
     }
 
     @Override
-    @NotNull
+    @NonNull
     public Set<DungeonMob> getAllyMobs() {
         return this.getMobs(MobFaction.ALLY);
     }
 
     @Override
-    @NotNull
+    @NonNull
     public Set<DungeonMob> getEnemyMobs() {
         return this.getMobs(MobFaction.ENEMY);
     }
 
     @Override
-    @NotNull
+    @NonNull
     public Set<DungeonMob> getMobs() {
         return new HashSet<>(this.mobByIdMap.values());
     }
 
     @Override
-    @NotNull
-    public Set<DungeonMob> getMobs(@NotNull MobFaction faction) {
+    @NonNull
+    public Set<DungeonMob> getMobs(@NonNull MobFaction faction) {
         return this.queryMobs(mob -> mob.isFaction(faction));
     }
 
-    @NotNull
-    public Set<DungeonMob> queryMobs(@NotNull Predicate<CriterionMob> predicate) {
+    @NonNull
+    public Set<DungeonMob> queryMobs(@NonNull Predicate<CriterionMob> predicate) {
         return this.getMobs().stream().filter(predicate).collect(Collectors.toSet());
     }
 
-    public int countMobs(@NotNull MobFaction faction) {
+    public int countMobs(@NonNull MobFaction faction) {
         return this.countMobs(mob -> MobCriterias.FACTION.predicate(faction).test(mob));
     }
 
-    public int countMobs(@NotNull Predicate<CriterionMob> predicate) {
+    public int countMobs(@NonNull Predicate<CriterionMob> predicate) {
         return this.queryMobs(predicate).size();
     }
 
 
 
-    public void addTasks(@NotNull Stage stage) {
+    public void addTasks(@NonNull Stage stage) {
         stage.getTasks().forEach(stageTask -> {
             if (stageTask.getParams().isAutoAdd()) {
                 this.addTask(stageTask);
@@ -1118,7 +1118,7 @@ public class DungeonInstance implements Dungeon {
         });
     }
 
-    public void addTask(@NotNull StageTask stageTask) {
+    public void addTask(@NonNull StageTask stageTask) {
         TaskProgress progress = stageTask.createProgress(this);
         if (progress.isEmpty()) return;
 
@@ -1137,7 +1137,7 @@ public class DungeonInstance implements Dungeon {
         this.broadcastEvent(new DungeonTaskCreatedEvent(this, stageTask, progress));
     }
 
-    public void removeTask(@NotNull StageTask stageTask) {
+    public void removeTask(@NonNull StageTask stageTask) {
         TaskProgress progress = this.taskProgress.remove(stageTask);
         if (progress == null) return;
 
@@ -1148,12 +1148,12 @@ public class DungeonInstance implements Dungeon {
         this.getTasks().forEach(this::removeTask);
     }
 
-    @NotNull
+    @NonNull
     public Set<StageTask> getTasks() {
         return new HashSet<>(this.taskProgress.keySet());
     }
 
-    public boolean hasTask(@NotNull StageTask stageTask) {
+    public boolean hasTask(@NonNull StageTask stageTask) {
         return this.taskProgress.containsKey(stageTask);
     }
 
@@ -1161,7 +1161,7 @@ public class DungeonInstance implements Dungeon {
         return !this.taskProgress.isEmpty();
     }
 
-    public boolean isTaskCompleted(@NotNull StageTask stageTask) {
+    public boolean isTaskCompleted(@NonNull StageTask stageTask) {
         TaskProgress progress = this.taskProgress.get(stageTask);
         return progress != null && progress.isCompleted();
     }
@@ -1180,7 +1180,7 @@ public class DungeonInstance implements Dungeon {
 
     // Loot chests are block entities scattered across the arena, so each one is touched on the region that
     // owns its own block - not on whichever region happens to own the instance anchor.
-    public void refillLootChest(@NotNull LootChest lootChest) {
+    public void refillLootChest(@NonNull LootChest lootChest) {
         this.atLootChest(lootChest, () -> lootChest.generateLoot(this));
     }
 
@@ -1188,11 +1188,11 @@ public class DungeonInstance implements Dungeon {
         this.config.getLootChests().forEach(this::clearLootChest);
     }
 
-    public void clearLootChest(@NotNull LootChest lootChest) {
+    public void clearLootChest(@NonNull LootChest lootChest) {
         this.atLootChest(lootChest, () -> lootChest.clearLoot(this));
     }
 
-    private void atLootChest(@NotNull LootChest lootChest, @NotNull Runnable runnable) {
+    private void atLootChest(@NonNull LootChest lootChest, @NonNull Runnable runnable) {
         World world = this.world;
         if (world == null) return;
 
@@ -1207,11 +1207,11 @@ public class DungeonInstance implements Dungeon {
         return this.config.gameSettings().isKitsEnabled();
     }
 
-    public boolean isKitAllowed(@NotNull Kit kit) {
+    public boolean isKitAllowed(@NonNull Kit kit) {
         return this.config.gameSettings().isKitAllowed(kit.getId());
     }
 
-    public boolean isKitAvailable(@NotNull Kit kit) {
+    public boolean isKitAvailable(@NonNull Kit kit) {
         if (!this.isKitAllowed(kit)) {
             return false;
         }
@@ -1219,19 +1219,19 @@ public class DungeonInstance implements Dungeon {
         return !this.isKitLimitReached(kit);
     }
 
-    public boolean isKitLimitReached(@NotNull Kit kit) {
+    public boolean isKitLimitReached(@NonNull Kit kit) {
         return this.countKitFreeSlots(kit) == 0;
     }
 
-    public int getKitLimit(@NotNull Kit kit) {
+    public int getKitLimit(@NonNull Kit kit) {
         return this.config.gameSettings().getKitLimit(kit.getId());
     }
 
-    public int countKitInUse(@NotNull Kit kit) {
+    public int countKitInUse(@NonNull Kit kit) {
         return (int) this.getPlayers().stream().filter(gamer -> gamer.isKit(kit)).count();
     }
 
-    public int countKitFreeSlots(@NotNull Kit kit) {
+    public int countKitFreeSlots(@NonNull Kit kit) {
         int limit = this.getKitLimit(kit);
         if (limit < 0) return -1;
 
@@ -1240,7 +1240,7 @@ public class DungeonInstance implements Dungeon {
 
 
     @Override
-    public boolean hasPlayer(@NotNull UUID playerId) {
+    public boolean hasPlayer(@NonNull UUID playerId) {
         return this.players.containsKey(playerId);
     }
 
@@ -1265,29 +1265,29 @@ public class DungeonInstance implements Dungeon {
     }
 
     @Override
-    @NotNull
+    @NonNull
     public DungeonGamer getRandomAlivePlayer() {
         return Rnd.get(this.getPlayers());
     }
 
     @Override
     @Nullable
-    public DungeonGamer getPlayer(@NotNull UUID playerId) {
+    public DungeonGamer getPlayer(@NonNull UUID playerId) {
         return this.players.get(playerId);
     }
 
     @Override
-    @NotNull
+    @NonNull
     public Set<DungeonGamer> getPlayers() {
         return new HashSet<>(this.players.values());
     }
 
-    @NotNull
+    @NonNull
     public Set<DungeonGamer> getAlivePlayers() {
         return this.players.values().stream().filter(DungeonPlayer::isAlive).collect(Collectors.toSet());
     }
 
-    @NotNull
+    @NonNull
     public Set<DungeonGamer> getDeadPlayers() {
         return this.players.values().stream().filter(DungeonPlayer::isDead).collect(Collectors.toSet());
     }
@@ -1295,7 +1295,7 @@ public class DungeonInstance implements Dungeon {
 
 
 
-    public void addGroundItem(@NotNull Item item) {
+    public void addGroundItem(@NonNull Item item) {
         this.groundItems.removeIf(other -> !other.isValid());
         this.groundItems.add(item);
 
@@ -1330,7 +1330,7 @@ public class DungeonInstance implements Dungeon {
         items.forEach(item -> this.plugin.runTask(item, item::remove));
     }
 
-    @NotNull
+    @NonNull
     public Set<Item> getGroundItems() {
         return this.groundItems;
     }
@@ -1342,14 +1342,14 @@ public class DungeonInstance implements Dungeon {
         this.config.getSpots().forEach(this::resetSpotState);
     }
 
-    public void resetSpotState(@NotNull Spot spot) {
+    public void resetSpotState(@NonNull Spot spot) {
         SpotState state = spot.getDefaultState();
         if (state == null) return;
 
         this.setSpotState(spot, state);
     }
 
-    public void setSpotState(@NotNull Spot spot, @NotNull SpotState state) {
+    public void setSpotState(@NonNull Spot spot, @NonNull SpotState state) {
         if (!this.isActive()) return;
 
         spot.build(this.world, state);
@@ -1362,22 +1362,22 @@ public class DungeonInstance implements Dungeon {
 
 
     @Override
-    public boolean contains(@NotNull BlockPos blockPos) {
+    public boolean contains(@NonNull BlockPos blockPos) {
         return this.config.isInProtection(blockPos);
     }
 
     @Override
-    public boolean contains(@NotNull Block block) {
+    public boolean contains(@NonNull Block block) {
         return this.config.isInProtection(block);
     }
 
     @Override
-    public boolean contains(@NotNull Location location) {
+    public boolean contains(@NonNull Location location) {
         return this.config.isInProtection(location);
     }
 
     @Override
-    public boolean contains(@NotNull Entity entity) {
+    public boolean contains(@NonNull Entity entity) {
         return this.config.isInProtection(entity);
     }
 
@@ -1389,33 +1389,33 @@ public class DungeonInstance implements Dungeon {
     }
 
     @Override
-    @NotNull
+    @NonNull
     public String getId() {
         return this.config.getId();
     }
 
-    @NotNull
+    @NonNull
     public DungeonConfig getConfig() {
         return this.config;
     }
 
-    @NotNull
+    @NonNull
     public DungeonStats getStats() {
         return this.stats;
     }
 
-    @NotNull
+    @NonNull
     public DungeonVariables getVariables() {
         return this.variables;
     }
 
     @Override
-    @NotNull
+    @NonNull
     public GameState getState() {
         return this.state;
     }
 
-    @NotNull
+    @NonNull
     public Location getLobbyLocation() {
         return this.config.getLobbyPos().toLocation(this.world);
     }
@@ -1424,7 +1424,7 @@ public class DungeonInstance implements Dungeon {
      *
      * @return Spawn location of the current dungeon level.
      */
-    @NotNull
+    @NonNull
     public Location getSpawnLocation() {
         return this.level.getSpawnLocation(this.world);
     }
@@ -1437,7 +1437,7 @@ public class DungeonInstance implements Dungeon {
         this.countdown = countdown;
     }
 
-    public void setCountdown(int countdown, @NotNull GameResult gameResult) {
+    public void setCountdown(int countdown, @NonNull GameResult gameResult) {
         this.countdown = countdown;
         if (this.state == GameState.INGAME) {
             this.gameResult = gameResult;
@@ -1452,27 +1452,27 @@ public class DungeonInstance implements Dungeon {
         this.timeLeft = timeLeft;
     }
 
-    @NotNull
+    @NonNull
     public Level getLevel() {
         return this.level;
     }
 
-    @NotNull
+    @NonNull
     public Stage getStage() {
         return this.stage;
     }
 
-    @NotNull
+    @NonNull
     public GameMode getGameMode() {
         return this.config.gameSettings().isAdventureMode() ? GameMode.ADVENTURE : GameMode.SURVIVAL;
     }
 
-    @NotNull
+    @NonNull
     public List<DungeonEventReceiver> getEventReceivers() {
         return this.eventReceivers;
     }
 
-    @NotNull
+    @NonNull
     public Map<StageTask, TaskProgress> getTaskProgress() {
         return this.taskProgress;
     }

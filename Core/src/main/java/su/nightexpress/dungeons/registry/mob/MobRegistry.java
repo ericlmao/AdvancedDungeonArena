@@ -1,8 +1,8 @@
 package su.nightexpress.dungeons.registry.mob;
 
 import org.bukkit.entity.LivingEntity;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.api.mob.MobProvider;
 import su.nightexpress.dungeons.hook.HookId;
@@ -20,7 +20,7 @@ public class MobRegistry {
 
     private static DungeonPlugin plugin;
 
-    public static void load(@NotNull DungeonPlugin dungeonPlugin) {
+    public static void load(@NonNull DungeonPlugin dungeonPlugin) {
         plugin = dungeonPlugin;
 
         // MythicMobs is the one and only mob engine supported by the plugin.
@@ -41,7 +41,7 @@ public class MobRegistry {
         plugin = null;
     }
 
-    public static void register(@NotNull MobProvider provider) {
+    public static void register(@NonNull MobProvider provider) {
         BY_ID_MAP.put(provider.getName(), provider);
         plugin.info("Registered mob provider: " + provider.getName());
     }
@@ -51,22 +51,22 @@ public class MobRegistry {
     }
 
     @Nullable
-    public static MobProvider getProviderByName(@NotNull String name) {
+    public static MobProvider getProviderByName(@NonNull String name) {
         return BY_ID_MAP.get(name.toLowerCase());
     }
 
-    @NotNull
+    @NonNull
     public static Map<String, MobProvider> getProviderByIdMap() {
         return BY_ID_MAP;
     }
 
-    @NotNull
+    @NonNull
     public static Set<MobProvider> getProviders() {
         return new HashSet<>(BY_ID_MAP.values());
     }
 
     @Nullable
-    public static MobProvider getProvider(@NotNull LivingEntity entity) {
+    public static MobProvider getProvider(@NonNull LivingEntity entity) {
         return getProviders().stream().filter(provider -> provider.isProducedBy(entity)).findFirst().orElse(null);
     }
 }

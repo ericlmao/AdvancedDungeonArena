@@ -20,7 +20,7 @@ import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.selection.visual.FakeEntity;
 import su.nightexpress.dungeons.nightcore.util.Lists;
@@ -36,14 +36,14 @@ public class BlockPacketsHighlighter extends BlockHighlighter {
 
     private final PlayerManager manager;
 
-    public BlockPacketsHighlighter(@NotNull DungeonPlugin plugin) {
+    public BlockPacketsHighlighter(@NonNull DungeonPlugin plugin) {
         super(plugin);
         this.manager = PacketEvents.getAPI().getPlayerManager();
     }
 
     @Override
-    @NotNull
-    protected FakeEntity spawnVisualBlock(int entityID, @NotNull Player player, @NotNull Location location, @NotNull BlockData blockData, @NotNull ChatColor color, float size) {
+    @NonNull
+    protected FakeEntity spawnVisualBlock(int entityID, @NonNull Player player, @NonNull Location location, @NonNull BlockData blockData, @NonNull ChatColor color, float size) {
         EntityType type = EntityType.BLOCK_DISPLAY;
         UUID uuid = UUID.randomUUID();
         String entityUID = uuid.toString();
@@ -76,7 +76,7 @@ public class BlockPacketsHighlighter extends BlockHighlighter {
     }
 
     @Override
-    protected void destroyEntity(@NotNull Player player, @NotNull List<FakeEntity> idList) {
+    protected void destroyEntity(@NonNull Player player, @NonNull List<FakeEntity> idList) {
         idList.forEach(fakeEntity -> {
             String entityUID = fakeEntity.getUUID().toString();
 
@@ -88,16 +88,16 @@ public class BlockPacketsHighlighter extends BlockHighlighter {
         this.manager.sendPacket(player, destroyPacket);
     }
 
-    @NotNull
-    private WrapperPlayServerSpawnEntity createSpawnPacket(@NotNull EntityType type, @NotNull Location location, int entityID, @NotNull UUID uuid) {
+    @NonNull
+    private WrapperPlayServerSpawnEntity createSpawnPacket(@NonNull EntityType type, @NonNull Location location, int entityID, @NonNull UUID uuid) {
         com.github.retrooper.packetevents.protocol.entity.type.EntityType wrappedType = SpigotConversionUtil.fromBukkitEntityType(type);
         com.github.retrooper.packetevents.protocol.world.Location wrappedLocation = SpigotConversionUtil.fromBukkitLocation(location);
 
         return new WrapperPlayServerSpawnEntity(entityID, uuid, wrappedType, wrappedLocation, 0f, 0, new Vector3d());
     }
 
-    @NotNull
-    private PacketWrapper<?> createMetadataPacket(int entityID, @NotNull Consumer<List<EntityData<?>>> consumer) {
+    @NonNull
+    private PacketWrapper<?> createMetadataPacket(int entityID, @NonNull Consumer<List<EntityData<?>>> consumer) {
         List<EntityData<?>> dataList = new ArrayList<>();
 
         consumer.accept(dataList);

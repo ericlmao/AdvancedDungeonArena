@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.api.dungeon;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.nightcore.util.geodata.pos.ChunkPos;
 
 import java.util.Objects;
@@ -10,17 +10,17 @@ public class DungeonPos {
     private final String   worldName;
     private final ChunkPos chunkPos;
 
-    public DungeonPos(@NotNull String worldName, @NotNull ChunkPos chunkPos) {
+    public DungeonPos(@NonNull String worldName, @NonNull ChunkPos chunkPos) {
         this.worldName = worldName;
         this.chunkPos = chunkPos;
     }
 
-    @NotNull
+    @NonNull
     public String getWorldName() {
         return this.worldName;
     }
 
-    @NotNull
+    @NonNull
     public ChunkPos getChunkPos() {
         return this.chunkPos;
     }

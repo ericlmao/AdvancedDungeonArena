@@ -5,8 +5,8 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.api.compat.BoardPlugin;
 import su.nightexpress.dungeons.api.compat.GodPlugin;
@@ -72,7 +72,7 @@ public class DungeonGamer implements DungeonPlayer {
     /** Written from the teleport completion stage, read from the teleport listener on another thread. */
     private volatile boolean teleporting;
 
-    public DungeonGamer(@NotNull Player player, @NotNull DungeonInstance dungeon) {
+    public DungeonGamer(@NonNull Player player, @NonNull DungeonInstance dungeon) {
         this.player = player;
         this.dungeon = dungeon;
         this.state = GameState.WAITING;
@@ -97,12 +97,12 @@ public class DungeonGamer implements DungeonPlayer {
     /**
      * This player's pre-rendered scoreboard line. Safe to read from any thread. See {@link #boardEntry}.
      */
-    @NotNull
+    @NonNull
     public String getBoardEntry() {
         return this.boardEntry;
     }
 
-    @NotNull
+    @NonNull
     public UnaryOperator<String> replacePlaceholders() {
         return Placeholders.DUNGEON_GAMER.replacer(this);
     }
@@ -152,8 +152,8 @@ public class DungeonGamer implements DungeonPlayer {
     }
 
     @Override
-    @NotNull
-    public CompletableFuture<Boolean> teleport(@NotNull Location location) {
+    @NonNull
+    public CompletableFuture<Boolean> teleport(@NonNull Location location) {
         // The `teleporting` flag is what tells DungeonGameListener#onDungeonPlayerTeleport not to cancel our
         // own boundary-crossing teleports. It therefore has to stay raised for the entire flight, not just
         // for the duration of this method - PlayerTeleportEvent fires while teleportAsync is still in
@@ -178,7 +178,7 @@ public class DungeonGamer implements DungeonPlayer {
     }
 
     @Override
-    public void teleportThen(@NotNull Location location, @NotNull Runnable onArrival) {
+    public void teleportThen(@NonNull Location location, @NonNull Runnable onArrival) {
         // teleport() already completes `arrival` on the player's scheduler, and completion is always at
         // least one tick away, so the callback attached here cannot run inline on the calling thread.
         this.teleport(location).thenRun(onArrival);
@@ -191,7 +191,7 @@ public class DungeonGamer implements DungeonPlayer {
      * accepts nothing and reports nothing, so without it a player who disconnects mid-teleport would leave
      * their instance bookkeeping, refunds and rewards permanently unfinished.
      */
-    private void onPlayerThread(@NotNull Runnable runnable) {
+    private void onPlayerThread(@NonNull Runnable runnable) {
         Runnable fallback = () -> Scheduler.sync().run(task -> runnable.run());
 
         if (Scheduler.entity(this.player).run(task -> runnable.run(), fallback) == null) {
@@ -263,14 +263,14 @@ public class DungeonGamer implements DungeonPlayer {
     }
 
     @Override
-    public void manageExternalGod(@NotNull Consumer<GodPlugin> consumer) {
+    public void manageExternalGod(@NonNull Consumer<GodPlugin> consumer) {
         if (this.godPlugin != null) {
             consumer.accept(this.godPlugin);
         }
     }
 
     @Override
-    public void manageExternalBoard(@NotNull Consumer<BoardPlugin> consumer) {
+    public void manageExternalBoard(@NonNull Consumer<BoardPlugin> consumer) {
         if (this.boardPlugin != null) {
             consumer.accept(this.boardPlugin);
         }
@@ -308,34 +308,34 @@ public class DungeonGamer implements DungeonPlayer {
     }
 
     @Override
-    @NotNull
+    @NonNull
     public Player getPlayer() {
         return this.player;
     }
 
     @Override
-    @NotNull
+    @NonNull
     public DungeonInstance getDungeon() {
         return this.dungeon;
     }
 
     @Override
-    @NotNull
+    @NonNull
     public GameState getState() {
         return this.state;
     }
 
     @Override
-    public void setState(@NotNull GameState state) {
+    public void setState(@NonNull GameState state) {
         this.state = state;
     }
 
-    @NotNull
+    @NonNull
     public List<GameReward> getRewards() {
         return this.rewards;
     }
 
-    public void addReward(@NotNull GameReward reward) {
+    public void addReward(@NonNull GameReward reward) {
         this.rewards.add(reward);
     }
 
@@ -364,7 +364,7 @@ public class DungeonGamer implements DungeonPlayer {
         return this.kit != null;
     }
 
-    public boolean isKit(@NotNull Kit kit) {
+    public boolean isKit(@NonNull Kit kit) {
         return this.kit == kit;
     }
 

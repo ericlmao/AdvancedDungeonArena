@@ -8,7 +8,7 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedNumberFormat;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.player.DungeonGamer;
 import su.nightexpress.dungeons.dungeon.feature.board.AbstractBoard;
 import su.nightexpress.dungeons.dungeon.feature.board.BoardLayout;
@@ -18,18 +18,18 @@ import java.util.Optional;
 
 public class ProtocolBoard extends AbstractBoard<PacketContainer> {
 
-    public ProtocolBoard(@NotNull DungeonGamer gamer, @NotNull BoardLayout boardConfig) {
+    public ProtocolBoard(@NonNull DungeonGamer gamer, @NonNull BoardLayout boardConfig) {
         super(gamer, boardConfig);
     }
 
     @Override
-    protected void sendPacket(@NotNull Player player, @NotNull PacketContainer packet) {
+    protected void sendPacket(@NonNull Player player, @NonNull PacketContainer packet) {
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
     }
 
     @Override
-    @NotNull
-    protected PacketContainer createObjectivePacket(ObjectiveMode mode, @NotNull String displayName) {
+    @NonNull
+    protected PacketContainer createObjectivePacket(ObjectiveMode mode, @NonNull String displayName) {
         int method = switch (mode) {
             case CREATE -> 0;
             case REMOVE -> 1;
@@ -47,8 +47,8 @@ public class ProtocolBoard extends AbstractBoard<PacketContainer> {
     }
 
     @Override
-    @NotNull
-    protected PacketContainer createResetScorePacket(@NotNull String scoreId) {
+    @NonNull
+    protected PacketContainer createResetScorePacket(@NonNull String scoreId) {
         PacketContainer scorePacket = new PacketContainer(PacketType.Play.Server.RESET_SCORE);
         scorePacket.getModifier().writeDefaults();
         scorePacket.getStrings().write(0, scoreId);
@@ -57,8 +57,8 @@ public class ProtocolBoard extends AbstractBoard<PacketContainer> {
     }
 
     @Override
-    @NotNull
-    protected PacketContainer createScorePacket(@NotNull String scoreId, int score, @NotNull String text) {
+    @NonNull
+    protected PacketContainer createScorePacket(@NonNull String scoreId, int score, @NonNull String text) {
         PacketContainer scorePacket = new PacketContainer(PacketType.Play.Server.SCOREBOARD_SCORE);
         scorePacket.getModifier().writeDefaults();
         scorePacket.getStrings().write(0, scoreId); // 'owner'
@@ -71,7 +71,7 @@ public class ProtocolBoard extends AbstractBoard<PacketContainer> {
     }
 
     @Override
-    @NotNull
+    @NonNull
     protected PacketContainer createDisplayPacket() {
         PacketContainer displayPacket = new PacketContainer(PacketType.Play.Server.SCOREBOARD_DISPLAY_OBJECTIVE);
         displayPacket.getModifier().writeDefaults();

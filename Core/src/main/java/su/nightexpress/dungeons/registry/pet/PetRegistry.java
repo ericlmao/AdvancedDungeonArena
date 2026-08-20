@@ -1,7 +1,7 @@
 package su.nightexpress.dungeons.registry.pet;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.hook.HookId;
 import su.nightexpress.dungeons.registry.pet.provider.CombatPetsProvider;
@@ -16,13 +16,13 @@ public class PetRegistry {
 
     private static DungeonPlugin plugin;
 
-    public static void load(@NotNull DungeonPlugin dungeonPlugin) {
+    public static void load(@NonNull DungeonPlugin dungeonPlugin) {
         plugin = dungeonPlugin;
 
         loadIntegration(HookId.COMBAT_PETS, CombatPetsProvider::new);
     }
 
-    private static void loadIntegration(@NotNull String pluginName, @NotNull Supplier<PetProvider> provider) {
+    private static void loadIntegration(@NonNull String pluginName, @NonNull Supplier<PetProvider> provider) {
         if (!Plugins.isInstalled(pluginName)) return;
 
         register(provider.get());
@@ -33,22 +33,22 @@ public class PetRegistry {
         plugin = null;
     }
 
-    public static void register(@NotNull PetProvider provider) {
+    public static void register(@NonNull PetProvider provider) {
         BY_ID_MAP.put(provider.getName(), provider);
         plugin.info("Registered pet provider: " + provider.getName());
     }
 
     @Nullable
-    public static PetProvider getProvider(@NotNull String name) {
+    public static PetProvider getProvider(@NonNull String name) {
         return BY_ID_MAP.get(name.toLowerCase());
     }
 
-    @NotNull
+    @NonNull
     public static Map<String, PetProvider> getByIdMap() {
         return BY_ID_MAP;
     }
 
-    @NotNull
+    @NonNull
     public static Set<PetProvider> getProviders() {
         return new HashSet<>(BY_ID_MAP.values());
     }

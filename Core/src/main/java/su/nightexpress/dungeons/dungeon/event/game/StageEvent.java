@@ -1,9 +1,9 @@
 package su.nightexpress.dungeons.dungeon.event.game;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.stage.Stage;
 
 public interface StageEvent {
 
-    @NotNull Stage getStage();
+    @NonNull Stage getStage();
 }

@@ -1,7 +1,7 @@
 package su.nightexpress.dungeons.dungeon.feature.board;
 
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.api.dungeon.Board;
 import su.nightexpress.dungeons.api.type.GameState;
@@ -36,15 +36,15 @@ public abstract class AbstractBoard<T> implements Board {
      */
     protected volatile Map<Integer, String> scores = Map.of();
 
-    public AbstractBoard(@NotNull DungeonGamer gamer, @NotNull BoardLayout layout) {
+    public AbstractBoard(@NonNull DungeonGamer gamer, @NonNull BoardLayout layout) {
         this.layout = layout;
         this.gamer = gamer;
         this.player = gamer.getPlayer();
         this.identifier = createIdentifier(this.player).substring(0, 16);
     }
 
-    @NotNull
-    public static String createIdentifier(@NotNull Player player) {
+    @NonNull
+    public static String createIdentifier(@NonNull Player player) {
         String uuid = player.getUniqueId().toString();
 
         // Bedrock players have UUIDs leading with zeros.
@@ -55,12 +55,12 @@ public abstract class AbstractBoard<T> implements Board {
         return uuid;
     }
 
-    @NotNull
+    @NonNull
     public final BoardLayout getLayout() {
         return this.gamer.getDungeon().getState() == GameState.INGAME ? this.layout : Config.SCOREBOARD_LOBBY_LAYOUT.get();
     }
 
-    @NotNull
+    @NonNull
     private String getScoreIdentifier(int score) {
         return "line_" + score;
     }
@@ -71,18 +71,18 @@ public abstract class AbstractBoard<T> implements Board {
         UPDATE
     }
 
-    protected abstract void sendPacket(@NotNull Player player, @NotNull T packet);
+    protected abstract void sendPacket(@NonNull Player player, @NonNull T packet);
 
-    @NotNull
-    protected abstract T createObjectivePacket(ObjectiveMode mode, @NotNull String displayName);
+    @NonNull
+    protected abstract T createObjectivePacket(ObjectiveMode mode, @NonNull String displayName);
 
-    @NotNull
-    protected abstract T createResetScorePacket(@NotNull String scoreId);
+    @NonNull
+    protected abstract T createResetScorePacket(@NonNull String scoreId);
 
-    @NotNull
-    protected abstract T createScorePacket(@NotNull String scoreId, int score, @NotNull String text);
+    @NonNull
+    protected abstract T createScorePacket(@NonNull String scoreId, int score, @NonNull String text);
 
-    @NotNull
+    @NonNull
     protected abstract T createDisplayPacket();
 
     @Override
@@ -101,8 +101,8 @@ public abstract class AbstractBoard<T> implements Board {
         previous.keySet().forEach(score -> this.sendPacket(this.player, this.createResetScorePacket(this.getScoreIdentifier(score))));
     }
 
-    @NotNull
-    private String replacePlaceholders(@NotNull String string) {
+    @NonNull
+    private String replacePlaceholders(@NonNull String string) {
         return Replacer.create()
             .replace(Placeholders.forPlayerWithPAPI(this.player))
             .replace(this.gamer.replacePlaceholders())
@@ -110,7 +110,7 @@ public abstract class AbstractBoard<T> implements Board {
             .apply(string);
     }
 
-    @NotNull
+    @NonNull
     private List<String> getFormattedTasks() {
         DungeonInstance dungeon = this.gamer.getDungeon();
         List<String> list = new ArrayList<>();
@@ -137,7 +137,7 @@ public abstract class AbstractBoard<T> implements Board {
      * exactly the cross-region access that publishing them per-player avoids. See
      * {@link DungeonGamer#getBoardEntry()}.
      */
-    @NotNull
+    @NonNull
     private List<String> getFormattedPlayers() {
         return this.gamer.getDungeon().getPlayers().stream().map(DungeonGamer::getBoardEntry).toList();
     }

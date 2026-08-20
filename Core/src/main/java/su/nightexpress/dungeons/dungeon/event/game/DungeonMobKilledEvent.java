@@ -1,8 +1,8 @@
 package su.nightexpress.dungeons.dungeon.event.game;
 
 import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.api.dungeon.DungeonEntity;
 import su.nightexpress.dungeons.dungeon.player.DungeonGamer;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
@@ -14,7 +14,7 @@ public class DungeonMobKilledEvent extends DungeonMobEvent implements GamerEvent
 
     private DungeonGamer killer;
 
-    public DungeonMobKilledEvent(@NotNull DungeonInstance dungeon, @NotNull DungeonEntity dungeonMob) {
+    public DungeonMobKilledEvent(@NonNull DungeonInstance dungeon, @NonNull DungeonEntity dungeonMob) {
         super(DungeonEventType.MOB_KILLED, dungeon, dungeonMob);
     }
 
@@ -34,13 +34,13 @@ public class DungeonMobKilledEvent extends DungeonMobEvent implements GamerEvent
         this.killer = gamer;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public HandlerList getHandlers() {
         return HANDLER_LIST;
     }
 
-    @NotNull
+    @NonNull
     public static HandlerList getHandlerList() {
         return HANDLER_LIST;
     }

@@ -1,7 +1,7 @@
 package su.nightexpress.dungeons.command.impl;
 
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.command.CommandArguments;
@@ -19,7 +19,7 @@ import su.nightexpress.dungeons.nightcore.locale.entry.MessageLocale;
 
 public class KitCommands {
 
-    public static void load(@NotNull DungeonPlugin plugin, @NotNull HubNodeBuilder root) {
+    public static void load(@NonNull DungeonPlugin plugin, @NonNull HubNodeBuilder root) {
         var kitRoot = Commands.hub( "kit")
             .description(Lang.COMMAND_KIT_DESC)
             .permission(Perms.COMMAND_KIT);
@@ -61,7 +61,7 @@ public class KitCommands {
         root.branch(kitRoot);
     }
 
-    private static boolean createKit(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean createKit(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         Player player = context.getPlayerOrThrow();
         String name = arguments.getString(CommandArguments.NAME);
 
@@ -69,7 +69,7 @@ public class KitCommands {
         return true;
     }
 
-    private static boolean updateKit(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean updateKit(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         Player player = context.getPlayerOrThrow();
         Kit kit = arguments.get(CommandArguments.KIT, Kit.class);
 
@@ -77,7 +77,7 @@ public class KitCommands {
         return true;
     }
 
-    private static boolean grantOrRevokeKit(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments, boolean grant) {
+    private static boolean grantOrRevokeKit(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments, boolean grant) {
         String playerName = arguments.getString(CommandArguments.PLAYER);
         Kit kit = arguments.get(CommandArguments.KIT, Kit.class);
 

@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.script.condition.impl;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.script.condition.ConditionId;
 import su.nightexpress.dungeons.dungeon.script.condition.type.MobAmountCondition;
@@ -9,23 +9,23 @@ import su.nightexpress.dungeons.nightcore.config.FileConfig;
 @Deprecated
 public class AliveMobAmountCondition extends MobAmountCondition {
 
-    public AliveMobAmountCondition(@NotNull MobData mobData) {
+    public AliveMobAmountCondition(@NonNull MobData mobData) {
         super(mobData);
     }
 
-    @NotNull
-    public static AliveMobAmountCondition read(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static AliveMobAmountCondition read(@NonNull FileConfig config, @NonNull String path) {
         return new AliveMobAmountCondition(readMobData(config, path));
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return ConditionId.ALIVE_MOB_AMOUNT;
     }
 
     @Override
-    protected double getDungeonValue(@NotNull DungeonInstance dungeon) {
+    protected double getDungeonValue(@NonNull DungeonInstance dungeon) {
         return dungeon.countMobs(mob -> mob.isMob(this.identifier));
     }
 }

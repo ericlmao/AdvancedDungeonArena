@@ -1,7 +1,7 @@
 package su.nightexpress.dungeons.dungeon.mob;
 
 import org.bukkit.entity.LivingEntity;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.dungeon.DungeonEntity;
 import su.nightexpress.dungeons.api.mob.MobIdentifier;
 import su.nightexpress.dungeons.api.mob.MobSnapshot;
@@ -21,11 +21,11 @@ public class DungeonMob implements DungeonEntity {
     private final MobIdentifier   identifier;
     private final MobSnapshot snapshot;
 
-    public DungeonMob(@NotNull DungeonInstance dungeon,
-                      @NotNull LivingEntity bukkitEntity,
-                      @NotNull MobFaction faction,
-                      @NotNull MobProvider provider,
-                      @NotNull String mobId) {
+    public DungeonMob(@NonNull DungeonInstance dungeon,
+                      @NonNull LivingEntity bukkitEntity,
+                      @NonNull MobFaction faction,
+                      @NonNull MobProvider provider,
+                      @NonNull String mobId) {
         this.dungeon = dungeon;
         this.bukkitEntity = bukkitEntity;
         this.faction = faction;
@@ -35,51 +35,51 @@ public class DungeonMob implements DungeonEntity {
         this.snapshot = new MobSnapshot(this.getProviderId(), this.getMobId(), this.faction, this.dungeon.getStage().getId());
     }
 
-    @NotNull
+    @NonNull
     @Override
     public DungeonInstance getDungeon() {
         return this.dungeon;
     }
 
     @Override
-    @NotNull
+    @NonNull
     public UUID getUniqueId() {
         return this.bukkitEntity.getUniqueId();
     }
 
     @Override
-    @NotNull
+    @NonNull
     public MobSnapshot getSnapshot() {
         return this.snapshot;
     }
 
     @Override
-    public boolean isMob(@NotNull MobProvider provider, @NotNull String mobId) {
+    public boolean isMob(@NonNull MobProvider provider, @NonNull String mobId) {
         return this.isProvider(provider) && this.isId(mobId);
     }
 
     @Override
-    public boolean isMob(@NotNull MobIdentifier identifier) {
+    public boolean isMob(@NonNull MobIdentifier identifier) {
         return this.isProvider(identifier.getProviderId()) && this.isId(identifier.getMobId());
     }
 
     @Override
-    public boolean isId(@NotNull String mobId) {
+    public boolean isId(@NonNull String mobId) {
         return this.mobId.equalsIgnoreCase(mobId);
     }
 
     @Override
-    public boolean isProvider(@NotNull MobProvider provider) {
+    public boolean isProvider(@NonNull MobProvider provider) {
         return this.provider == provider;
     }
 
     @Override
-    public boolean isProvider(@NotNull String providerId) {
+    public boolean isProvider(@NonNull String providerId) {
         return this.provider.getName().equalsIgnoreCase(providerId);
     }
 
     @Override
-    public boolean isFaction(@NotNull MobFaction faction) {
+    public boolean isFaction(@NonNull MobFaction faction) {
         return this.faction == faction;
     }
 
@@ -94,43 +94,43 @@ public class DungeonMob implements DungeonEntity {
     }
 
     @Override
-    @NotNull
+    @NonNull
     public MobIdentifier getIdentifier() {
         return this.identifier;
     }
 
     @Override
-    @NotNull
+    @NonNull
     public String getProviderId() {
         return this.provider.getName();
     }
 
     @Override
-    @NotNull
+    @NonNull
     public LivingEntity getBukkitEntity() {
         return this.bukkitEntity;
     }
 
     @Override
-    @NotNull
+    @NonNull
     public MobFaction getFaction() {
         return this.faction;
     }
 
     @Override
-    @NotNull
+    @NonNull
     public MobProvider getProvider() {
         return this.provider;
     }
 
     @Override
-    @NotNull
+    @NonNull
     public String getMobId() {
         return this.mobId;
     }
 
     @Override
-    @NotNull
+    @NonNull
     public String getBornStageId() {
         return this.snapshot.getBornStageId();
     }

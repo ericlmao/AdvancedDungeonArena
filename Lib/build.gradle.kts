@@ -6,7 +6,7 @@
 // dropped; the text pipeline was rewritten onto Adventure.
 dependencies {
     compileOnly(libs.paper.api)
-    compileOnly(libs.annotations)
+    compileOnly(libs.jspecify)
 
     // Folia region schedulers. `api` so :Core sees it too - the scheduling seams live here, but Core
     // call sites need the same types. Shaded + relocated by :Core's shadowJar.

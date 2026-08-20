@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.script.action.impl;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.level.Level;
 import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
@@ -13,24 +13,24 @@ public class SetLevelAction implements Action {
 
     private final String levelId;
 
-    public SetLevelAction(@NotNull String levelId) {
+    public SetLevelAction(@NonNull String levelId) {
         this.levelId = levelId;
     }
 
-    @NotNull
-    public static SetLevelAction load(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static SetLevelAction load(@NonNull FileConfig config, @NonNull String path) {
         String levelId = config.getString(path + ".LevelId", "null");
 
         return new SetLevelAction(levelId);
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".LevelId", this.levelId);
     }
 
     @Override
-    public void perform(@NotNull DungeonInstance dungeon, @NotNull DungeonGameEvent event) {
+    public void perform(@NonNull DungeonInstance dungeon, @NonNull DungeonGameEvent event) {
         Level level = dungeon.getConfig().getLevelById(this.levelId);
         if (level == null) {
             ErrorHandler.error("Could not set level '" + this.levelId + "': level does not exist.", this, dungeon);
@@ -40,13 +40,13 @@ public class SetLevelAction implements Action {
         dungeon.setLevel(level);
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return ActionId.SET_LEVEL;
     }
 
-    @NotNull
+    @NonNull
     public String getLevelId() {
         return this.levelId;
     }

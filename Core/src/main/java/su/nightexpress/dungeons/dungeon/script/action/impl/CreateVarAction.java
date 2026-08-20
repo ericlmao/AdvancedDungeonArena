@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.script.action.impl;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.script.action.Action;
@@ -17,7 +17,7 @@ public class CreateVarAction implements Action {
     private final double minValue;
     private final double maxValue;
 
-    public CreateVarAction(@NotNull String name, double initialValue, boolean limited, double minValue, double maxValue) {
+    public CreateVarAction(@NonNull String name, double initialValue, boolean limited, double minValue, double maxValue) {
         this.name = name.toLowerCase();
         this.initialValue = initialValue;
         this.limited = limited;
@@ -25,8 +25,8 @@ public class CreateVarAction implements Action {
         this.maxValue = maxValue;
     }
 
-    @NotNull
-    public static CreateVarAction load(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static CreateVarAction load(@NonNull FileConfig config, @NonNull String path) {
         String name = ConfigValue.create(path + ".Name", "null").read(config);
         double initialValue = ConfigValue.create(path + ".InitialValue", 0D).read(config);
         boolean limited = ConfigValue.create(path + ".Limited", false).read(config);
@@ -37,7 +37,7 @@ public class CreateVarAction implements Action {
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".Name", this.name);
         config.set(path + ".InitialValue", this.initialValue);
         config.set(path + ".Limited", this.limited);
@@ -45,14 +45,14 @@ public class CreateVarAction implements Action {
         config.set(path + ".MaxValue", this.maxValue);
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return ActionId.CREATE_VAR;
     }
 
     @Override
-    public void perform(@NotNull DungeonInstance dungeon, @NotNull DungeonGameEvent event) {
+    public void perform(@NonNull DungeonInstance dungeon, @NonNull DungeonGameEvent event) {
         if (this.limited) {
             dungeon.getVariables().createLimitedVariable(this.name, this.initialValue, this.minValue, this.maxValue);
         }

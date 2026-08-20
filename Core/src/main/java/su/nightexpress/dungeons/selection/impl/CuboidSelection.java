@@ -2,8 +2,8 @@ package su.nightexpress.dungeons.selection.impl;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.config.Lang;
 import su.nightexpress.dungeons.selection.SelectionType;
@@ -31,7 +31,7 @@ public class CuboidSelection extends Selection {
     }
 
     @Override
-    public void onSelect(@NotNull Player player, @NotNull BlockPos pos, @NotNull Action action) {
+    public void onSelect(@NonNull Player player, @NonNull BlockPos pos, @NonNull Action action) {
         int value;
         if (action == Action.LEFT_CLICK_BLOCK) {
             this.setFirst(pos);

@@ -2,8 +2,8 @@ package su.nightexpress.dungeons.api.dungeon;
 
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +18,7 @@ public class DungeonEntityBridge {
     }
 
     @Nullable
-    public static DungeonEntity getByMob(@NotNull LivingEntity entity) {
+    public static DungeonEntity getByMob(@NonNull LivingEntity entity) {
         if (entity.getType() == EntityType.PLAYER) {
             return null;
         }
@@ -26,15 +26,15 @@ public class DungeonEntityBridge {
     }
 
     @Nullable
-    public static DungeonEntity getByMobId(@NotNull UUID uuid) {
+    public static DungeonEntity getByMobId(@NonNull UUID uuid) {
         return BY_ID.get(uuid);
     }
 
-    public static void addHolder(@NotNull DungeonEntity holder) {
+    public static void addHolder(@NonNull DungeonEntity holder) {
         BY_ID.put(holder.getBukkitEntity().getUniqueId(), holder);
     }
 
-    public static void removeHolder(@NotNull DungeonEntity holder) {
+    public static void removeHolder(@NonNull DungeonEntity holder) {
         BY_ID.remove(holder.getBukkitEntity().getUniqueId());
     }
 }

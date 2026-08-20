@@ -1,13 +1,13 @@
 package su.nightexpress.dungeons.dungeon.scale;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 
 public interface ScaleBase {
 
-    @NotNull String getName();
+    @NonNull String getName();
 
-    double getBaseValue(@NotNull DungeonInstance instance);
+    double getBaseValue(@NonNull DungeonInstance instance);
 
-    //double getScaled(@NotNull DungeonInstance instance, double original);
+    //double getScaled(@NonNull DungeonInstance instance, double original);
 }

@@ -4,7 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.*;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.config.Config;
@@ -33,19 +33,19 @@ public class KitPreviewMenu extends LinkedMenu<DungeonPlugin, KitPreviewMenu.Dat
     private int[] itemSlots;
     private int[] armorSlots;
 
-    public record Data(@NotNull Kit kit, @NotNull DungeonInstance dungeon){}
+    public record Data(@NonNull Kit kit, @NonNull DungeonInstance dungeon){}
 
-    public KitPreviewMenu(@NotNull DungeonPlugin plugin) {
+    public KitPreviewMenu(@NonNull DungeonPlugin plugin) {
         super(plugin, MenuType.GENERIC_9X6, BLACK.wrap("Kit Preview: " + KIT_NAME));
 
         this.load(FileConfig.loadOrExtract(plugin, Config.DIR_MENU, FILE_NAME));
     }
 
-    public void open(@NotNull Player player, @NotNull Kit kit, @NotNull DungeonInstance dungeon) {
+    public void open(@NonNull Player player, @NonNull Kit kit, @NonNull DungeonInstance dungeon) {
         this.open(player, new Data(kit, dungeon));
     }
 
-    private void handleReturn(@NotNull MenuViewer viewer) {
+    private void handleReturn(@NonNull MenuViewer viewer) {
         Player player = viewer.getPlayer();
         DungeonUser user = plugin.getUserManager().getOrFetch(player);
         Data data = this.getLink(player);
@@ -59,13 +59,13 @@ public class KitPreviewMenu extends LinkedMenu<DungeonPlugin, KitPreviewMenu.Dat
     }
 
     @Override
-    @NotNull
-    protected String getTitle(@NotNull MenuViewer viewer) {
+    @NonNull
+    protected String getTitle(@NonNull MenuViewer viewer) {
         return this.getLink(viewer).kit.replacePlaceholders().apply(this.title);
     }
 
     @Override
-    public void onPrepare(@NotNull MenuViewer viewer, @NotNull InventoryView view) {
+    public void onPrepare(@NonNull MenuViewer viewer, @NonNull InventoryView view) {
         Player player = viewer.getPlayer();
         Kit kit = this.getLink(player).kit;
 
@@ -90,18 +90,18 @@ public class KitPreviewMenu extends LinkedMenu<DungeonPlugin, KitPreviewMenu.Dat
     }
 
     @Override
-    protected void onReady(@NotNull MenuViewer viewer, @NotNull Inventory inventory) {
+    protected void onReady(@NonNull MenuViewer viewer, @NonNull Inventory inventory) {
 
     }
 
 //    @Override
-//    public void onClose(@NotNull MenuViewer viewer, @NotNull InventoryCloseEvent event) {
+//    public void onClose(@NonNull MenuViewer viewer, @NonNull InventoryCloseEvent event) {
 //        this.handleReturn(viewer);
 //        super.onClose(viewer, event);
 //    }
 
     @Override
-    public void loadConfiguration(@NotNull FileConfig config, @NotNull MenuLoader loader) {
+    public void loadConfiguration(@NonNull FileConfig config, @NonNull MenuLoader loader) {
         this.itemSlots = ConfigValue.create("Item_Slots",
             new int[]{45,46,47,48,49,50,51,52,53,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44}
         ).read(config);

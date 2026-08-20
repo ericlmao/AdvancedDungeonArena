@@ -16,7 +16,7 @@ import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.dungeon.DungeonManager;
 import su.nightexpress.dungeons.nightcore.manager.AbstractListener;
@@ -25,7 +25,7 @@ public class DungeonProtectionListener extends AbstractListener<DungeonPlugin> {
 
     private final DungeonManager manager;
 
-    public DungeonProtectionListener(@NotNull DungeonPlugin plugin, @NotNull DungeonManager manager) {
+    public DungeonProtectionListener(@NonNull DungeonPlugin plugin, @NonNull DungeonManager manager) {
         super(plugin);
         this.manager = manager;
     }

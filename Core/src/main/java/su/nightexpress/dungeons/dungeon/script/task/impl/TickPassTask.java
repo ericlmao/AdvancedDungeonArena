@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.script.task.impl;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
 import su.nightexpress.dungeons.dungeon.event.DungeonEventType;
@@ -13,23 +13,23 @@ import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
 public class TickPassTask implements Task {
 
-    @NotNull
-    public static TickPassTask load(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static TickPassTask load(@NonNull FileConfig config, @NonNull String path) {
         return new TickPassTask();
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         // Nothing to write :p
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return TaskId.TICK_PASS;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public ProgressFormatter getFormatter() {
         return ProgressFormatter.TIME_DIGITAL;
@@ -41,17 +41,17 @@ public class TickPassTask implements Task {
     }
 
     @Override
-    public void onTaskAdd(@NotNull DungeonInstance dungeon, @NotNull StageTask stageTask, @NotNull TaskProgress progress) {
+    public void onTaskAdd(@NonNull DungeonInstance dungeon, @NonNull StageTask stageTask, @NonNull TaskProgress progress) {
 
     }
 
     @Override
-    public void onTaskRemove(@NotNull DungeonInstance dungeon, @NotNull StageTask stageTask, @NotNull TaskProgress progress) {
+    public void onTaskRemove(@NonNull DungeonInstance dungeon, @NonNull StageTask stageTask, @NonNull TaskProgress progress) {
 
     }
 
     @Override
-    public void progress(@NotNull DungeonGameEvent event, @NotNull DungeonInstance dungeon, @NotNull StageTask stageTask, @NotNull TaskProgress progress) {
+    public void progress(@NonNull DungeonGameEvent event, @NonNull DungeonInstance dungeon, @NonNull StageTask stageTask, @NonNull TaskProgress progress) {
         if (event.getType() == DungeonEventType.DUNGEON_TICK) {
             progress.addProgress(1);
         }

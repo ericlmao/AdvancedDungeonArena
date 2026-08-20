@@ -3,8 +3,8 @@ package su.nightexpress.dungeons.dungeon.lootchest;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.inventory.Inventory;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
@@ -34,13 +34,13 @@ public class LootChest extends AbstractFileData<DungeonPlugin> {
 
     private final Map<String, LootItem> itemByIdMap;
 
-    public LootChest(@NotNull DungeonPlugin plugin, @NotNull File file) {
+    public LootChest(@NonNull DungeonPlugin plugin, @NonNull File file) {
         super(plugin, file);
         this.itemByIdMap = new HashMap<>();
     }
 
     @Override
-    protected boolean onLoad(@NotNull FileConfig config) {
+    protected boolean onLoad(@NonNull FileConfig config) {
         this.setBlockPos(BlockPos.read(config, "Location"));
         this.itemsAmount = ScalableAmount.read(config, "ItemsAmount");
 //        this.setMinItems(ConfigValue.create("MinItems", 0).read(config));
@@ -61,7 +61,7 @@ public class LootChest extends AbstractFileData<DungeonPlugin> {
     }
 
     @Override
-    protected void onSave(@NotNull FileConfig config) {
+    protected void onSave(@NonNull FileConfig config) {
         config.set("Location", this.blockPos);
         config.set("ItemsAmount", this.itemsAmount);
 //        config.set("MinItems", this.minItems);
@@ -74,14 +74,14 @@ public class LootChest extends AbstractFileData<DungeonPlugin> {
         });
     }
 
-    @NotNull
+    @NonNull
     public UnaryOperator<String> replacePlaceholders() {
         return Placeholders.LOOT_CHEST.replacer(this);
     }
 
     // TODO Highlight loot chest when generated per player?
 
-    public void generateLoot(@NotNull DungeonInstance dungeon) {
+    public void generateLoot(@NonNull DungeonInstance dungeon) {
         Container container = this.getContainer(dungeon);
         if (container == null) return;
 
@@ -117,7 +117,7 @@ public class LootChest extends AbstractFileData<DungeonPlugin> {
         }
     }
 
-    public void clearLoot(@NotNull DungeonInstance dungeon) {
+    public void clearLoot(@NonNull DungeonInstance dungeon) {
         Container container = this.getContainer(dungeon);
         if (container == null) return;
 
@@ -126,7 +126,7 @@ public class LootChest extends AbstractFileData<DungeonPlugin> {
     }
 
     @Nullable
-    private Container getContainer(@NotNull DungeonInstance dungeon) {
+    private Container getContainer(@NonNull DungeonInstance dungeon) {
         if (!dungeon.isActive()) return null;
 
         Block block = this.blockPos.toBlock(dungeon.getWorld());
@@ -137,21 +137,21 @@ public class LootChest extends AbstractFileData<DungeonPlugin> {
         return null;
     }
 
-    @NotNull
+    @NonNull
     public BlockPos getBlockPos() {
         return this.blockPos;
     }
 
-    public void setBlockPos(@NotNull BlockPos blockPos) {
+    public void setBlockPos(@NonNull BlockPos blockPos) {
         this.blockPos = blockPos;
     }
 
-    @NotNull
+    @NonNull
     public ScalableAmount getItemsAmount() {
         return this.itemsAmount;
     }
 
-    public void setItemsAmount(@NotNull ScalableAmount itemsAmount) {
+    public void setItemsAmount(@NonNull ScalableAmount itemsAmount) {
         this.itemsAmount = itemsAmount;
     }
 
@@ -179,22 +179,22 @@ public class LootChest extends AbstractFileData<DungeonPlugin> {
         this.uniqueOnly = uniqueOnly;
     }
 
-    @NotNull
+    @NonNull
     public Map<String, LootItem> getItemByIdMap() {
         return this.itemByIdMap;
     }
 
-    @NotNull
+    @NonNull
     public Set<LootItem> getItems() {
         return new HashSet<>(this.itemByIdMap.values());
     }
 
     @Nullable
-    public LootItem getItemById(@NotNull String id) {
+    public LootItem getItemById(@NonNull String id) {
         return this.itemByIdMap.get(id.toLowerCase());
     }
 
-    public void addItem(@NotNull LootItem item) {
+    public void addItem(@NonNull LootItem item) {
         this.itemByIdMap.put(item.getId(), item);
     }
 }

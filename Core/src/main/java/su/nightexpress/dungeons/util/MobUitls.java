@@ -7,8 +7,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SpawnEggMeta;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.api.dungeon.Dungeon;
 import su.nightexpress.dungeons.config.Config;
 import su.nightexpress.dungeons.config.Keys;
@@ -29,11 +29,11 @@ public class MobUitls {
 
     private static final String SPAWN_EGG_SUFFIX = "_SPAWN_EGG";
 
-    public static boolean isPet(@NotNull LivingEntity entity) {
+    public static boolean isPet(@NonNull LivingEntity entity) {
         return PetRegistry.getProviders().stream().anyMatch(provider -> provider.isPet(entity));
     }
 
-    @NotNull
+    @NonNull
     public static Map<EntityType, MobIdentifier> getDefaultEggAllies() {
         // Mobs are provided by MythicMobs only, so there is no sane cross-server default here.
         // Server owners have to map spawn eggs to their own MythicMobs mob ids.
@@ -45,7 +45,7 @@ public class MobUitls {
      * Replaces the former NMS-based lookup, since only the Bukkit API is needed for it.
      */
     @Nullable
-    public static EntityType getSpawnEggType(@NotNull ItemStack itemStack) {
+    public static EntityType getSpawnEggType(@NonNull ItemStack itemStack) {
         Material material = itemStack.getType();
         String name = material.name();
         if (!name.endsWith(SPAWN_EGG_SUFFIX)) return null;
@@ -60,7 +60,7 @@ public class MobUitls {
         return BukkitThing.getEntityType(name.substring(0, name.length() - SPAWN_EGG_SUFFIX.length()).toLowerCase(Locale.ROOT));
     }
 
-    @NotNull
+    @NonNull
     public static Map<String, KillStreak> getDefaultKillStreaks() {
         Map<String, KillStreak> map = new HashMap<>();
 
@@ -76,7 +76,7 @@ public class MobUitls {
     }
 
     @Nullable
-    public static MobIdentifier getEggAllyIdentifier(@NotNull EntityType entityType) {
+    public static MobIdentifier getEggAllyIdentifier(@NonNull EntityType entityType) {
         return Config.MOBS_EGG_ALLIES.get().get(entityType);
     }
 
@@ -90,16 +90,16 @@ public class MobUitls {
         return random;
     }
 
-    public static boolean isExternalAlly(@NotNull MobIdentifier identifier) {
+    public static boolean isExternalAlly(@NonNull MobIdentifier identifier) {
         return Config.MOBS_ALLIES_EXTERNAL.get().contains(identifier);
     }
 
-    public static void setDungeonId(@NotNull LivingEntity entity, @NotNull Dungeon dungeon) {
+    public static void setDungeonId(@NonNull LivingEntity entity, @NonNull Dungeon dungeon) {
         PDCUtil.set(entity, Keys.mobDungeonId, dungeon.getId());
     }
 
     @Nullable
-    public static String getDungeonId(@NotNull LivingEntity entity) {
+    public static String getDungeonId(@NonNull LivingEntity entity) {
         return PDCUtil.getString(entity, Keys.mobDungeonId).orElse(null);
     }
 }

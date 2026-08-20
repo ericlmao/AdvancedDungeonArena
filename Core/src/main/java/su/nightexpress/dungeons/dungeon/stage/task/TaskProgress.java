@@ -1,20 +1,20 @@
 package su.nightexpress.dungeons.dungeon.stage.task;
 
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.api.dungeon.DungeonPlayer;
 import su.nightexpress.dungeons.dungeon.script.task.ProgressFormatter;
 
 public interface TaskProgress {
 
-    @NotNull ProgressFormatter getFormatter();
+    @NonNull ProgressFormatter getFormatter();
 
-    @NotNull String format(@Nullable Player player);
+    @NonNull String format(@Nullable Player player);
 
-    void onPlayerJoined(@NotNull DungeonPlayer player);
+    void onPlayerJoined(@NonNull DungeonPlayer player);
 
-    void onPlayerLeft(@NotNull DungeonPlayer player);
+    void onPlayerLeft(@NonNull DungeonPlayer player);
 
     void addProgress(int amount);
 

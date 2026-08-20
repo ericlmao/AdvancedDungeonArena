@@ -2,7 +2,7 @@ package su.nightexpress.dungeons.nms;
 
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.schema.SchemaBlock;
 
 import java.io.File;
@@ -10,9 +10,9 @@ import java.util.List;
 
 public interface DungeonNMS {
 
-    void setSchemaBlock(@NotNull World world, @NotNull SchemaBlock schemaBlock);
+    void setSchemaBlock(@NonNull World world, @NonNull SchemaBlock schemaBlock);
 
-    @NotNull List<SchemaBlock> loadSchema(@NotNull File file, boolean compressed);
+    @NonNull List<SchemaBlock> loadSchema(@NonNull File file, boolean compressed);
 
-    void saveSchema(@NotNull World world, @NotNull List<Block> blocks, @NotNull File file);
+    void saveSchema(@NonNull World world, @NonNull List<Block> blocks, @NonNull File file);
 }

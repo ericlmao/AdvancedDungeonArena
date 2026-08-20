@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.script.condition.impl;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.criteria.CriteriaProvider;
 import su.nightexpress.dungeons.api.criteria.CriterionMob;
 import su.nightexpress.dungeons.api.type.MobFaction;
@@ -13,29 +13,29 @@ import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
 public class MobsAmountCondition extends MobsCondition {
 
-    public MobsAmountCondition(@NotNull NumberComparator comparator,
+    public MobsAmountCondition(@NonNull NumberComparator comparator,
                                double compareValue,
-                               @NotNull CriteriaProvider<CriterionMob> mobCriterias,
-                               @NotNull CriteriaProvider<Stage> stageCriterias) {
+                               @NonNull CriteriaProvider<CriterionMob> mobCriterias,
+                               @NonNull CriteriaProvider<Stage> stageCriterias) {
         super(comparator, compareValue, mobCriterias, stageCriterias);
     }
 
-    @NotNull
-    public static MobsAmountCondition read(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static MobsAmountCondition read(@NonNull FileConfig config, @NonNull String path) {
         NumberData data = readNumberData(config, path);
         CriteriaData criteriaData = readCriteriaData(config, path);
 
         return new MobsAmountCondition(data.comparator(), data.compareValue(), criteriaData.mobCriterias(), criteriaData.stageCriterias());
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return ConditionId.MOBS_AMOUNT;
     }
 
     @Override
-    protected double getDungeonValue(@NotNull DungeonInstance dungeon) {
+    protected double getDungeonValue(@NonNull DungeonInstance dungeon) {
         return dungeon.countMobs(this.mobCriterias.getPredicate(mob -> mob.isFaction(MobFaction.ENEMY)));
     }
 }

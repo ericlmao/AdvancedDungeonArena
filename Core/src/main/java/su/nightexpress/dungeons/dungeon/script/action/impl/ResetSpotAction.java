@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.script.action.impl;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
 import su.nightexpress.dungeons.dungeon.spot.Spot;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
@@ -18,26 +18,26 @@ public class ResetSpotAction implements Action {
         this.spotId = spotId;
     }
 
-    @NotNull
-    public static ResetSpotAction load(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static ResetSpotAction load(@NonNull FileConfig config, @NonNull String path) {
         String spotId = ConfigValue.create(path + ".SpotId", "null").read(config);
 
         return new ResetSpotAction(spotId);
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".SpotId", this.spotId);
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return ActionId.RESET_SPOT;
     }
 
     @Override
-    public void perform(@NotNull DungeonInstance dungeon, @NotNull DungeonGameEvent event) {
+    public void perform(@NonNull DungeonInstance dungeon, @NonNull DungeonGameEvent event) {
         Spot spot = dungeon.getConfig().getSpotById(this.spotId);
         if (spot == null) {
             ErrorHandler.error("Invalid spot '" + this.spotId + "'!", this, dungeon);

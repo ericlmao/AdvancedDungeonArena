@@ -11,8 +11,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.config.Keys;
@@ -51,7 +51,7 @@ public class Kit extends AbstractFileData<DungeonPlugin> {
     private List<String>      commands;
     private Set<PotionEffect> potionEffects;
 
-    public Kit(@NotNull DungeonPlugin plugin, @NotNull File file) {
+    public Kit(@NonNull DungeonPlugin plugin, @NonNull File file) {
         super(plugin, file);
         this.costMap = new HashMap<>();
         this.attributeMap = new HashMap<>();
@@ -62,7 +62,7 @@ public class Kit extends AbstractFileData<DungeonPlugin> {
     }
 
     @Override
-    protected boolean onLoad(@NotNull FileConfig config) {
+    protected boolean onLoad(@NonNull FileConfig config) {
         this.setName(config.getString("Name", this.getId()));
         this.setDescription(config.getStringList("Description"));
         this.setPermissionRequired(config.getBoolean("Permission_Required"));
@@ -113,7 +113,7 @@ public class Kit extends AbstractFileData<DungeonPlugin> {
     }
 
     @Override
-    protected void onSave(@NotNull FileConfig config) {
+    protected void onSave(@NonNull FileConfig config) {
         config.set("Name", this.name);
         config.set("Description", this.description);
         config.set("Permission_Required", this.permissionRequired);
@@ -153,7 +153,7 @@ public class Kit extends AbstractFileData<DungeonPlugin> {
         }
     }
 
-    @NotNull
+    @NonNull
     private ItemStack readItem(@Nullable String tag) {
         ItemStack itemStack = null;
 
@@ -164,17 +164,17 @@ public class Kit extends AbstractFileData<DungeonPlugin> {
         return itemStack == null ? new ItemStack(Material.AIR) : itemStack;
     }
 
-    @NotNull
+    @NonNull
     public UnaryOperator<String> replacePlaceholders() {
         return Placeholders.KIT.replacer(this);
     }
 
-    @NotNull
+    @NonNull
     public String getPermission() {
         return Perms.PREFIX_KIT + this.getId();
     }
 
-    public boolean hasPermission(@NotNull Player player) {
+    public boolean hasPermission(@NonNull Player player) {
         return !this.permissionRequired || player.hasPermission(this.getPermission());
     }
 
@@ -190,22 +190,22 @@ public class Kit extends AbstractFileData<DungeonPlugin> {
         return !this.potionEffects.isEmpty();
     }
 
-    public boolean canAfford(@NotNull Player player) {
+    public boolean canAfford(@NonNull Player player) {
         if (!this.hasCost()) return true;
         if (player.hasPermission(Perms.BYPASS_KIT_COST)) return true;
 
         return this.costMap.entrySet().stream().allMatch(entry -> EconomyBridge.hasEnough(player, entry.getKey(), entry.getValue()));
     }
 
-    public void takeCosts(@NotNull Player player) {
+    public void takeCosts(@NonNull Player player) {
         this.costMap.forEach((id, amount) -> EconomyBridge.withdraw(player, id, amount));
     }
 
-    public void refundCosts(@NotNull Player player) {
+    public void refundCosts(@NonNull Player player) {
         this.costMap.forEach((id, amount) -> EconomyBridge.deposit(player, id, amount));
     }
 
-    public void applyPotionEffects(@NotNull Player player) {
+    public void applyPotionEffects(@NonNull Player player) {
         this.getPotionEffects().forEach(effect -> {
             if (!player.hasPotionEffect(effect.getType())) {
                 player.addPotionEffect(effect);
@@ -213,13 +213,13 @@ public class Kit extends AbstractFileData<DungeonPlugin> {
         });
     }
 
-    public void resetPotionEffects(@NotNull Player player) {
+    public void resetPotionEffects(@NonNull Player player) {
         this.getPotionEffects().forEach(effect -> {
             player.removePotionEffect(effect.getType());
         });
     }
 
-    public void applyAttributeModifiers(@NotNull Player player) {
+    public void applyAttributeModifiers(@NonNull Player player) {
         this.attributeMap.forEach((attribute, modifier) -> {
             AttributeInstance instance = player.getAttribute(attribute);
             if (instance == null) return;
@@ -228,7 +228,7 @@ public class Kit extends AbstractFileData<DungeonPlugin> {
         });
     }
 
-    public void resetAttributeModifiers(@NotNull Player player) {
+    public void resetAttributeModifiers(@NonNull Player player) {
         this.attributeMap.forEach((attribute, modifier) -> {
             AttributeInstance instance = player.getAttribute(attribute);
             if (instance == null) return;
@@ -237,7 +237,7 @@ public class Kit extends AbstractFileData<DungeonPlugin> {
         });
     }
 
-    public void give(@NotNull Player player) {
+    public void give(@NonNull Player player) {
         PlayerInventory inventory = player.getInventory();
 
         for (int index = 0; index < this.items.length; index++) {
@@ -255,39 +255,39 @@ public class Kit extends AbstractFileData<DungeonPlugin> {
         Players.dispatchCommands(player, this.commands);
     }
 
-    @NotNull
+    @NonNull
     public String getName() {
         return this.name;
     }
 
-    public void setName(@NotNull String name) {
+    public void setName(@NonNull String name) {
         this.name = name;
     }
 
-    @NotNull
+    @NonNull
     public List<String> getDescription() {
         return this.description;
     }
 
-    public void setDescription(@NotNull List<String> description) {
+    public void setDescription(@NonNull List<String> description) {
         this.description = description;
     }
 
-    @NotNull
+    @NonNull
     public NightItem getIcon() {
         return this.icon.copy();
     }
 
-    public void setIcon(@NotNull NightItem icon) {
+    public void setIcon(@NonNull NightItem icon) {
         this.icon = icon.copy();
     }
 
-    @NotNull
+    @NonNull
     public Map<String, Double> getCostMap() {
         return this.costMap;
     }
 
-    public void setCost(@NotNull String id, double amount) {
+    public void setCost(@NonNull String id, double amount) {
         this.costMap.put(id.toLowerCase(), amount);
     }
 
@@ -299,66 +299,66 @@ public class Kit extends AbstractFileData<DungeonPlugin> {
         this.permissionRequired = permissionRequired;
     }
 
-    @NotNull
+    @NonNull
     public List<String> getCommands() {
         return this.commands;
     }
 
-    public void setCommands(@NotNull List<String> commands) {
+    public void setCommands(@NonNull List<String> commands) {
         this.commands = commands;
     }
 
-    @NotNull
+    @NonNull
     public Map<Attribute, AttributeModifier> getAttributeMap() {
         return this.attributeMap;
     }
 
-    public void setAttribute(@NotNull Attribute attribute, @NotNull Operation operation, double amount) {
+    public void setAttribute(@NonNull Attribute attribute, @NonNull Operation operation, double amount) {
         this.setAttribute(attribute, new AttributeModifier(Keys.kitModifier, amount, operation, EquipmentSlotGroup.ANY));
     }
 
-    public void setAttribute(@NotNull Attribute attribute, @NotNull AttributeModifier modifier) {
+    public void setAttribute(@NonNull Attribute attribute, @NonNull AttributeModifier modifier) {
         this.attributeMap.put(attribute, modifier);
     }
 
     @Nullable
-    public AttributeModifier getAttributeModifier(@NotNull Attribute attribute) {
+    public AttributeModifier getAttributeModifier(@NonNull Attribute attribute) {
         return this.attributeMap.get(attribute);
     }
 
-    @NotNull
+    @NonNull
     public Set<PotionEffect> getPotionEffects() {
         return this.potionEffects;
     }
 
-    public void setPotionEffects(@NotNull Set<PotionEffect> potionEffects) {
+    public void setPotionEffects(@NonNull Set<PotionEffect> potionEffects) {
         this.potionEffects = potionEffects;
     }
 
-    @NotNull
+    @NonNull
     public Map<EquipmentSlot, ItemStack> getEquipment() {
         return this.equipment;
     }
 
-    @NotNull
-    public ItemStack getEquipment(@NotNull EquipmentSlot slot) {
+    @NonNull
+    public ItemStack getEquipment(@NonNull EquipmentSlot slot) {
         return this.equipment.computeIfAbsent(slot, k -> new ItemStack(Material.AIR));
     }
 
-    public void setEquipment(@NotNull EquipmentSlot slot, @Nullable ItemStack item) {
+    public void setEquipment(@NonNull EquipmentSlot slot, @Nullable ItemStack item) {
         this.equipment.put(slot, item == null ? new ItemStack(Material.AIR) : item);
     }
 
-    @NotNull
+    @NonNull
     public ItemStack[] getItems() {
         return this.items;
     }
 
-    public void setItems(@NotNull List<ItemStack> items) {
+    public void setItems(@NonNull List<ItemStack> items) {
         this.setItems(items.toArray(new ItemStack[0]));
     }
 
-    public void setItems(@NotNull ItemStack[] items) {
+    public void setItems(@NonNull ItemStack[] items) {
         for (int index = 0; index < INVENTORY_SIZE; index++) {
             ItemStack item = index >= items.length ? null : items[index];
             if (item == null) item = new ItemStack(Material.AIR);

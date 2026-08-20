@@ -9,7 +9,7 @@ dependencies {
     implementation(project(":NMS"))
     implementation(project(":MC_1_21_11"))
 
-    implementation(libs.annotations)
+    compileOnly(libs.jspecify)
 
     compileOnly(libs.paper.api)
 

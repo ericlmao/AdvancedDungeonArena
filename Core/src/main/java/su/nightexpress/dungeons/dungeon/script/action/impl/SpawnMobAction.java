@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.script.action.impl;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.dungeon.DungeonSpawner;
 import su.nightexpress.dungeons.api.mob.MobIdentifier;
 import su.nightexpress.dungeons.api.mob.MobProvider;
@@ -21,15 +21,15 @@ public class SpawnMobAction implements Action {
     private final ScalableAmount amount;
     private final ScalableAmount level;
 
-    public SpawnMobAction(@NotNull MobIdentifier mobId, @NotNull String spawnerId, @NotNull ScalableAmount amount, @NotNull ScalableAmount level) {
+    public SpawnMobAction(@NonNull MobIdentifier mobId, @NonNull String spawnerId, @NonNull ScalableAmount amount, @NonNull ScalableAmount level) {
         this.mobId = mobId;
         this.spawnerId = spawnerId;
         this.amount = amount;
         this.level = level;
     }
 
-    @NotNull
-    public static SpawnMobAction load(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static SpawnMobAction load(@NonNull FileConfig config, @NonNull String path) {
         MobIdentifier mobId = MobIdentifier.read(config, path + ".MobId");
         String spawnerId = config.getString(path + ".SpawnerId", "null");
         ScalableAmount amount = ScalableAmount.read(config, path + ".Amount");
@@ -39,21 +39,21 @@ public class SpawnMobAction implements Action {
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".MobId", this.mobId.serialize());
         config.set(path + ".SpawnerId", this.spawnerId);
         config.set(path + ".Amount", this.amount);
         config.set(path + ".Level", this.level);
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return ActionId.SPAWN_MOB;
     }
 
     @Override
-    public void perform(@NotNull DungeonInstance dungeon, @NotNull DungeonGameEvent event) {
+    public void perform(@NonNull DungeonInstance dungeon, @NonNull DungeonGameEvent event) {
         DungeonSpawner spawner = dungeon.getConfig().getSpawnerById(this.spawnerId);
         if (spawner == null) {
             ErrorHandler.error("Invalid spawner '" + this.spawnerId + "'!", this, dungeon);

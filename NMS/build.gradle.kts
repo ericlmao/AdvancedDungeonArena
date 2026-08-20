@@ -2,5 +2,5 @@ dependencies {
     api(project(":API"))
 
     compileOnly(libs.paper.api)
-    compileOnly(libs.annotations)
+    compileOnly(libs.jspecify)
 }

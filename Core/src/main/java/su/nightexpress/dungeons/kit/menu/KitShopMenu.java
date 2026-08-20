@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.MenuType;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.config.Config;
@@ -58,25 +58,25 @@ public class KitShopMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> impl
     protected List<String> kitInfoPermission;
     protected List<String> kitInfoPurchase;
 
-    public KitShopMenu(@NotNull DungeonPlugin plugin) {
+    public KitShopMenu(@NonNull DungeonPlugin plugin) {
         super(plugin, MenuType.GENERIC_9X4, BLACK.wrap("Kit Shop"));
 
         this.load(FileConfig.loadOrExtract(plugin, Config.DIR_MENU, FILE_NAME));
     }
 
     @Override
-    public void onPrepare(@NotNull MenuViewer viewer, @NotNull InventoryView view) {
+    public void onPrepare(@NonNull MenuViewer viewer, @NonNull InventoryView view) {
         this.autoFill(viewer);
     }
 
     @Override
-    protected void onReady(@NotNull MenuViewer viewer, @NotNull Inventory inventory) {
+    protected void onReady(@NonNull MenuViewer viewer, @NonNull Inventory inventory) {
 
     }
 
     @Override
-    @NotNull
-    public MenuFiller<Kit> createFiller(@NotNull MenuViewer viewer) {
+    @NonNull
+    public MenuFiller<Kit> createFiller(@NonNull MenuViewer viewer) {
         Player player = viewer.getPlayer();
         DungeonUser user = plugin.getUserManager().getOrFetch(player);
         DungeonInstance dungeon = this.getLink(player);
@@ -171,7 +171,7 @@ public class KitShopMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> impl
     }
 
     @Override
-    public void loadConfiguration(@NotNull FileConfig config, @NotNull MenuLoader loader) {
+    public void loadConfiguration(@NonNull FileConfig config, @NonNull MenuLoader loader) {
         this.kitName = ConfigValue.create("Kit.Name", KIT_NAME).read(config);
 
         this.kitLore = ConfigValue.create("Kit.Lore", Lists.newList(

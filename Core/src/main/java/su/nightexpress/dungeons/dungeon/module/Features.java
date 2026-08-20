@@ -1,7 +1,7 @@
 package su.nightexpress.dungeons.dungeon.module;
 
 import org.bukkit.Material;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.config.DungeonConfig;
 import su.nightexpress.dungeons.dungeon.feature.LevelRequirement;
 import su.nightexpress.dungeons.dungeon.feature.itemfilter.ItemFilterCriteria;
@@ -29,7 +29,7 @@ public class Features implements Writeable {
     private ItemFilterMode     itemFilterMode     = ItemFilterMode.BAN_SPECIFIC;
     private ItemFilterCriteria itemFilterCriteria = new ItemFilterCriteria(Collections.emptyList(), Collections.emptyList(), Lists.newList(Material.ENDER_PEARL, Material.ENCHANTED_GOLDEN_APPLE));
 
-    public Features(@NotNull DungeonConfig dungeonConfig) {
+    public Features(@NonNull DungeonConfig dungeonConfig) {
         //this.dungeonConfig = dungeonConfig;
 
         this.entranceCooldown = RankTable.ranked(0).permissionPrefix("dungeon.cooldown.").addRankValue("admin", 0).build();
@@ -39,7 +39,7 @@ public class Features implements Writeable {
         this.entranceCostMap.put(CurrencyId.VAULT, 0D);
     }
 
-    public void load(@NotNull FileConfig config, @NotNull String path) {
+    public void load(@NonNull FileConfig config, @NonNull String path) {
         this.setPermissionRequired(config.getBoolean(path + ".Permission_Required"));
 
         this.entranceCooldown = ConfigValue.create(path + ".Entrance.Cooldown", RankTable::read, this.entranceCooldown).read(config);
@@ -61,7 +61,7 @@ public class Features implements Writeable {
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".Permission_Required", this.permissionRequired);
         config.set(path + ".Entrance.Cooldown", this.entranceCooldown);
         config.set(path + ".Entrance.Commands", this.entranceCommands);
@@ -87,37 +87,37 @@ public class Features implements Writeable {
         this.permissionRequired = permissionRequired;
     }
 
-    @NotNull
+    @NonNull
     public RankTable getEntranceCooldown() {
         return this.entranceCooldown;
     }
 
-    @NotNull
+    @NonNull
     public List<String> getEntranceCommands() {
         return this.entranceCommands;
     }
 
-    @NotNull
+    @NonNull
     public Map<String, Double> getEntranceCostMap() {
         return this.entranceCostMap;
     }
 
-    @NotNull
+    @NonNull
     public List<String> getExitCommands() {
         return this.exitCommands;
     }
 
-    @NotNull
+    @NonNull
     public LevelRequirement getLevelRequirement() {
         return this.levelRequirement;
     }
 
-    @NotNull
+    @NonNull
     public ItemFilterMode getItemFilterMode() {
         return this.itemFilterMode;
     }
 
-    @NotNull
+    @NonNull
     public ItemFilterCriteria getItemFilterCriteria() {
         return this.itemFilterCriteria;
     }

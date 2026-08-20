@@ -1,10 +1,10 @@
 package su.nightexpress.dungeons.api.criteria;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public interface CriteriaValidator<T> {
 
-    @NotNull T deserialize(@NotNull String string);
+    @NonNull T deserialize(@NonNull String string);
 
-    @NotNull String serialize(@NotNull T value);
+    @NonNull String serialize(@NonNull T value);
 }

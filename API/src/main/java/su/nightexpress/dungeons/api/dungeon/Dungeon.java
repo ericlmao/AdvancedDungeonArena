@@ -5,8 +5,8 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.api.mob.MobProvider;
 import su.nightexpress.dungeons.api.type.GameState;
 import su.nightexpress.dungeons.api.type.MobFaction;
@@ -17,13 +17,13 @@ import java.util.UUID;
 
 public interface Dungeon {
 
-    @NotNull World getWorld();
+    @NonNull World getWorld();
 
-    @NotNull String getId();
+    @NonNull String getId();
 
-    @NotNull GameState getState();
+    @NonNull GameState getState();
 
-    void handlePlayerJoin(@NotNull DungeonPlayer player, boolean forced);
+    void handlePlayerJoin(@NonNull DungeonPlayer player, boolean forced);
 
     /**
      * As {@link #handlePlayerJoin(DungeonPlayer, boolean)}, but reports when the player has physically
@@ -36,22 +36,22 @@ public interface Dungeon {
      *
      * @param onArrival runs after arrival; not run at all if the player leaves mid-teleport.
      */
-    void handlePlayerJoin(@NotNull DungeonPlayer player, boolean forced, @NotNull Runnable onArrival);
+    void handlePlayerJoin(@NonNull DungeonPlayer player, boolean forced, @NonNull Runnable onArrival);
 
-    void handlePlayerLeave(@NotNull DungeonPlayer player);
-
-
-    boolean contains(@NotNull Entity entity);
-
-    boolean contains(@NotNull Location location);
-
-    boolean contains(@NotNull Block block);
-
-    boolean contains(@NotNull BlockPos blockPos);
+    void handlePlayerLeave(@NonNull DungeonPlayer player);
 
 
+    boolean contains(@NonNull Entity entity);
 
-    boolean hasPlayer(@NotNull UUID playerId);
+    boolean contains(@NonNull Location location);
+
+    boolean contains(@NonNull Block block);
+
+    boolean contains(@NonNull BlockPos blockPos);
+
+
+
+    boolean hasPlayer(@NonNull UUID playerId);
 
     boolean hasAlivePlayers();
 
@@ -61,21 +61,21 @@ public interface Dungeon {
 
     int countDeadPlayers();
 
-    @NotNull DungeonPlayer getRandomAlivePlayer();
+    @NonNull DungeonPlayer getRandomAlivePlayer();
 
-    @Nullable DungeonPlayer getPlayer(@NotNull UUID playerId);
+    @Nullable DungeonPlayer getPlayer(@NonNull UUID playerId);
 
-    @NotNull Set<? extends DungeonPlayer> getPlayers();
+    @NonNull Set<? extends DungeonPlayer> getPlayers();
 
-    @NotNull Set<? extends DungeonPlayer> getAlivePlayers();
+    @NonNull Set<? extends DungeonPlayer> getAlivePlayers();
 
-    @NotNull Set<? extends DungeonPlayer> getDeadPlayers();
+    @NonNull Set<? extends DungeonPlayer> getDeadPlayers();
 
-//    @Nullable DungeonPlayer getPlayer(@NotNull UUID playerId);
+//    @Nullable DungeonPlayer getPlayer(@NonNull UUID playerId);
 //
-//    boolean isPlaying(@NotNull Player player);
+//    boolean isPlaying(@NonNull Player player);
 //
-//    boolean isPlaying(@NotNull UUID playerId);
+//    boolean isPlaying(@NonNull UUID playerId);
 
     long getTickCount();
 
@@ -86,41 +86,41 @@ public interface Dungeon {
 
     void killMobs();
 
-    boolean isAllyMob(@NotNull LivingEntity entity);
+    boolean isAllyMob(@NonNull LivingEntity entity);
 
-    boolean isEnemyMob(@NotNull LivingEntity entity);
+    boolean isEnemyMob(@NonNull LivingEntity entity);
 
     boolean hasAllyMobs();
 
     boolean hasEnemyMobs();
 
-    boolean hasMobsOfFaction(@NotNull MobFaction faction);
+    boolean hasMobsOfFaction(@NonNull MobFaction faction);
 
-    @Nullable MobFaction getMobFaction(@NotNull LivingEntity entity);
+    @Nullable MobFaction getMobFaction(@NonNull LivingEntity entity);
 
-    void eliminateMob(@NotNull DungeonEntity mob);
+    void eliminateMob(@NonNull DungeonEntity mob);
 
-    void spawnMob(@NotNull MobProvider provider, @NotNull String mobId, @NotNull MobFaction faction, @NotNull Location location, int level);
+    void spawnMob(@NonNull MobProvider provider, @NonNull String mobId, @NonNull MobFaction faction, @NonNull Location location, int level);
 
-    void spawnMob(@NotNull MobProvider provider, @NotNull String mobId, @NotNull MobFaction faction, @NotNull DungeonSpawner spawner, int level, int amount);
+    void spawnMob(@NonNull MobProvider provider, @NonNull String mobId, @NonNull MobFaction faction, @NonNull DungeonSpawner spawner, int level, int amount);
 
-    void addMob(@NotNull DungeonEntity mob);
+    void addMob(@NonNull DungeonEntity mob);
 
-    void removeMob(@NotNull DungeonEntity mob);
+    void removeMob(@NonNull DungeonEntity mob);
 
-    void removeMob(@NotNull UUID mobId);
+    void removeMob(@NonNull UUID mobId);
 
-    boolean hasMob(@NotNull UUID mobId);
+    boolean hasMob(@NonNull UUID mobId);
 
-    @Nullable DungeonEntity getMob(@NotNull LivingEntity entity);
+    @Nullable DungeonEntity getMob(@NonNull LivingEntity entity);
 
-    @Nullable DungeonEntity getMobById(@NotNull UUID mobId);
+    @Nullable DungeonEntity getMobById(@NonNull UUID mobId);
 
-    @NotNull Set<? extends DungeonEntity> getAllyMobs();
+    @NonNull Set<? extends DungeonEntity> getAllyMobs();
 
-    @NotNull Set<? extends DungeonEntity> getEnemyMobs();
+    @NonNull Set<? extends DungeonEntity> getEnemyMobs();
 
-    @NotNull Set<? extends DungeonEntity> getMobs();
+    @NonNull Set<? extends DungeonEntity> getMobs();
 
-    @NotNull Set<? extends DungeonEntity> getMobs(@NotNull MobFaction faction);
+    @NonNull Set<? extends DungeonEntity> getMobs(@NonNull MobFaction faction);
 }

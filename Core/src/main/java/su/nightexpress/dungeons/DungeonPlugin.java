@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.dungeon.DungeonEntityBridge;
 import su.nightexpress.dungeons.command.impl.BaseCommands;
 import su.nightexpress.dungeons.command.impl.KitCommands;
@@ -50,7 +50,7 @@ public class DungeonPlugin extends NightPlugin {
     private DungeonNMS internals;
 
     @Override
-    @NotNull
+    @NonNull
     protected PluginDetails getDefaultDetails() {
         return PluginDetails.create("Dungeons", new String[]{"ada", "dungeon", "dungeons", "dungeonarena"})
             .setConfigClass(Config.class)
@@ -160,37 +160,37 @@ public class DungeonPlugin extends NightPlugin {
         });
     }
 
-    @NotNull
+    @NonNull
     public DataHandler getDataHandler() {
         return this.dataHandler;
     }
 
-    @NotNull
+    @NonNull
     public UserManager getUserManager() {
         return this.userManager;
     }
 
-    @NotNull
+    @NonNull
     public SelectionManager getSelectionManager() {
         return this.selectionManager;
     }
 
-    @NotNull
+    @NonNull
     public DungeonManager getDungeonManager() {
         return this.dungeonManager;
     }
 
-    @NotNull
+    @NonNull
     public DungeonSetup getDungeonSetup() {
         return this.dungeonSetup;
     }
 
-    @NotNull
+    @NonNull
     public KitManager getKitManager() {
         return this.kitManager;
     }
 
-    @NotNull
+    @NonNull
     public DungeonNMS getInternals() {
         return this.internals;
     }

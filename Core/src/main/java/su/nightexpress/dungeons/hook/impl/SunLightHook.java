@@ -6,8 +6,8 @@ import java.util.Optional;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import su.nightexpress.dungeons.api.compat.BoardPlugin;
 import su.nightexpress.dungeons.api.compat.GodPlugin;
@@ -28,22 +28,22 @@ public class SunLightHook implements GodPlugin, BoardPlugin {
     private static final String CLASS_SCOREBOARD_PROPS  = "su.nightexpress.sunlight.module.scoreboard.ScoreboardProperties";
 
     @Override
-    public boolean isGodEnabled(@NotNull Player player) {
+    public boolean isGodEnabled(@NonNull Player player) {
         return player.isInvulnerable();
     }
 
     @Override
-    public void disableGod(@NotNull Player player) {
+    public void disableGod(@NonNull Player player) {
         player.setInvulnerable(false);
     }
 
     @Override
-    public void enableGod(@NotNull Player player) {
+    public void enableGod(@NonNull Player player) {
         player.setInvulnerable(true);
     }
 
     @Override
-    public boolean isBoardEnabled(@NotNull Player player) {
+    public boolean isBoardEnabled(@NonNull Player player) {
         Object user = this.getUser(player);
         if (user == null) return false;
 
@@ -62,16 +62,16 @@ public class SunLightHook implements GodPlugin, BoardPlugin {
     }
 
     @Override
-    public void disableBoard(@NotNull Player player) {
+    public void disableBoard(@NonNull Player player) {
         this.callBoardModule("removeBoard", player);
     }
 
     @Override
-    public void enableBoard(@NotNull Player player) {
+    public void enableBoard(@NonNull Player player) {
         this.callBoardModule("addBoard", player);
     }
 
-    private void callBoardModule(@NotNull String methodName, @NotNull Player player) {
+    private void callBoardModule(@NonNull String methodName, @NonNull Player player) {
         Object module = this.getScoreboardModule();
         if (module == null) return;
 
@@ -106,7 +106,7 @@ public class SunLightHook implements GodPlugin, BoardPlugin {
     }
 
     @Nullable
-    private Object getUser(@NotNull Player player) {
+    private Object getUser(@NonNull Player player) {
         Plugin plugin = Bukkit.getPluginManager().getPlugin(HookId.SUNLIGHT);
         if (plugin == null) return null;
 
@@ -126,7 +126,7 @@ public class SunLightHook implements GodPlugin, BoardPlugin {
     }
 
     @Nullable
-    private static Method findMethod(@NotNull Class<?> owner, @NotNull String name, int parameterCount) {
+    private static Method findMethod(@NonNull Class<?> owner, @NonNull String name, int parameterCount) {
         for (Class<?> clazz = owner; clazz != null; clazz = clazz.getSuperclass()) {
             for (Method method : clazz.getMethods()) {
                 if (method.getName().equals(name) && method.getParameterCount() == parameterCount) {

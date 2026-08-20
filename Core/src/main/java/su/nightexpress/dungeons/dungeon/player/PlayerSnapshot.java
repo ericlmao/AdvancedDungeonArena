@@ -7,8 +7,8 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.api.dungeon.DungeonPlayer;
 import su.nightexpress.dungeons.config.Config;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
@@ -37,7 +37,7 @@ public class PlayerSnapshot {
     private final GameMode                 gameMode;
     private final List<ItemStack>          confiscate;
 
-    PlayerSnapshot(@NotNull Player player) {
+    PlayerSnapshot(@NonNull Player player) {
         this.worldName = player.getWorld().getName();
         this.blockPos = ExactPos.from(player.getLocation());
         this.foodLevel = player.getFoodLevel();
@@ -52,18 +52,18 @@ public class PlayerSnapshot {
     }
 
     @Nullable
-    public static PlayerSnapshot get(@NotNull Player player) {
+    public static PlayerSnapshot get(@NonNull Player player) {
         return SNAPSHOTS.get(player.getUniqueId());
     }
 
-    @NotNull
-    public static PlayerSnapshot doSnapshot(@NotNull Player player) {
+    @NonNull
+    public static PlayerSnapshot doSnapshot(@NonNull Player player) {
         PlayerSnapshot snapshot = new PlayerSnapshot(player);
         SNAPSHOTS.put(player.getUniqueId(), snapshot);
         return snapshot;
     }
 
-    public static void clear(@NotNull Player player) {
+    public static void clear(@NonNull Player player) {
         //player.setGameMode(GameMode.SURVIVAL);
         player.setAllowFlight(false);
         player.setFlying(false);
@@ -90,8 +90,8 @@ public class PlayerSnapshot {
      * @return a future completing once the player has been fully restored, so that callers can order their
      *         own follow-up work (rewards, refunds, exit commands) after it.
      */
-    @NotNull
-    public static CompletableFuture<Void> restore(@NotNull DungeonPlayer gamer) {
+    @NonNull
+    public static CompletableFuture<Void> restore(@NonNull DungeonPlayer gamer) {
         Player player = gamer.getPlayer();
         PlayerSnapshot snapshot = SNAPSHOTS.remove(player.getUniqueId());
         if (snapshot == null) return CompletableFuture.completedFuture(null);
@@ -119,7 +119,7 @@ public class PlayerSnapshot {
         return restored;
     }
 
-    private static void applyState(@NotNull Player player, @NotNull PlayerSnapshot snapshot, @NotNull DungeonInstance arena) {
+    private static void applyState(@NonNull Player player, @NonNull PlayerSnapshot snapshot, @NonNull DungeonInstance arena) {
         player.setFoodLevel(snapshot.getFoodLevel());
         player.setSaturation(snapshot.getSaturation());
         player.setExhaustion(snapshot.getExhaustion());
@@ -143,12 +143,12 @@ public class PlayerSnapshot {
         }
     }
 
-    @NotNull
+    @NonNull
     public String getWorldName() {
         return this.worldName;
     }
 
-    @NotNull
+    @NonNull
     public ExactPos getBlockPos() {
         return this.blockPos;
     }
@@ -169,7 +169,7 @@ public class PlayerSnapshot {
         return health;
     }
 
-    @NotNull
+    @NonNull
     public ItemStack[] getInventory() {
         return this.inventory;
     }
@@ -178,17 +178,17 @@ public class PlayerSnapshot {
         return this.armor;
     }
 
-    @NotNull
+    @NonNull
     public Collection<PotionEffect> getPotionEffects() {
         return this.effects;
     }
 
-    @NotNull
+    @NonNull
     public GameMode getGameMode() {
         return this.gameMode;
     }
 
-    @NotNull
+    @NonNull
     public List<ItemStack> getConfiscate() {
         return confiscate;
     }

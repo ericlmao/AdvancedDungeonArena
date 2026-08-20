@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.feature.board;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 import su.nightexpress.dungeons.nightcore.config.Writeable;
 
@@ -13,36 +13,36 @@ public class BoardLayout implements Writeable {
     private final String       title;
     private final List<String> lines;
 
-    public BoardLayout(/*@NotNull String id, */@NotNull String title, @NotNull List<String> lines) {
+    public BoardLayout(/*@NonNull String id, */@NonNull String title, @NonNull List<String> lines) {
         //this.id = id.toLowerCase();
         this.title = title;
         this.lines = lines;
     }
 
-    @NotNull
-    public static BoardLayout read(@NotNull FileConfig config, @NotNull String path/*, @NotNull String id*/) {
+    @NonNull
+    public static BoardLayout read(@NonNull FileConfig config, @NonNull String path/*, @NonNull String id*/) {
         String title = config.getString(path +  ".Title", "");
         List<String> lines = config.getStringList(path + ".List");
         return new BoardLayout(/*id, */title, lines);
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".Title", this.title);
         config.set(path + ".List", this.lines);
     }
 
-//    @NotNull
+//    @NonNull
 //    public String getId() {
 //        return id;
 //    }
 
-    @NotNull
+    @NonNull
     public String getTitle() {
         return title;
     }
 
-    @NotNull
+    @NonNull
     public List<String> getLines() {
         return new ArrayList<>(lines);
     }

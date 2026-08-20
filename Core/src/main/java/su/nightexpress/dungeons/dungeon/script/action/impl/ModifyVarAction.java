@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.script.action.impl;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.game.DungeonVariables;
@@ -21,14 +21,14 @@ public class ModifyVarAction implements Action {
         PLUS, MINUS, MULTIPLY, DIVIDE, SET
     }
 
-    public ModifyVarAction(@NotNull String varName, @NotNull Operation operation, double value) {
+    public ModifyVarAction(@NonNull String varName, @NonNull Operation operation, double value) {
         this.varName = varName.toLowerCase();
         this.operation = operation;
         this.value = value;
     }
 
-    @NotNull
-    public static ModifyVarAction load(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static ModifyVarAction load(@NonNull FileConfig config, @NonNull String path) {
         String varName = ConfigValue.create(path + ".Variable", "null").read(config);
         Operation operation = ConfigValue.create(path + ".Operation", Operation.class, Operation.PLUS).read(config);
         double amount = ConfigValue.create(path + ".Value", 0D).read(config);
@@ -37,20 +37,20 @@ public class ModifyVarAction implements Action {
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".Variable", this.varName);
         config.set(path + ".Operation", this.operation);
         config.set(path + ".Value", this.value);
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return ActionId.MODIFY_VAR;
     }
 
     @Override
-    public void perform(@NotNull DungeonInstance dungeon, @NotNull DungeonGameEvent event) {
+    public void perform(@NonNull DungeonInstance dungeon, @NonNull DungeonGameEvent event) {
         DungeonVariables variables = dungeon.getVariables();
         Variable variable = variables.getVariable(this.varName);
 

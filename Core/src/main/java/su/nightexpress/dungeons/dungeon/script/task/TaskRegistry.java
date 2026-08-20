@@ -1,7 +1,7 @@
 package su.nightexpress.dungeons.dungeon.script.task;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.dungeon.script.task.impl.*;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
@@ -26,7 +26,7 @@ public class TaskRegistry {
     }
 
     @Nullable
-    public static Task loadTask(@NotNull String name, @NotNull FileConfig config, @NotNull String path) {
+    public static Task loadTask(@NonNull String name, @NonNull FileConfig config, @NonNull String path) {
         Loader loader = getLoader(name);
         if (loader == null) return null;
 
@@ -34,17 +34,17 @@ public class TaskRegistry {
     }
 
     @Nullable
-    public static Loader getLoader(@NotNull String name) {
+    public static Loader getLoader(@NonNull String name) {
         return LOADERS.get(name.toLowerCase());
     }
 
-    public static void addLoader(@NotNull String name, @NotNull Loader loader) {
+    public static void addLoader(@NonNull String name, @NonNull Loader loader) {
         LOADERS.put(name.toLowerCase(), loader);
     }
 
     public interface Loader {
 
-        Task load(@NotNull FileConfig config, @NotNull String path);
+        Task load(@NonNull FileConfig config, @NonNull String path);
 
     }
 }

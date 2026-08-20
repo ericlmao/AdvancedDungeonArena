@@ -1,8 +1,8 @@
 package su.nightexpress.dungeons.config;
 
 import org.bukkit.entity.EntityType;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.api.mob.MobIdentifier;
 import su.nightexpress.dungeons.dungeon.feature.board.BoardLayout;
@@ -195,7 +195,7 @@ public class Config {
     );
 
     @Nullable
-    public static BoardLayout getDungeonBoard(@NotNull String id) {
+    public static BoardLayout getDungeonBoard(@NonNull String id) {
         return SCOREBOARD_LAYOUTS.get().get(id.toLowerCase());
     }
 }

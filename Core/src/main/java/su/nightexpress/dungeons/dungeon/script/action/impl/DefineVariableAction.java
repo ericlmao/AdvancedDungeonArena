@@ -1,7 +1,7 @@
 package su.nightexpress.dungeons.dungeon.script.action.impl;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.script.action.Action;
@@ -20,9 +20,9 @@ public class DefineVariableAction implements Action {
 
     private final List<VarDefinition> definitions;
 
-    public record VarDefinition(@NotNull String name, double initial, @Nullable UniDouble bounds){
+    public record VarDefinition(@NonNull String name, double initial, @Nullable UniDouble bounds){
 
-        @NotNull
+        @NonNull
         public String serialize() {
             if (this.bounds != null) {
                 return this.initial + DELIMITER + this.bounds.getMinValue() + DELIMITER + this.bounds.getMaxValue();
@@ -31,12 +31,12 @@ public class DefineVariableAction implements Action {
         }
     }
 
-    public DefineVariableAction(@NotNull List<VarDefinition> definitions) {
+    public DefineVariableAction(@NonNull List<VarDefinition> definitions) {
         this.definitions = definitions;
     }
 
-    @NotNull
-    public static DefineVariableAction load(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static DefineVariableAction load(@NonNull FileConfig config, @NonNull String path) {
         List<VarDefinition> definitions = new ArrayList<>();
 
         config.getSection(path + ".Variables").forEach(name -> {
@@ -70,21 +70,21 @@ public class DefineVariableAction implements Action {
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.remove(path + ".Variables");
         this.definitions.forEach(definition -> {
             config.set(path + ".Variables." + definition.name(), definition.serialize());
         });
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return ActionId.DEFINE_VARIABLE;
     }
 
     @Override
-    public void perform(@NotNull DungeonInstance dungeon, @NotNull DungeonGameEvent event) {
+    public void perform(@NonNull DungeonInstance dungeon, @NonNull DungeonGameEvent event) {
         this.definitions.forEach(definition -> {
             UniDouble bounds = definition.bounds();
             if (bounds != null) {

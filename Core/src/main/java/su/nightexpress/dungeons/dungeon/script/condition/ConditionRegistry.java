@@ -1,7 +1,7 @@
 package su.nightexpress.dungeons.dungeon.script.condition;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.dungeon.script.condition.impl.*;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
@@ -45,7 +45,7 @@ public class ConditionRegistry {
     }
 
     @Nullable
-    public static Condition loadCondition(@NotNull String name, @NotNull FileConfig config, @NotNull String path) {
+    public static Condition loadCondition(@NonNull String name, @NonNull FileConfig config, @NonNull String path) {
         Loader loader = getLoader(name);
         if (loader == null) return null;
 
@@ -53,17 +53,17 @@ public class ConditionRegistry {
     }
 
     @Nullable
-    public static Loader getLoader(@NotNull String name) {
+    public static Loader getLoader(@NonNull String name) {
         return CONDITION_LOADERS.get(name.toLowerCase());
     }
 
-    public static void addLoader(@NotNull String name, @NotNull Loader loader) {
+    public static void addLoader(@NonNull String name, @NonNull Loader loader) {
         CONDITION_LOADERS.put(name.toLowerCase(), loader);
     }
 
     public interface Loader {
 
-        Condition load(@NotNull FileConfig config, @NotNull String path);
+        Condition load(@NonNull FileConfig config, @NonNull String path);
 
     }
 }

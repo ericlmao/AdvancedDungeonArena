@@ -1,7 +1,7 @@
 package su.nightexpress.dungeons.dungeon.event.game;
 
 import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.DungeonEventType;
 import su.nightexpress.dungeons.dungeon.stage.StageTask;
@@ -11,17 +11,17 @@ public class DungeonTaskFinishedEvent extends DungeonTaskEvent {
 
     public static final HandlerList HANDLER_LIST = new HandlerList();
 
-    public DungeonTaskFinishedEvent(@NotNull DungeonInstance dungeon, @NotNull StageTask stageTask, @NotNull TaskProgress progress) {
+    public DungeonTaskFinishedEvent(@NonNull DungeonInstance dungeon, @NonNull StageTask stageTask, @NonNull TaskProgress progress) {
         super(DungeonEventType.TASK_FINISHED, dungeon, stageTask, progress);
     }
 
-    @NotNull
+    @NonNull
     @Override
     public HandlerList getHandlers() {
         return HANDLER_LIST;
     }
 
-    @NotNull
+    @NonNull
     public static HandlerList getHandlerList() {
         return HANDLER_LIST;
     }

@@ -7,7 +7,7 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.api.type.GameState;
 import su.nightexpress.dungeons.dungeon.player.DungeonGamer;
@@ -18,7 +18,7 @@ public class KitListener extends AbstractListener<DungeonPlugin> {
 
     private final KitManager manager;
 
-    public KitListener(@NotNull DungeonPlugin plugin, KitManager manager) {
+    public KitListener(@NonNull DungeonPlugin plugin, KitManager manager) {
         super(plugin);
         this.manager = manager;
     }

@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.config;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.dungeon.DungeonSpawner;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 import su.nightexpress.dungeons.nightcore.util.Lists;
@@ -15,13 +15,13 @@ public class DungeonMobSpawner implements DungeonSpawner {
     private final String id;
     private final Set<BlockPos> positions;
 
-    public DungeonMobSpawner(@NotNull String id, @NotNull Set<BlockPos> positions) {
+    public DungeonMobSpawner(@NonNull String id, @NonNull Set<BlockPos> positions) {
         this.id = id.toLowerCase();
         this.positions = positions;
     }
 
-    @NotNull
-    public static DungeonMobSpawner read(@NotNull FileConfig config, @NotNull String path, @NotNull String id) {
+    @NonNull
+    public static DungeonMobSpawner read(@NonNull FileConfig config, @NonNull String path, @NonNull String id) {
         Set<BlockPos> positions = Lists.modify(config.getStringSet(path + ".Positions"), BlockPos::deserialize);
         positions.removeIf(Objects::isNull);
 
@@ -29,7 +29,7 @@ public class DungeonMobSpawner implements DungeonSpawner {
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".Positions", this.positions.stream().map(BlockPos::serialize).toList());
     }
 
@@ -39,19 +39,19 @@ public class DungeonMobSpawner implements DungeonSpawner {
     }
 
     @Override
-    @NotNull
+    @NonNull
     public BlockPos getRandomPosition() {
         return Rnd.get(this.positions);
     }
 
     @Override
-    @NotNull
+    @NonNull
     public String getId() {
         return this.id;
     }
 
     @Override
-    @NotNull
+    @NonNull
     public Set<BlockPos> getPositions() {
         return this.positions;
     }

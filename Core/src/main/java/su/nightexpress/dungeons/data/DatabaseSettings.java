@@ -2,7 +2,7 @@ package su.nightexpress.dungeons.data;
 
 import java.util.UUID;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import su.nightexpress.dungeons.nightcore.NightPlugin;
 import su.nightexpress.dungeons.nightcore.config.ConfigValue;
@@ -41,18 +41,18 @@ public class DatabaseSettings implements Writeable {
         SQLITE, MYSQL
     }
 
-    public DatabaseSettings(@NotNull DatabaseType type,
-                            @NotNull String tablePrefix,
+    public DatabaseSettings(@NonNull DatabaseType type,
+                            @NonNull String tablePrefix,
                             int syncInterval,
                             boolean purgeEnabled,
                             int purgePeriod,
-                            @NotNull String username,
-                            @NotNull String password,
-                            @NotNull String host,
-                            @NotNull String database,
-                            @NotNull String urlOptions,
-                            @NotNull String filename,
-                            @NotNull String serverId) {
+                            @NonNull String username,
+                            @NonNull String password,
+                            @NonNull String host,
+                            @NonNull String database,
+                            @NonNull String urlOptions,
+                            @NonNull String filename,
+                            @NonNull String serverId) {
         this.type = type;
         this.tablePrefix = tablePrefix;
         this.syncInterval = syncInterval;
@@ -67,8 +67,8 @@ public class DatabaseSettings implements Writeable {
         this.serverId = serverId;
     }
 
-    @NotNull
-    public static DatabaseSettings read(@NotNull NightPlugin plugin) {
+    @NonNull
+    public static DatabaseSettings read(@NonNull NightPlugin plugin) {
         String defaultPrefix = StringUtil.lowerCaseUnderscore(plugin.getName());
 
         FileConfig config = plugin.getConfig();
@@ -87,8 +87,8 @@ public class DatabaseSettings implements Writeable {
         return read(engineConf, defaultPrefix);
     }
 
-    @NotNull
-    public static DatabaseSettings read(@NotNull FileConfig config, @NotNull String defaultPrefix) {
+    @NonNull
+    public static DatabaseSettings read(@NonNull FileConfig config, @NonNull String defaultPrefix) {
         DatabaseType type = ConfigValue.create(PATH + ".Type", DatabaseType.class, DatabaseType.SQLITE,
             "Sets database type.",
             "Available values: SQLITE, MYSQL")
@@ -153,7 +153,7 @@ public class DatabaseSettings implements Writeable {
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         String root = path.isEmpty() ? PATH : path + "." + PATH;
 
         config.set(root + ".Type", this.type.name());
@@ -170,12 +170,12 @@ public class DatabaseSettings implements Writeable {
         config.set(root + ".Purge.For_Period", this.purgePeriod);
     }
 
-    @NotNull
+    @NonNull
     public DatabaseType getType() {
         return this.type;
     }
 
-    @NotNull
+    @NonNull
     public String getTablePrefix() {
         return this.tablePrefix;
     }
@@ -192,23 +192,23 @@ public class DatabaseSettings implements Writeable {
         return this.purgePeriod;
     }
 
-    @NotNull
+    @NonNull
     public String getUsername() {
         return this.username;
     }
 
-    @NotNull
+    @NonNull
     public String getPassword() {
         return this.password;
     }
 
-    @NotNull
+    @NonNull
     public String getFilename() {
         return this.filename;
     }
 
-    @NotNull
-    public String getJdbcUrl(@NotNull NightPlugin plugin) {
+    @NonNull
+    public String getJdbcUrl(@NonNull NightPlugin plugin) {
         if (this.type == DatabaseType.SQLITE) {
             return "jdbc:sqlite:" + plugin.getDataFolder().getAbsolutePath() + "/" + this.filename;
         }

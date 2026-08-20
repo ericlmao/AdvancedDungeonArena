@@ -7,8 +7,8 @@ import org.bukkit.block.Container;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.config.Config;
@@ -46,7 +46,7 @@ import java.util.*;
 
 public class DungeonSetup extends AbstractManager<DungeonPlugin> {
 
-    public DungeonSetup(@NotNull DungeonPlugin plugin) {
+    public DungeonSetup(@NonNull DungeonPlugin plugin) {
         super(plugin);
     }
 
@@ -61,13 +61,13 @@ public class DungeonSetup extends AbstractManager<DungeonPlugin> {
     }
 
     @Nullable
-    private Cuboid getSelectedCuboid(@NotNull Player player) {
+    private Cuboid getSelectedCuboid(@NonNull Player player) {
         Selection selection = this.plugin.getSelectionManager().getSelection(player);
         return selection instanceof CuboidSelection cube ? cube.toCuboid() : null;
     }
 
-    @NotNull
-    private Level injectLevel(@NotNull DungeonConfig config, @NotNull String id, @NotNull ExactPos blockPos) {
+    @NonNull
+    private Level injectLevel(@NonNull DungeonConfig config, @NonNull String id, @NonNull ExactPos blockPos) {
         File file = new File(config.getLevelsPath(), id + FileConfig.EXTENSION);
         Level level = new Level(this.plugin, file);
 
@@ -82,8 +82,8 @@ public class DungeonSetup extends AbstractManager<DungeonPlugin> {
         return level;
     }
 
-    @NotNull
-    private Stage injectStage(@NotNull DungeonConfig config, @NotNull String id) {
+    @NonNull
+    private Stage injectStage(@NonNull DungeonConfig config, @NonNull String id) {
         File file = new File(config.getStagesPath(), id + FileConfig.EXTENSION);
         Stage stage = new Stage(this.plugin, file);
 
@@ -97,7 +97,7 @@ public class DungeonSetup extends AbstractManager<DungeonPlugin> {
         return stage;
     }
 
-    public boolean createDungeon(@NotNull Player player, @NotNull String name) {
+    public boolean createDungeon(@NonNull Player player, @NonNull String name) {
         Cuboid cuboid = this.getSelectedCuboid(player);
         if (cuboid == null) {
             Lang.SETUP_SELECTION_NO_CUBOID.message().send(player);
@@ -147,7 +147,7 @@ public class DungeonSetup extends AbstractManager<DungeonPlugin> {
         return true;
     }
 
-    public boolean setProtectionFromSelection(@NotNull Player player, @NotNull DungeonConfig config) {
+    public boolean setProtectionFromSelection(@NonNull Player player, @NonNull DungeonConfig config) {
         Cuboid cuboid = this.getSelectedCuboid(player);
         if (cuboid == null || !config.isWorld(player.getWorld())) {
             Lang.SETUP_SELECTION_NO_CUBOID.message().send(player);
@@ -170,7 +170,7 @@ public class DungeonSetup extends AbstractManager<DungeonPlugin> {
         return true;
     }
 
-    public boolean setLobby(@NotNull Player player, @NotNull DungeonConfig config) {
+    public boolean setLobby(@NonNull Player player, @NonNull DungeonConfig config) {
         ExactPos pos = ExactPos.from(player.getLocation());
         if (!config.isInProtection(pos) || !config.isWorld(player.getWorld())) {
             Lang.SETUP_SELECTION_POSITION_OUT_OF_PROTECTION.message().send(player, replacer -> replacer.replace(config.replacePlaceholders()));
@@ -185,7 +185,7 @@ public class DungeonSetup extends AbstractManager<DungeonPlugin> {
         return true;
     }
 
-    public boolean createSpawner(@NotNull Player player, @NotNull DungeonConfig config, @NotNull String name) {
+    public boolean createSpawner(@NonNull Player player, @NonNull DungeonConfig config, @NonNull String name) {
         Selection selection = this.plugin.getSelectionManager().getSelection(player);
         Set<BlockPos> positions = selection instanceof PositionSelection pos ? pos.getPositions() : Collections.emptySet();
 
@@ -218,7 +218,7 @@ public class DungeonSetup extends AbstractManager<DungeonPlugin> {
         return true;
     }
 
-    public boolean createLevel(@NotNull Player player, @NotNull DungeonConfig config, @NotNull String name) {
+    public boolean createLevel(@NonNull Player player, @NonNull DungeonConfig config, @NonNull String name) {
         ExactPos blockPos = ExactPos.from(player.getLocation());
         if (!config.isWorld(player.getWorld()) || !config.isInProtection(blockPos.toBlockPos())) {
             Lang.SETUP_SELECTION_POSITION_OUT_OF_PROTECTION.message().send(player, replacer -> replacer.replace(config.replacePlaceholders()));
@@ -242,7 +242,7 @@ public class DungeonSetup extends AbstractManager<DungeonPlugin> {
         return true;
     }
 
-    public boolean setLevelSpawn(@NotNull Player player, @NotNull DungeonConfig config, @NotNull String name) {
+    public boolean setLevelSpawn(@NonNull Player player, @NonNull DungeonConfig config, @NonNull String name) {
         ExactPos blockPos = ExactPos.from(player.getLocation());
         if (!config.isWorld(player.getWorld()) || !config.isInProtection(blockPos.toBlockPos())) {
             Lang.SETUP_SELECTION_POSITION_OUT_OF_PROTECTION.message().send(player, replacer -> replacer.replace(config.replacePlaceholders()));
@@ -263,7 +263,7 @@ public class DungeonSetup extends AbstractManager<DungeonPlugin> {
         return true;
     }
 
-    public boolean createStage(@NotNull Player player, @NotNull DungeonConfig config, @NotNull String name) {
+    public boolean createStage(@NonNull Player player, @NonNull DungeonConfig config, @NonNull String name) {
         String id = StringUtil.transformForID(name);
         if (id.isBlank()) {
             Lang.SETUP_ERROR_INVALID_NAME.message().send(player);
@@ -281,7 +281,7 @@ public class DungeonSetup extends AbstractManager<DungeonPlugin> {
         return true;
     }
 
-    public boolean createReward(@NotNull Player player, @NotNull DungeonConfig config, @NotNull String name) {
+    public boolean createReward(@NonNull Player player, @NonNull DungeonConfig config, @NonNull String name) {
         String id = StringUtil.transformForID(name);
         if (id.isBlank()) {
             Lang.SETUP_ERROR_INVALID_NAME.message().send(player);
@@ -307,7 +307,7 @@ public class DungeonSetup extends AbstractManager<DungeonPlugin> {
         return true;
     }
 
-    public boolean removeReward(@NotNull CommandSender sender, @NotNull DungeonConfig config, @NotNull String name) {
+    public boolean removeReward(@NonNull CommandSender sender, @NonNull DungeonConfig config, @NonNull String name) {
         Reward reward = config.getRewardById(name);
         if (reward == null) {
             Lang.SETUP_REWARD_INVALID.message().send(sender);
@@ -321,7 +321,7 @@ public class DungeonSetup extends AbstractManager<DungeonPlugin> {
         return true;
     }
 
-    public boolean addRewardItem(@NotNull Player player, @NotNull DungeonConfig config, @NotNull String rewardId) {
+    public boolean addRewardItem(@NonNull Player player, @NonNull DungeonConfig config, @NonNull String rewardId) {
         Reward reward = config.getRewardById(rewardId);
         if (reward == null) {
             Lang.SETUP_REWARD_INVALID.message().send(player);
@@ -349,7 +349,7 @@ public class DungeonSetup extends AbstractManager<DungeonPlugin> {
         return true;
     }
 
-    public boolean createLootChest(@NotNull Player player, @NotNull DungeonConfig config, @NotNull String name) {
+    public boolean createLootChest(@NonNull Player player, @NonNull DungeonConfig config, @NonNull String name) {
         String id = StringUtil.transformForID(name);
         if (id.isBlank()) {
             Lang.SETUP_ERROR_INVALID_NAME.message().send(player);
@@ -380,7 +380,7 @@ public class DungeonSetup extends AbstractManager<DungeonPlugin> {
         return true;
     }
 
-    public boolean removeLootChest(@NotNull CommandSender sender, @NotNull DungeonConfig config, @NotNull String name) {
+    public boolean removeLootChest(@NonNull CommandSender sender, @NonNull DungeonConfig config, @NonNull String name) {
         LootChest lootChest = config.getLootChestById(name);
         if (lootChest == null) {
             Lang.SETUP_LOOT_CHEST_INVALID.message().send(sender);
@@ -394,7 +394,7 @@ public class DungeonSetup extends AbstractManager<DungeonPlugin> {
         return true;
     }
 
-    public boolean addLootChestItem(@NotNull Player player, @NotNull DungeonConfig config, @NotNull String lootId, @NotNull String itemName, double weight) {
+    public boolean addLootChestItem(@NonNull Player player, @NonNull DungeonConfig config, @NonNull String lootId, @NonNull String itemName, double weight) {
         LootChest lootChest = config.getLootChestById(lootId);
         if (lootChest == null) {
             Lang.SETUP_LOOT_CHEST_INVALID.message().send(player);
@@ -430,7 +430,7 @@ public class DungeonSetup extends AbstractManager<DungeonPlugin> {
 
 
 
-    public boolean createSpot(@NotNull Player player, @NotNull DungeonConfig config, @NotNull String name) {
+    public boolean createSpot(@NonNull Player player, @NonNull DungeonConfig config, @NonNull String name) {
         Cuboid cuboid = this.getSelectedCuboid(player);
         if (cuboid == null || !config.isWorld(player.getWorld())) {
             Lang.SETUP_SELECTION_NO_CUBOID.message().send(player);
@@ -471,7 +471,7 @@ public class DungeonSetup extends AbstractManager<DungeonPlugin> {
         return true;
     }
 
-    public boolean removeSpot(@NotNull CommandSender sender, @NotNull DungeonConfig config, @NotNull String name) {
+    public boolean removeSpot(@NonNull CommandSender sender, @NonNull DungeonConfig config, @NonNull String name) {
         Spot spot = config.getSpotById(name);
         if (spot == null) {
             Lang.SETUP_SPOT_INVALID.message().send(sender);
@@ -485,7 +485,7 @@ public class DungeonSetup extends AbstractManager<DungeonPlugin> {
         return true;
     }
 
-    public boolean addSpotState(@NotNull Player player, @NotNull DungeonConfig config, @NotNull String spotId, @NotNull String name) {
+    public boolean addSpotState(@NonNull Player player, @NonNull DungeonConfig config, @NonNull String spotId, @NonNull String name) {
         Cuboid cuboid = this.getSelectedCuboid(player);
         if (cuboid == null || !config.isWorld(player.getWorld())) {
             Lang.SETUP_SELECTION_NO_CUBOID.message().send(player);

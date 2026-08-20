@@ -1,8 +1,8 @@
 package su.nightexpress.dungeons.dungeon.stage.task;
 
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.dungeon.script.task.ProgressFormatter;
 
 public abstract class AbstractProgress implements TaskProgress {
@@ -10,17 +10,17 @@ public abstract class AbstractProgress implements TaskProgress {
     protected final ProgressFormatter formatter;
     protected int requiredAmount;
 
-    public AbstractProgress(@NotNull ProgressFormatter formatter, int requiredAmount) {
+    public AbstractProgress(@NonNull ProgressFormatter formatter, int requiredAmount) {
         this.formatter = formatter;
         this.requiredAmount = requiredAmount;
     }
 
-    @NotNull
+    @NonNull
     public ProgressFormatter getFormatter() {
         return this.formatter;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String format(@Nullable Player player) {
         return this.formatter.format(this, player);

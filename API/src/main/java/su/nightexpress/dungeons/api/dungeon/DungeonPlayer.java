@@ -2,8 +2,8 @@ package su.nightexpress.dungeons.api.dungeon;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.api.compat.BoardPlugin;
 import su.nightexpress.dungeons.api.compat.GodPlugin;
 import su.nightexpress.dungeons.api.type.GameState;
@@ -29,13 +29,13 @@ public interface DungeonPlayer {
      * @return a future completing with {@code true} if the player actually arrived.
      * @see #teleportThen(Location, Runnable)
      */
-    @NotNull CompletableFuture<Boolean> teleport(@NotNull Location location);
+    @NonNull CompletableFuture<Boolean> teleport(@NonNull Location location);
 
     /**
      * Convenience form of {@link #teleport(Location)}: runs {@code onArrival} on the player's scheduler once
      * the move completes. Anything that reads or writes player state after a teleport belongs in here.
      */
-    void teleportThen(@NotNull Location location, @NotNull Runnable onArrival);
+    void teleportThen(@NonNull Location location, @NonNull Runnable onArrival);
 
     void handleDeath();
 
@@ -45,9 +45,9 @@ public interface DungeonPlayer {
 
     void updateBoard();
 
-    void manageExternalGod(@NotNull Consumer<GodPlugin> consumer);
+    void manageExternalGod(@NonNull Consumer<GodPlugin> consumer);
 
-    void manageExternalBoard(@NotNull Consumer<BoardPlugin> consumer);
+    void manageExternalBoard(@NonNull Consumer<BoardPlugin> consumer);
 
     boolean isAlive();
 
@@ -70,13 +70,13 @@ public interface DungeonPlayer {
      */
     @Nullable Location getLastKnownLocation();
 
-    @NotNull Player getPlayer();
+    @NonNull Player getPlayer();
 
-    @NotNull Dungeon getDungeon();
+    @NonNull Dungeon getDungeon();
 
-    @NotNull GameState getState();
+    @NonNull GameState getState();
 
-    void setState(@NotNull GameState state);
+    void setState(@NonNull GameState state);
 
     int getLives();
 

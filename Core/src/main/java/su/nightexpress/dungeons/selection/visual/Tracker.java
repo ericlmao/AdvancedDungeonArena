@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.selection.visual;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.nightcore.util.geodata.pos.BlockPos;
 
 public class Tracker {

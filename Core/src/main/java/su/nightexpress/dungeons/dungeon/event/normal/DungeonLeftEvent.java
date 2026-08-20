@@ -2,7 +2,7 @@ package su.nightexpress.dungeons.dungeon.event.normal;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.dungeon.DungeonPlayer;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.AbstractDungeonEvent;
@@ -13,28 +13,28 @@ public class DungeonLeftEvent extends AbstractDungeonEvent {
 
     private final DungeonPlayer dungeonPlayer;
 
-    public DungeonLeftEvent(@NotNull DungeonInstance dungeon, @NotNull DungeonPlayer dungeonPlayer) {
+    public DungeonLeftEvent(@NonNull DungeonInstance dungeon, @NonNull DungeonPlayer dungeonPlayer) {
         super(dungeon);
         this.dungeonPlayer = dungeonPlayer;
     }
 
-    @NotNull
+    @NonNull
     public DungeonPlayer getDungeonPlayer() {
         return this.dungeonPlayer;
     }
 
-    @NotNull
+    @NonNull
     public Player getPlayer() {
         return this.dungeonPlayer.getPlayer();
     }
 
-    @NotNull
+    @NonNull
     @Override
     public HandlerList getHandlers() {
         return HANDLER_LIST;
     }
 
-    @NotNull
+    @NonNull
     public static HandlerList getHandlerList() {
         return HANDLER_LIST;
     }

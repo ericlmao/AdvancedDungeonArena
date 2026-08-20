@@ -1,13 +1,13 @@
 package su.nightexpress.dungeons.api.compat;
 
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public interface GodPlugin {
 
-    boolean isGodEnabled(@NotNull Player player);
+    boolean isGodEnabled(@NonNull Player player);
 
-    void disableGod(@NotNull Player player);
+    void disableGod(@NonNull Player player);
 
-    void enableGod(@NotNull Player player);
+    void enableGod(@NonNull Player player);
 }

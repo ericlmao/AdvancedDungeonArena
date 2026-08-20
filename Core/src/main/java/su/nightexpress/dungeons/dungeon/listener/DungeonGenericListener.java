@@ -5,7 +5,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.dungeon.DungeonManager;
 import su.nightexpress.dungeons.nightcore.manager.AbstractListener;
@@ -14,7 +14,7 @@ public class DungeonGenericListener extends AbstractListener<DungeonPlugin> {
 
     private final DungeonManager manager;
 
-    public DungeonGenericListener(@NotNull DungeonPlugin plugin, @NotNull DungeonManager manager) {
+    public DungeonGenericListener(@NonNull DungeonPlugin plugin, @NonNull DungeonManager manager) {
         super(plugin);
         this.manager = manager;
     }

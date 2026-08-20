@@ -6,8 +6,8 @@ import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.core.mobs.ActiveMob;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.api.dungeon.Dungeon;
 import su.nightexpress.dungeons.api.mob.MobProvider;
 import su.nightexpress.dungeons.api.type.MobFaction;
@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 
 public class MythicMobProvider implements MobProvider {
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return MobProviderId.MYTHIC_MOBS;
@@ -27,7 +27,7 @@ public class MythicMobProvider implements MobProvider {
 
     @Nullable
     @Override
-    public LivingEntity spawn(@NotNull Dungeon arena, @NotNull String mobId, @NotNull MobFaction faction, @NotNull Location location, int level, @Nullable Consumer<LivingEntity> prespawn) {
+    public LivingEntity spawn(@NonNull Dungeon arena, @NonNull String mobId, @NonNull MobFaction faction, @NonNull Location location, int level, @Nullable Consumer<LivingEntity> prespawn) {
         MythicMob mythicMob = MythicMobsHook.getMobConfig(mobId);
         if (mythicMob == null) return null;
 
@@ -45,20 +45,20 @@ public class MythicMobProvider implements MobProvider {
         return entity;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public List<String> getMobNames() {
         return MythicMobsHook.getMobConfigIds();
     }
 
     @Override
-    public boolean isProducedBy(@NotNull LivingEntity entity) {
+    public boolean isProducedBy(@NonNull LivingEntity entity) {
         return MythicMobsHook.isMythicMob(entity);
     }
 
     @Override
     @Nullable
-    public String getMobId(@NotNull LivingEntity entity) {
+    public String getMobId(@NonNull LivingEntity entity) {
         return MythicMobsHook.getMobInternalName(entity);
     }
 }

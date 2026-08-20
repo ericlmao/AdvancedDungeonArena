@@ -1,7 +1,7 @@
 package su.nightexpress.dungeons.dungeon.game;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.nightcore.util.NumberUtil;
 import su.nightexpress.dungeons.nightcore.util.placeholder.Replacer;
@@ -19,7 +19,7 @@ public class DungeonVariables {
         this.variableMap = new HashMap<>();
     }
 
-    @NotNull
+    @NonNull
     public UnaryOperator<String> replacePlaceholders() {
         Replacer replacer = Replacer.create();
 
@@ -38,33 +38,33 @@ public class DungeonVariables {
         this.variableMap.clear();
     }
 
-    @NotNull
-    public Optional<Variable> variable(@NotNull String name) {
+    @NonNull
+    public Optional<Variable> variable(@NonNull String name) {
         return Optional.ofNullable(this.getVariable(name));
     }
 
     @Nullable
-    public Variable getVariable(@NotNull String name) {
+    public Variable getVariable(@NonNull String name) {
         return this.variableMap.get(name);
     }
 
-    public boolean hasVariable(@NotNull String name) {
+    public boolean hasVariable(@NonNull String name) {
         return this.getVariable(name) != null;
     }
 
-    public void createLimitedVariable(@NotNull String name, double initial, double min, double max) {
+    public void createLimitedVariable(@NonNull String name, double initial, double min, double max) {
         this.createVariable(name, new Variable(initial, true, min, max));
     }
 
-    public void createUnlimitedVariable(@NotNull String name, double initial) {
+    public void createUnlimitedVariable(@NonNull String name, double initial) {
         this.createVariable(name, new Variable(initial, false, -1, -1));
     }
 
-    private void createVariable(@NotNull String name, @NotNull Variable variable) {
+    private void createVariable(@NonNull String name, @NonNull Variable variable) {
         this.variableMap.put(name, variable);
     }
 
-    public void removeVariable(@NotNull String name) {
+    public void removeVariable(@NonNull String name) {
         this.variableMap.remove(name);
     }
 }

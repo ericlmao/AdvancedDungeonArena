@@ -1,8 +1,8 @@
 package su.nightexpress.dungeons.util;
 
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.nightcore.bridge.item.AdaptedItem;
 import su.nightexpress.dungeons.nightcore.bridge.item.ItemAdapter;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
@@ -18,8 +18,8 @@ import java.util.Optional;
 
 public class ItemHelper {
 
-    @NotNull
-    public static Optional<AdaptedItem> read(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static Optional<AdaptedItem> read(@NonNull FileConfig config, @NonNull String path) {
         String oldType = config.getString(path + ".Type");
         if (oldType != null) {
             AdaptedItem adaptedItem = null;
@@ -62,29 +62,29 @@ public class ItemHelper {
     }
 
     @Nullable
-    public static ItemStack toItemStack(@NotNull AdaptedItem item) {
+    public static ItemStack toItemStack(@NonNull AdaptedItem item) {
         return item.itemStack().orElse(null);
     }
 
-    public static boolean isCustom(@NotNull ItemStack itemStack) {
+    public static boolean isCustom(@NonNull ItemStack itemStack) {
         ItemAdapter<?> adapter = ItemBridge.getAdapter(itemStack);
         return adapter != null && !adapter.isVanilla();
     }
 
-    @NotNull
-    public static AdaptedItem vanilla(@NotNull ItemStack itemStack) {
+    @NonNull
+    public static AdaptedItem vanilla(@NonNull ItemStack itemStack) {
         return AdaptedVanillaStack.of(itemStack);
     }
 
-    @NotNull
-    public static AdaptedItem adapt(@NotNull ItemStack itemStack) {
+    @NonNull
+    public static AdaptedItem adapt(@NonNull ItemStack itemStack) {
         ItemAdapter<?> adapter = ItemBridge.getAdapterOrVanilla(itemStack);
         AdaptedItem item = adapter.adapt(itemStack).orElse(null);
         return item == null ? vanilla(itemStack) : item;
     }
 
-    @NotNull
-    public static AdaptedItem adapt(@NotNull ItemStack itemStack, boolean allowCustoms) {
+    @NonNull
+    public static AdaptedItem adapt(@NonNull ItemStack itemStack, boolean allowCustoms) {
         return allowCustoms ? adapt(itemStack) : vanilla(itemStack);
     }
 }

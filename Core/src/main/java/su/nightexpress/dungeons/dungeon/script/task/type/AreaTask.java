@@ -9,7 +9,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Transformation;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.joml.AxisAngle4f;
 import org.joml.Vector3f;
 import su.nightexpress.dungeons.api.dungeon.DungeonPlayer;
@@ -34,7 +34,7 @@ public abstract class AreaTask implements Task {
     protected final int      height;
     protected final BlockPos targetPos;
 
-    public AreaTask(int radius, int height, @NotNull BlockPos targetPos) {
+    public AreaTask(int radius, int height, @NonNull BlockPos targetPos) {
         // Populated from per-chunk region tasks that can run concurrently on Folia.
         this.blockLights = new ConcurrentHashMap<>();
 
@@ -45,11 +45,11 @@ public abstract class AreaTask implements Task {
 
     protected interface Creator<T extends AreaTask> {
 
-        @NotNull T create(int radius, int height, @NotNull BlockPos targetPos);
+        @NonNull T create(int radius, int height, @NonNull BlockPos targetPos);
     }
 
-    @NotNull
-    protected static <T extends AreaTask> T load(@NotNull FileConfig config, @NotNull String path, @NotNull Creator<T> creator) {
+    @NonNull
+    protected static <T extends AreaTask> T load(@NonNull FileConfig config, @NonNull String path, @NonNull Creator<T> creator) {
         int radius = ConfigValue.create(path + ".Radius", 5).read(config);
         int height = ConfigValue.create(path + ".Height", 5).read(config);
         BlockPos pos = BlockPos.read(config, path + ".Location");
@@ -58,7 +58,7 @@ public abstract class AreaTask implements Task {
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".Radius", this.radius);
         config.set(path + ".Height", this.height);
         config.set(path + ".Location", this.targetPos.serialize());
@@ -78,7 +78,7 @@ public abstract class AreaTask implements Task {
      * reads and spawns happen on the region that owns it.
      */
     @Override
-    public void onTaskAdd(@NotNull DungeonInstance dungeon, @NotNull StageTask stageTask, @NotNull TaskProgress progress) {
+    public void onTaskAdd(@NonNull DungeonInstance dungeon, @NonNull StageTask stageTask, @NonNull TaskProgress progress) {
         World world = dungeon.getWorld();
         int fixedY = this.targetPos.getY();
 
@@ -99,7 +99,7 @@ public abstract class AreaTask implements Task {
     }
 
     @Override
-    public void onTaskRemove(@NotNull DungeonInstance dungeon, @NotNull StageTask stageTask, @NotNull TaskProgress progress) {
+    public void onTaskRemove(@NonNull DungeonInstance dungeon, @NonNull StageTask stageTask, @NonNull TaskProgress progress) {
         Set<BlockDisplay> displays = this.blockLights.remove(stageTask.getId());
         if (displays != null) {
             displays.forEach(display -> Scheduler.entity(display).run(task -> display.remove()));
@@ -111,11 +111,11 @@ public abstract class AreaTask implements Task {
 
     protected interface ChunkConsumer {
 
-        void accept(int chunkX, int chunkZ, @NotNull List<Column> columns);
+        void accept(int chunkX, int chunkZ, @NonNull List<Column> columns);
     }
 
     /** Buckets the circle's columns by chunk so each bucket can be dispatched to its owning region. */
-    protected void forEachChunkOfArea(@NotNull ChunkConsumer consumer) {
+    protected void forEachChunkOfArea(@NonNull ChunkConsumer consumer) {
         Map<Long, List<Column>> byChunk = new LinkedHashMap<>();
 
         int centerX = this.targetPos.getX();
@@ -133,23 +133,23 @@ public abstract class AreaTask implements Task {
         byChunk.forEach((chunkKey, columns) -> consumer.accept((int) (long) chunkKey, (int) (chunkKey >> 32), columns));
     }
 
-    protected abstract void onTaskProgress(@NotNull DungeonGameEvent event, @NotNull DungeonInstance dungeon, @NotNull StageTask stageTask, @NotNull TaskProgress progress);
+    protected abstract void onTaskProgress(@NonNull DungeonGameEvent event, @NonNull DungeonInstance dungeon, @NonNull StageTask stageTask, @NonNull TaskProgress progress);
 
     @Override
-    public void progress(@NotNull DungeonGameEvent event, @NotNull DungeonInstance dungeon, @NotNull StageTask stageTask, @NotNull TaskProgress progress) {
+    public void progress(@NonNull DungeonGameEvent event, @NonNull DungeonInstance dungeon, @NonNull StageTask stageTask, @NonNull TaskProgress progress) {
         if (event.getType() != DungeonEventType.DUNGEON_TICK) return;
 
         this.onTaskProgress(event, dungeon, stageTask, progress);
     }
 
-    protected void setAreaColor(@NotNull StageTask stageTask, @NotNull Color color) {
+    protected void setAreaColor(@NonNull StageTask stageTask, @NonNull Color color) {
         // Recolouring a display is an entity mutation, and the displays are spread across the area, so each
         // one is recoloured on its own scheduler rather than in a sweep from the caller's thread.
         this.blockLights.getOrDefault(stageTask.getId(), Collections.emptySet())
             .forEach(display -> Scheduler.entity(display).run(task -> display.setGlowColorOverride(color)));
     }
 
-    protected boolean isInside(@NotNull DungeonPlayer gamer) {
+    protected boolean isInside(@NonNull DungeonPlayer gamer) {
         // Deliberately the snapshot rather than player.getLocation(): this runs from the dungeon clock, and
         // on Folia the player is very often owned by a different region thread.
         Location location = gamer.getLastKnownLocation();

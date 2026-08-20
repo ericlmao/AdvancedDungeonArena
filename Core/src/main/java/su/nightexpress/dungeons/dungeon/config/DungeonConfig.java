@@ -4,8 +4,8 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.api.dungeon.DungeonPos;
@@ -64,7 +64,7 @@ public class DungeonConfig extends AbstractFileData<DungeonPlugin> {
     private NightItem    icon;
     private ExactPos     lobbyPos;
 
-    public DungeonConfig(@NotNull DungeonPlugin plugin, @NotNull File file, @NotNull String id) {
+    public DungeonConfig(@NonNull DungeonPlugin plugin, @NonNull File file, @NonNull String id) {
         super(plugin, file, id);
         this.spawnerByIdMap = new HashMap<>();
         this.stageByIdMap = new HashMap<>();
@@ -78,7 +78,7 @@ public class DungeonConfig extends AbstractFileData<DungeonPlugin> {
     }
 
     @Override
-    protected boolean onLoad(@NotNull FileConfig config) {
+    protected boolean onLoad(@NonNull FileConfig config) {
         this.setWorldName(String.valueOf(config.getString("WorldName")));
         this.setStartLevelId(String.valueOf(config.getString("StartLevel")));
         this.setStartStageId(String.valueOf(config.getString("StartStage")));
@@ -110,7 +110,7 @@ public class DungeonConfig extends AbstractFileData<DungeonPlugin> {
     }
 
     @Override
-    protected void onSave(@NotNull FileConfig config) {
+    protected void onSave(@NonNull FileConfig config) {
         config.set("WorldName", this.worldName);
         config.set("StartLevel", this.startLevelId);
         config.set("StartStage", this.startStageId);
@@ -135,49 +135,49 @@ public class DungeonConfig extends AbstractFileData<DungeonPlugin> {
         this.writeSection(this::writeSpawners);
     }
 
-    private void writeSection(@NotNull Consumer<FileConfig> consumer) {
+    private void writeSection(@NonNull Consumer<FileConfig> consumer) {
         FileConfig config = this.getConfig();
         consumer.accept(config);
         config.saveChanges();
     }
 
-    private void writeSpawners(@NotNull FileConfig config) {
+    private void writeSpawners(@NonNull FileConfig config) {
         config.remove("Spawners");
         this.spawnerByIdMap.forEach((id, spawner) -> config.set("Spawners." + id, spawner));
     }
 
-    @NotNull
+    @NonNull
     public String getFolderPath() {
         return this.file.getParentFile().getAbsolutePath();
     }
 
-    @NotNull
+    @NonNull
     public String getStagesPath() {
         return this.getSubPath(Config.DIR_STAGES);
     }
 
-    @NotNull
+    @NonNull
     public String getLevelsPath() {
         return this.getSubPath(Config.DIR_LEVELS);
     }
 
-    @NotNull
+    @NonNull
     public String getRewardsPath() {
         return this.getSubPath(Config.DIR_REWARDS);
     }
 
-    @NotNull
+    @NonNull
     public String getLootChestsPath() {
         return this.getSubPath(Config.DIR_LOOT_CHESTS);
     }
 
-    @NotNull
+    @NonNull
     public String getSpotsPath() {
         return this.getSubPath(Config.DIR_SPOTS);
     }
 
-    @NotNull
-    private String getSubPath(@NotNull String sub) {
+    @NonNull
+    private String getSubPath(@NonNull String sub) {
         return this.getFolderPath() + sub;
     }
 
@@ -206,7 +206,7 @@ public class DungeonConfig extends AbstractFileData<DungeonPlugin> {
         this.plugin.info("Loaded " + this.spotByIdMap.size() + " spots for the '" + this.getId() + "' dungeon.");
     }
 
-    private <T extends AbstractFileData<DungeonPlugin>> void loadData(@NotNull String path, @NotNull BiFunction<DungeonPlugin, File, T> function, @NotNull Consumer<T> onLoad) {
+    private <T extends AbstractFileData<DungeonPlugin>> void loadData(@NonNull String path, @NonNull BiFunction<DungeonPlugin, File, T> function, @NonNull Consumer<T> onLoad) {
         for (File file : this.getFilesInDirectory(path)) {
             T spot = function.apply(this.plugin, file);
             if (spot.load()) {
@@ -216,8 +216,8 @@ public class DungeonConfig extends AbstractFileData<DungeonPlugin> {
         }
     }
 
-    @NotNull
-    private List<File> getFilesInDirectory(@NotNull String path) {
+    @NonNull
+    private List<File> getFilesInDirectory(@NonNull String path) {
         File dir = new File(path);
         dir.mkdirs();
 
@@ -282,36 +282,36 @@ public class DungeonConfig extends AbstractFileData<DungeonPlugin> {
         }
     }
 
-    @NotNull
+    @NonNull
     public UnaryOperator<String> replacePlaceholders() {
         return Placeholders.DUNGEON_CONFIG.replacer(this);
     }
 
-    public boolean isInProtection(@NotNull Entity entity) {
+    public boolean isInProtection(@NonNull Entity entity) {
         return this.isInProtection(entity.getLocation());
     }
 
-    public boolean isInProtection(@NotNull Block block) {
+    public boolean isInProtection(@NonNull Block block) {
         return this.isInProtection(BlockPos.from(block));
     }
 
-    public boolean isInProtection(@NotNull ExactPos exactPos) {
+    public boolean isInProtection(@NonNull ExactPos exactPos) {
         return this.isInProtection(exactPos.toBlockPos());
     }
 
-    public boolean isInProtection(@NotNull BlockPos blockPos) {
+    public boolean isInProtection(@NonNull BlockPos blockPos) {
         return this.cuboid.contains(blockPos);
     }
 
-    public boolean isInProtection(@NotNull Location location) {
+    public boolean isInProtection(@NonNull Location location) {
         return this.cuboid.contains(location);
     }
 
-    public boolean isWorld(@NotNull World world) {
+    public boolean isWorld(@NonNull World world) {
         return this.worldName.equalsIgnoreCase(world.getName());
     }
 
-    @NotNull
+    @NonNull
     public Set<DungeonPos> getDungeonPositions() {
         return this.cuboid.getIntersectingChunkPositions().stream().map(pos -> new DungeonPos(this.worldName, pos)).collect(Collectors.toSet());
     }
@@ -319,35 +319,35 @@ public class DungeonConfig extends AbstractFileData<DungeonPlugin> {
 
 
 
-    @NotNull
+    @NonNull
     public DungeonInstance getInstance() {
         if (this.instance == null) throw new IllegalStateException("Dungeon instance is not set!");
 
         return this.instance;
     }
 
-    public void setInstance(@NotNull DungeonInstance instance) {
+    public void setInstance(@NonNull DungeonInstance instance) {
         this.instance = instance;
     }
 
-    @NotNull
+    @NonNull
     public Features features() {
         return this.features;
     }
 
-    @NotNull
+    @NonNull
     public GameSettings gameSettings() {
         return this.gameSettings;
     }
 
 
 
-    @NotNull
+    @NonNull
     public String getWorldName() {
         return this.worldName;
     }
 
-    public void setWorldName(@NotNull String worldName) {
+    public void setWorldName(@NonNull String worldName) {
         this.worldName = worldName;
     }
 
@@ -359,205 +359,205 @@ public class DungeonConfig extends AbstractFileData<DungeonPlugin> {
         return this.getStageById(this.startStageId);
     }
 
-    @NotNull
+    @NonNull
     public String getStartLevelId() {
         return this.startLevelId;
     }
 
-    public void setStartLevelId(@NotNull String startLevelId) {
+    public void setStartLevelId(@NonNull String startLevelId) {
         this.startLevelId = startLevelId;
     }
 
-    @NotNull
+    @NonNull
     public String getStartStageId() {
         return startStageId;
     }
 
-    public void setStartStageId(@NotNull String startStageId) {
+    public void setStartStageId(@NonNull String startStageId) {
         this.startStageId = startStageId;
     }
 
-    @NotNull
+    @NonNull
     public Cuboid getCuboid() {
         return this.cuboid;
     }
 
-    public void setCuboid(@NotNull Cuboid cuboid) {
+    public void setCuboid(@NonNull Cuboid cuboid) {
         this.cuboid = cuboid;
     }
 
-    @NotNull
+    @NonNull
     public String getName() {
         return this.name;
     }
 
-    public void setName(@NotNull String name) {
+    public void setName(@NonNull String name) {
         this.name = name;
     }
 
-    @NotNull
+    @NonNull
     public List<String> getDescription() {
         return this.description;
     }
 
-    public void setDescription(@NotNull List<String> description) {
+    public void setDescription(@NonNull List<String> description) {
         this.description = description;
     }
 
-    @NotNull
+    @NonNull
     public String getPrefix() {
         return this.prefix;
     }
 
-    public void setPrefix(@NotNull String prefix) {
+    public void setPrefix(@NonNull String prefix) {
         this.prefix = prefix;
     }
 
-    @NotNull
+    @NonNull
     public NightItem getIcon() {
         return this.icon.copy();
     }
 
-    public void setIcon(@NotNull NightItem icon) {
+    public void setIcon(@NonNull NightItem icon) {
         this.icon = icon.copy().setHideComponents(true);
     }
 
-    @NotNull
+    @NonNull
     public ExactPos getLobbyPos() {
         return this.lobbyPos;
     }
 
-    public void setLobbyPos(@NotNull ExactPos lobbyPos) {
+    public void setLobbyPos(@NonNull ExactPos lobbyPos) {
         this.lobbyPos = lobbyPos;
     }
 
-    public void addSpawner(@NotNull DungeonMobSpawner spawner) {
+    public void addSpawner(@NonNull DungeonMobSpawner spawner) {
         this.spawnerByIdMap.put(spawner.getId(), spawner);
     }
 
-    @NotNull
+    @NonNull
     public Map<String, DungeonMobSpawner> getSpawnerByIdMap() {
         return this.spawnerByIdMap;
     }
 
-    @NotNull
+    @NonNull
     public Set<DungeonMobSpawner> getSpawners() {
         return new HashSet<>(this.spawnerByIdMap.values());
     }
 
     @Nullable
-    public DungeonMobSpawner getSpawnerById(@NotNull String id) {
+    public DungeonMobSpawner getSpawnerById(@NonNull String id) {
         return this.spawnerByIdMap.get(id.toLowerCase());
     }
 
-    public void addStage(@NotNull Stage stage) {
+    public void addStage(@NonNull Stage stage) {
         this.stageByIdMap.put(stage.getId(), stage);
     }
 
-    @NotNull
+    @NonNull
     public Map<String, Stage> getStageByIdMap() {
         return this.stageByIdMap;
     }
 
-    @NotNull
+    @NonNull
     public Set<Stage> getStages() {
         return new HashSet<>(this.stageByIdMap.values());
     }
 
     @Nullable
-    public Stage getStageById(@NotNull String id) {
+    public Stage getStageById(@NonNull String id) {
         return this.stageByIdMap.get(id.toLowerCase());
     }
 
-    @NotNull
+    @NonNull
     public Map<String, Level> getLevelByIdMap() {
         return this.levelByIdMap;
     }
 
-    @NotNull
+    @NonNull
     public Set<Level> getLevels() {
         return new HashSet<>(this.levelByIdMap.values());
     }
 
     @Nullable
-    public Level getLevelById(@NotNull String id) {
+    public Level getLevelById(@NonNull String id) {
         return this.levelByIdMap.get(id.toLowerCase());
     }
 
-    public void addLevel(@NotNull Level level) {
+    public void addLevel(@NonNull Level level) {
         this.levelByIdMap.put(level.getId(), level);
     }
 
 
-    @NotNull
+    @NonNull
     public Map<String, Reward> getRewardByIdMap() {
         return this.rewardByIdMap;
     }
 
-    @NotNull
+    @NonNull
     public Set<Reward> getRewards() {
         return new HashSet<>(this.rewardByIdMap.values());
     }
 
     @Nullable
-    public Reward getRewardById(@NotNull String id) {
+    public Reward getRewardById(@NonNull String id) {
         return this.rewardByIdMap.get(id.toLowerCase());
     }
 
-    public void addReward(@NotNull Reward reward) {
+    public void addReward(@NonNull Reward reward) {
         this.rewardByIdMap.put(reward.getId(), reward);
     }
 
-    public void removeReward(@NotNull String id) {
+    public void removeReward(@NonNull String id) {
         this.rewardByIdMap.remove(id);
     }
 
 
-    @NotNull
+    @NonNull
     public Map<String, LootChest> getLootChestByIdMap() {
         return this.lootChestByIdMap;
     }
 
-    @NotNull
+    @NonNull
     public Set<LootChest> getLootChests() {
         return new HashSet<>(this.lootChestByIdMap.values());
     }
 
     @Nullable
-    public LootChest getLootChestById(@NotNull String id) {
+    public LootChest getLootChestById(@NonNull String id) {
         return this.lootChestByIdMap.get(id.toLowerCase());
     }
 
-    public void addLootChest(@NotNull LootChest lootChest) {
+    public void addLootChest(@NonNull LootChest lootChest) {
         this.lootChestByIdMap.put(lootChest.getId(), lootChest);
     }
 
-    public void removeLootChest(@NotNull String id) {
+    public void removeLootChest(@NonNull String id) {
         this.lootChestByIdMap.remove(id);
     }
 
 
 
-    @NotNull
+    @NonNull
     public Map<String, Spot> getSpotByIdMap() {
         return this.spotByIdMap;
     }
 
-    @NotNull
+    @NonNull
     public Set<Spot> getSpots() {
         return new HashSet<>(this.spotByIdMap.values());
     }
 
     @Nullable
-    public Spot getSpotById(@NotNull String id) {
+    public Spot getSpotById(@NonNull String id) {
         return this.spotByIdMap.get(id.toLowerCase());
     }
 
-    public void addSpot(@NotNull Spot spot) {
+    public void addSpot(@NonNull Spot spot) {
         this.spotByIdMap.put(spot.getId(), spot);
     }
 
-    public void removeSpot(@NotNull String id) {
+    public void removeSpot(@NonNull String id) {
         this.spotByIdMap.remove(id);
     }
 }

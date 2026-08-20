@@ -4,8 +4,8 @@ import gg.moonrise.scheduler.Scheduler;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.api.schema.SchemaBlock;
@@ -30,14 +30,14 @@ public class Spot extends AbstractFileData<DungeonPlugin> {
     private String defaultStateId;
     private String lastState;
 
-    public Spot(@NotNull DungeonPlugin plugin, @NotNull File file) {
+    public Spot(@NonNull DungeonPlugin plugin, @NonNull File file) {
         super(plugin, file);
         this.stateByIdMap = new HashMap<>();
         this.defaultStateId = Placeholders.DEFAULT;
     }
 
     @Override
-    protected boolean onLoad(@NotNull FileConfig config) {
+    protected boolean onLoad(@NonNull FileConfig config) {
         this.setName(config.getString("Name", this.getId()));
         this.setDefaultStateId(config.getString("DefaultState", Placeholders.DEFAULT));
 
@@ -55,7 +55,7 @@ public class Spot extends AbstractFileData<DungeonPlugin> {
     }
 
     @Override
-    protected void onSave(@NotNull FileConfig config) {
+    protected void onSave(@NonNull FileConfig config) {
         config.set("Name", this.name);
         config.set("DefaultState", this.defaultStateId);
 //        this.cuboid.getMin().write(config, "Bounds.Min");
@@ -79,7 +79,7 @@ public class Spot extends AbstractFileData<DungeonPlugin> {
      * The schema is therefore bucketed by chunk and each bucket is dispatched to the region that owns it.
      * Blocks within one chunk keep their original relative order.
      */
-    public void build(@NotNull World world, @NotNull SpotState state) {
+    public void build(@NonNull World world, @NonNull SpotState state) {
         Map<Long, List<SchemaBlock>> byChunk = new LinkedHashMap<>();
 
         state.getSchema().forEach(schemaBlock -> {
@@ -102,7 +102,7 @@ public class Spot extends AbstractFileData<DungeonPlugin> {
         this.getStates().forEach(this::loadStateSchema);
     }
 
-    public void loadStateSchema(@NotNull SpotState state) {
+    public void loadStateSchema(@NonNull SpotState state) {
         boolean compressed = true;
 
         File file = this.getNewStateSchemaFile(state);
@@ -115,21 +115,21 @@ public class Spot extends AbstractFileData<DungeonPlugin> {
         state.loadSchema(this.plugin, file, compressed);
     }
 
-    public void writeStateSchema(@NotNull SpotState state, @NotNull World world, @NotNull List<Block> blocks) {
+    public void writeStateSchema(@NonNull SpotState state, @NonNull World world, @NonNull List<Block> blocks) {
         File file = this.getNewStateSchemaFile(state);
         FileUtil.create(file);
 
         this.plugin.getInternals().saveSchema(world, blocks, file);
     }
 
-    public void addStateOrUpdate(@NotNull SpotState state, @NotNull World world, @NotNull List<Block> blocks) {
+    public void addStateOrUpdate(@NonNull SpotState state, @NonNull World world, @NonNull List<Block> blocks) {
         this.removeState(state);
         this.addState(state);
         this.writeStateSchema(state, world, blocks);
         this.loadStateSchema(state);
     }
 
-    public void removeState(@NotNull SpotState state) {
+    public void removeState(@NonNull SpotState state) {
         this.stateByIdMap.remove(state.getId());
 
         File file = this.getAnyStateSchemaFile(state);
@@ -142,29 +142,29 @@ public class Spot extends AbstractFileData<DungeonPlugin> {
         this.getStates().forEach(this::removeState);
     }
 
-    @NotNull
+    @NonNull
     public UnaryOperator<String> replacePlaceholders() {
         return Placeholders.SPOT.replacer(this);
     }
 
-    @NotNull
-    public File getAnyStateSchemaFile(@NotNull SpotState state) {
+    @NonNull
+    public File getAnyStateSchemaFile(@NonNull SpotState state) {
         File modern = this.getNewStateSchemaFile(state);
         return modern.exists() ? modern : this.getOldStateSchemaFile(state);
     }
 
-    @NotNull
-    public File getOldStateSchemaFile(@NotNull SpotState state) {
+    @NonNull
+    public File getOldStateSchemaFile(@NonNull SpotState state) {
         return this.getStateSchemaFile(state, EXT_OLD);
     }
 
-    @NotNull
-    public File getNewStateSchemaFile(@NotNull SpotState state) {
+    @NonNull
+    public File getNewStateSchemaFile(@NonNull SpotState state) {
         return this.getStateSchemaFile(state, EXT_NEW);
     }
 
-    @NotNull
-    private File getStateSchemaFile(@NotNull SpotState state, @NotNull String extension) {
+    @NonNull
+    private File getStateSchemaFile(@NonNull SpotState state, @NonNull String extension) {
         String name = this.getId() + "_" + state.getId() + extension;
         return new File(this.file.getAbsoluteFile().getParent(), name);
     }
@@ -174,25 +174,25 @@ public class Spot extends AbstractFileData<DungeonPlugin> {
         return this.getState(this.defaultStateId);
     }
 
-    @NotNull
+    @NonNull
     public String getName() {
         return this.name;
     }
 
-    public void setName(@NotNull String name) {
+    public void setName(@NonNull String name) {
         this.name = name;
     }
 
-    @NotNull
+    @NonNull
     public String getDefaultStateId() {
         return this.defaultStateId;
     }
 
-    public void setDefaultStateId(@NotNull String defaultStateId) {
+    public void setDefaultStateId(@NonNull String defaultStateId) {
         this.defaultStateId = defaultStateId;
     }
 
-//    @NotNull
+//    @NonNull
 //    @Deprecated
 //    public Cuboid getCuboid() {
 //        return this.cuboid;
@@ -203,26 +203,26 @@ public class Spot extends AbstractFileData<DungeonPlugin> {
 //        this.cuboid = cuboid;
 //    }
 
-    public void addState(@NotNull SpotState state) {
+    public void addState(@NonNull SpotState state) {
         this.stateByIdMap.put(state.getId(), state);
     }
 
-    @NotNull
+    @NonNull
     public Map<String, SpotState> getStateByIdMap() {
         return this.stateByIdMap;
     }
 
-    @NotNull
+    @NonNull
     public Set<SpotState> getStates() {
         return new HashSet<>(this.stateByIdMap.values());
     }
 
     @Nullable
-    public SpotState getState(@NotNull String id) {
+    public SpotState getState(@NonNull String id) {
         return this.stateByIdMap.get(id.toLowerCase());
     }
 
-    @NotNull
+    @NonNull
     public String getLastState() {
         return this.lastState == null ? this.defaultStateId : this.lastState;
     }

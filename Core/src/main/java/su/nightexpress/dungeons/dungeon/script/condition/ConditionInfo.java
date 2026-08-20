@@ -1,13 +1,13 @@
 package su.nightexpress.dungeons.dungeon.script.condition;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public class ConditionInfo {
 
     private final boolean cached;
     private final Condition condition;
 
-    public ConditionInfo(boolean cached, @NotNull Condition condition) {
+    public ConditionInfo(boolean cached, @NonNull Condition condition) {
         this.cached = cached;
         this.condition = condition;
     }
@@ -16,7 +16,7 @@ public class ConditionInfo {
         return this.cached;
     }
 
-    @NotNull
+    @NonNull
     public Condition getCondition() {
         return this.condition;
     }

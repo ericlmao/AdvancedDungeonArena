@@ -10,7 +10,7 @@ paperweight = "2.0.0-beta.22"
 # Libraries
 foliaScheduler = "1.0.1"
 vault = "1.7.1"
-annotations = "26.0.2"
+jspecify = "1.0.0"
 mythic = "5.10.0"
 placeholderapi = "2.11.6"
 packetevents = "2.9.0"
@@ -31,7 +31,9 @@ paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper" }
 folia-scheduler = { module = "gg.moonrise.scheduler:folia-scheduler", version.ref = "foliaScheduler" }
 
 vault-api = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }
-annotations = { module = "org.jetbrains:annotations", version.ref = "annotations" }
+
+# Nullability annotations. Also arrives transitively via paper-api; declared so it is not accidental.
+jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 
 mythic-dist = { module = "io.lumine:Mythic-Dist", version.ref = "mythic" }
 mythiclib-dist = { module = "io.lumine:MythicLib-dist", version.ref = "mythiclib" }

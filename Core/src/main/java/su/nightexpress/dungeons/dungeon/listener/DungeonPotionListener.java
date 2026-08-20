@@ -8,7 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.*;
 import org.bukkit.potion.PotionEffectType;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.api.type.MobFaction;
 import su.nightexpress.dungeons.dungeon.DungeonManager;
@@ -36,18 +36,18 @@ public class DungeonPotionListener extends AbstractListener<DungeonPlugin> {
         PotionEffectType.SATURATION, PotionEffectType.SPEED, PotionEffectType.WATER_BREATHING
     );
 
-    public static boolean isPositiveEffect(@NotNull PotionEffectType type) {
+    public static boolean isPositiveEffect(@NonNull PotionEffectType type) {
         return POSITIVE_EFFECTS.contains(type);
     }
 
-    public DungeonPotionListener(@NotNull DungeonPlugin plugin, @NotNull DungeonManager manager) {
+    public DungeonPotionListener(@NonNull DungeonPlugin plugin, @NonNull DungeonManager manager) {
         super(plugin);
         this.manager = manager;
         this.affectedByPotion = new WeakHashMap<>();
         this.affectedByCloud = new WeakHashMap<>();
     }
 
-    private boolean checkPotionFaction(@NotNull LivingEntity entity, @NotNull BiFunction<MobFaction, MobFaction, Boolean> function) {
+    private boolean checkPotionFaction(@NonNull LivingEntity entity, @NonNull BiFunction<MobFaction, MobFaction, Boolean> function) {
         LivingEntity shooter = null;
 
         ThrownPotion potion = this.affectedByPotion.get(entity);

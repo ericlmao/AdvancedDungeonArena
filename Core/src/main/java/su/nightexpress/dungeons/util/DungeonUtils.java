@@ -1,8 +1,8 @@
 package su.nightexpress.dungeons.util;
 
 import org.bukkit.Material;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.api.dungeon.DungeonTarget;
 import su.nightexpress.dungeons.api.mob.MobIdentifier;
@@ -65,7 +65,7 @@ public class DungeonUtils {
             .orElse(null);
     }
 
-    public static void setStageDefaults(@NotNull Stage stage) {
+    public static void setStageDefaults(@NonNull Stage stage) {
         // Refers to a MythicMobs mob id. "SkeletalKnight" ships with MythicMobs' example configs.
         MobIdentifier zombieId = new MobIdentifier(MobProviderId.MYTHIC_MOBS, "SkeletalKnight");
 
@@ -96,7 +96,7 @@ public class DungeonUtils {
         stage.getTaskMap().putAll(taskMap);
     }
 
-    public static void setLevelDefaults(@NotNull Level level) {
+    public static void setLevelDefaults(@NonNull Level level) {
         Map<String, ActionInfo> actions = new LinkedHashMap<>();
         RunCommandAction action = new RunCommandAction(Lists.newList("money give " + Placeholders.PLAYER_NAME + " 1"), DungeonTarget.EVENT_PLAYER);
         actions.put("kill_reward", new ActionInfo(null, 100D, action));
@@ -106,7 +106,7 @@ public class DungeonUtils {
         level.addHandler(handler);
     }
 
-    @NotNull
+    @NonNull
     public static NightItem getDefaultSelectionItem() {
         return new NightItem(Material.BLAZE_ROD)
             .setDisplayName(LIGHT_YELLOW.wrap(BOLD.wrap("Selection Wand")))
@@ -118,7 +118,7 @@ public class DungeonUtils {
             ));
     }
 
-    @NotNull
+    @NonNull
     public static BoardLayout getDefaultBoardLayout() {
         String title = LIGHT_YELLOW.wrap(BOLD.wrap(DUNGEON_NAME));
 
@@ -140,7 +140,7 @@ public class DungeonUtils {
 
         return new BoardLayout(/*Placeholders.DEFAULT, */title, lines);
     }
-    @NotNull
+    @NonNull
     public static BoardLayout getDefaultLobbyBoardLayout() {
         String title = LIGHT_YELLOW.wrap(BOLD.wrap(DUNGEON_NAME)) + GRAY.wrap(" - " + WHITE.wrap("Hub"));
 

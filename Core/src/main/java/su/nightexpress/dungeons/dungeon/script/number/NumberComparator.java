@@ -1,20 +1,20 @@
 package su.nightexpress.dungeons.dungeon.script.number;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.BiPredicate;
 
 public interface NumberComparator {
 
-    @NotNull String getName();
+    @NonNull String getName();
 
     boolean test(double value, double compareWith);
 
-    @NotNull
-    static NumberComparator create(@NotNull String name, @NotNull BiPredicate<Double, Double> predicate) {
+    @NonNull
+    static NumberComparator create(@NonNull String name, @NonNull BiPredicate<Double, Double> predicate) {
         return new NumberComparator() {
 
-            @NotNull
+            @NonNull
             @Override
             public String getName() {
                 return name;
