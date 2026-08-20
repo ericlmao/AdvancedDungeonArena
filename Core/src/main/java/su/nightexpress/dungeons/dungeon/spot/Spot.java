@@ -84,7 +84,7 @@ public class Spot extends AbstractFileData<DungeonPlugin> {
 
         state.getSchema().forEach(schemaBlock -> {
             BlockPos pos = schemaBlock.getBlockPos();
-            long chunkKey = Chunk.getChunkKey(pos.getX() >> 4, pos.getZ() >> 4);
+            long chunkKey = Chunk.getChunkKey(pos.x() >> 4, pos.z() >> 4);
             byChunk.computeIfAbsent(chunkKey, key -> new ArrayList<>()).add(schemaBlock);
         });
 

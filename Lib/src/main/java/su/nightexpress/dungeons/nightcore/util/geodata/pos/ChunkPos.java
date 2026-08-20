@@ -11,17 +11,7 @@ import su.nightexpress.dungeons.nightcore.config.Writeable;
 import su.nightexpress.dungeons.nightcore.util.NumberUtil;
 import su.nightexpress.dungeons.nightcore.util.geodata.GeoUtils;
 
-import java.util.Objects;
-
-public class ChunkPos implements Writeable {
-
-    private final int x;
-    private final int z;
-
-    public ChunkPos(int x, int z) {
-        this.x = x;
-        this.z = z;
-    }
+public record ChunkPos(int x, int z) implements Writeable {
 
     @NonNull
     public static ChunkPos read(@NonNull FileConfig config, @NonNull String path) {
@@ -67,12 +57,12 @@ public class ChunkPos implements Writeable {
 
     @NonNull
     public static ChunkPos from(@NonNull BlockPos blockPos) {
-        return from(blockPos.getX(), blockPos.getZ());
+        return from(blockPos.x(), blockPos.z());
     }
 
     @NonNull
     public static ChunkPos from(@NonNull ExactPos blockPos) {
-        return from((int) blockPos.getX(), (int) blockPos.getZ());
+        return from((int) blockPos.x(), (int) blockPos.z());
     }
 
     @NonNull
@@ -103,37 +93,4 @@ public class ChunkPos implements Writeable {
         return world.getChunkAt(this.x, this.z, false);
     }
 
-
-    @NonNull
-    public ChunkPos copy() {
-        return new ChunkPos(this.x, this.z);
-    }
-
-    public int getX() {
-        return this.x;
-    }
-
-    public int getZ() {
-        return this.z;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof ChunkPos other)) return false;
-        return x == other.x && z == other.z;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(x, z);
-    }
-
-    @Override
-    public String toString() {
-        return "ChunkPos{" +
-            "x=" + x +
-            ", z=" + z +
-            '}';
-    }
 }

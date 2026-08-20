@@ -9,20 +9,7 @@ import su.nightexpress.dungeons.nightcore.config.FileConfig;
 import su.nightexpress.dungeons.nightcore.config.Writeable;
 import su.nightexpress.dungeons.nightcore.util.NumberUtil;
 
-import java.util.Objects;
-
-public class ExactPos implements Writeable {
-
-    private final double x, y, z;
-    private final float  yaw, pitch;
-
-    public ExactPos(double x, double y, double z, float yaw, float pitch) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.yaw = yaw;
-        this.pitch = pitch;
-    }
+public record ExactPos(double x, double y, double z, float yaw, float pitch) implements Writeable {
 
     @NonNull
     public static ExactPos read(@NonNull FileConfig config, @NonNull String path) {
@@ -70,7 +57,7 @@ public class ExactPos implements Writeable {
 
     @NonNull
     public static ExactPos from(@NonNull BlockPos pos) {
-        return new ExactPos(pos.getX(), pos.getY(), pos.getZ(), 0F, 0F);
+        return new ExactPos(pos.x(), pos.y(), pos.z(), 0F, 0F);
     }
 
     @NonNull
@@ -112,53 +99,4 @@ public class ExactPos implements Writeable {
         return this.toChunkPos().isLoaded(world);
     }
 
-
-    public double getX() {
-        return this.x;
-    }
-
-    public double getY() {
-        return this.y;
-    }
-
-    public double getZ() {
-        return this.z;
-    }
-
-    public float getYaw() {
-        return this.yaw;
-    }
-
-    public float getPitch() {
-        return this.pitch;
-    }
-
-    @NonNull
-    public ExactPos copy() {
-        return new ExactPos(this.x, this.y, this.z, this.yaw, this.pitch);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof ExactPos other)) return false;
-        return x == other.x && y == other.y && z == other.z && Float.compare(yaw, other.yaw) == 0 && Float.compare(
-            pitch, other.pitch) == 0;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(x, y, z, yaw, pitch);
-    }
-
-    @Override
-    public String toString() {
-        return "ExactPos{" +
-            "x=" + x +
-            ", y=" + y +
-            ", z=" + z +
-            ", yaw=" + yaw +
-            ", pitch=" + pitch +
-            '}';
-    }
 }

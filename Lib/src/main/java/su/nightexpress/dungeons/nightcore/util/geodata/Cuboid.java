@@ -40,13 +40,13 @@ public class Cuboid {
     }
 
     public Cuboid(BlockPos min, BlockPos max) {
-        int minX = Math.min(min.getX(), max.getX());
-        int minY = Math.min(min.getY(), max.getY());
-        int minZ = Math.min(min.getZ(), max.getZ());
+        int minX = Math.min(min.x(), max.x());
+        int minY = Math.min(min.y(), max.y());
+        int minZ = Math.min(min.z(), max.z());
 
-        int maxX = Math.max(min.getX(), max.getX());
-        int maxY = Math.max(min.getY(), max.getY());
-        int maxZ = Math.max(min.getZ(), max.getZ());
+        int maxX = Math.max(min.x(), max.x());
+        int maxY = Math.max(min.y(), max.y());
+        int maxZ = Math.max(min.z(), max.z());
 
         this.min = new BlockPos(minX, minY, minZ);
         this.max = new BlockPos(maxX, maxY, maxZ);
@@ -59,22 +59,22 @@ public class Cuboid {
 
         this.empty = this.min.isEmpty() && this.max.isEmpty();
 
-        minUp = new BlockPos(this.min.getX(), this.max.getY(), this.min.getZ());
-        maxDown = new BlockPos(this.max.getX(), this.min.getY(), this.max.getZ());
+        minUp = new BlockPos(this.min.x(), this.max.y(), this.min.z());
+        maxDown = new BlockPos(this.max.x(), this.min.y(), this.max.z());
 
-        zUp = new BlockPos(this.min.getX(), this.max.getY(), this.max.getZ());
-        zDown = new BlockPos(this.min.getX(), this.min.getY(), this.max.getZ());
+        zUp = new BlockPos(this.min.x(), this.max.y(), this.max.z());
+        zDown = new BlockPos(this.min.x(), this.min.y(), this.max.z());
 
-        xDown = new BlockPos(this.max.getX(), this.min.getY(), this.min.getZ());
-        xUp = new BlockPos(this.max.getX(), this.max.getY(), this.min.getZ());
+        xDown = new BlockPos(this.max.x(), this.min.y(), this.min.z());
+        xUp = new BlockPos(this.max.x(), this.max.y(), this.min.z());
 
         this.intersectingChunks = new HashSet<>(this.getIntersectingChunks());
     }
 
     public static Cuboid fromCenterAndRadius(BlockPos center, int radius) {
         return new Cuboid(
-            center.getX() - radius, center.getY() - radius, center.getZ() - radius, center.getX() + radius, center
-                .getY() + radius, center.getZ() + radius
+            center.x() - radius, center.y() - radius, center.z() - radius, center.x() + radius, center
+                .y() + radius, center.z() + radius
         );
     }
 
@@ -91,8 +91,8 @@ public class Cuboid {
 
 
     public Cuboid setHeight(int minHeight, int maxHeight) {
-        BlockPos min = new BlockPos(this.min.getX(), minHeight, this.min.getZ());
-        BlockPos max = new BlockPos(this.max.getX(), maxHeight, this.max.getZ());
+        BlockPos min = new BlockPos(this.min.x(), minHeight, this.min.z());
+        BlockPos max = new BlockPos(this.max.x(), maxHeight, this.max.z());
 
         return new Cuboid(min, max);
     }
@@ -124,38 +124,38 @@ public class Cuboid {
     }
 
     public boolean contains(ChunkPos pos) {
-        return this.containsX(GeoUtils.shiftToCoord(pos.getX())) && this.containsZ(GeoUtils.shiftToCoord(pos.getZ()));
+        return this.containsX(GeoUtils.shiftToCoord(pos.x())) && this.containsZ(GeoUtils.shiftToCoord(pos.z()));
     }
 
     public boolean contains(BlockPos pos, DimensionType type) {
-        if (!this.containsX(pos.getX())) return false;
-        if (!this.containsZ(pos.getZ())) return false;
+        if (!this.containsX(pos.x())) return false;
+        if (!this.containsZ(pos.z())) return false;
 
         if (type == DimensionType._3D) {
-            return this.containsY(pos.getY());
+            return this.containsY(pos.y());
         }
         return true;
     }
 
     public boolean containsX(int x) {
-        return x >= this.min.getX() && x <= this.max.getX();
+        return x >= this.min.x() && x <= this.max.x();
     }
 
     public boolean containsY(int y) {
-        return y >= this.min.getY() && y <= this.max.getY();
+        return y >= this.min.y() && y <= this.max.y();
     }
 
     public boolean containsZ(int z) {
-        return z >= this.min.getZ() && z <= this.max.getZ();
+        return z >= this.min.z() && z <= this.max.z();
     }
 
 
     public List<Block> getBlocks(World world) {
         List<Block> blocks = new ArrayList<>();
 
-        for (int x = this.min.getX(); x <= this.max.getX(); x++) {
-            for (int y = this.min.getY(); y <= this.max.getY(); y++) {
-                for (int z = this.min.getZ(); z <= this.max.getZ(); z++) {
+        for (int x = this.min.x(); x <= this.max.x(); x++) {
+            for (int y = this.min.y(); y <= this.max.y(); y++) {
+                for (int z = this.min.z(); z <= this.max.z(); z++) {
                     Block block = world.getBlockAt(x, y, z);
                     blocks.add(block);
                 }
@@ -185,20 +185,20 @@ public class Cuboid {
     public List<BlockPos> getCornerWiresY() {
         List<BlockPos> list = new ArrayList<>();
 
-        for (int y = this.min.getY() + 1; y < this.minUp.getY(); y++) {
-            list.add(new BlockPos(this.min.getX(), y, this.min.getZ()));
+        for (int y = this.min.y() + 1; y < this.minUp.y(); y++) {
+            list.add(new BlockPos(this.min.x(), y, this.min.z()));
         }
 
-        for (int y = this.max.getY() - 1; y > this.maxDown.getY(); y--) {
-            list.add(new BlockPos(this.max.getX(), y, this.max.getZ()));
+        for (int y = this.max.y() - 1; y > this.maxDown.y(); y--) {
+            list.add(new BlockPos(this.max.x(), y, this.max.z()));
         }
 
-        for (int y = this.zDown.getY() + 1; y < this.zUp.getY(); y++) {
-            list.add(new BlockPos(this.zDown.getX(), y, this.zDown.getZ()));
+        for (int y = this.zDown.y() + 1; y < this.zUp.y(); y++) {
+            list.add(new BlockPos(this.zDown.x(), y, this.zDown.z()));
         }
 
-        for (int y = this.xDown.getY() + 1; y < this.xUp.getY(); y++) {
-            list.add(new BlockPos(this.xDown.getX(), y, this.xDown.getZ()));
+        for (int y = this.xDown.y() + 1; y < this.xUp.y(); y++) {
+            list.add(new BlockPos(this.xDown.x(), y, this.xDown.z()));
         }
 
         return list;
@@ -208,13 +208,13 @@ public class Cuboid {
     public List<BlockPos> getCornerWiresX() {
         List<BlockPos> list = new ArrayList<>();
 
-        for (int x = this.min.getX() + 1; x < this.xDown.getX(); x++) {
-            list.add(new BlockPos(x, this.min.getY(), this.min.getZ()));
-            list.add(new BlockPos(x, this.minUp.getY(), this.minUp.getZ()));
+        for (int x = this.min.x() + 1; x < this.xDown.x(); x++) {
+            list.add(new BlockPos(x, this.min.y(), this.min.z()));
+            list.add(new BlockPos(x, this.minUp.y(), this.minUp.z()));
         }
-        for (int x = this.zDown.getX() + 1; x < this.max.getX(); x++) {
-            list.add(new BlockPos(x, this.zDown.getY(), this.zDown.getZ()));
-            list.add(new BlockPos(x, this.zUp.getY(), this.zUp.getZ()));
+        for (int x = this.zDown.x() + 1; x < this.max.x(); x++) {
+            list.add(new BlockPos(x, this.zDown.y(), this.zDown.z()));
+            list.add(new BlockPos(x, this.zUp.y(), this.zUp.z()));
         }
 
         return list;
@@ -224,13 +224,13 @@ public class Cuboid {
     public List<BlockPos> getCornerWiresZ() {
         List<BlockPos> list = new ArrayList<>();
 
-        for (int z = this.min.getZ() + 1; z < this.zDown.getZ(); z++) {
-            list.add(new BlockPos(this.min.getX(), this.min.getY(), z));
-            list.add(new BlockPos(this.min.getX(), this.minUp.getY(), z));
+        for (int z = this.min.z() + 1; z < this.zDown.z(); z++) {
+            list.add(new BlockPos(this.min.x(), this.min.y(), z));
+            list.add(new BlockPos(this.min.x(), this.minUp.y(), z));
         }
-        for (int z = this.xDown.getZ() + 1; z < this.max.getZ(); z++) {
-            list.add(new BlockPos(this.xDown.getX(), this.xDown.getY(), z));
-            list.add(new BlockPos(this.xUp.getX(), this.xUp.getY(), z));
+        for (int z = this.xDown.z() + 1; z < this.max.z(); z++) {
+            list.add(new BlockPos(this.xDown.x(), this.xDown.y(), z));
+            list.add(new BlockPos(this.xUp.x(), this.xUp.y(), z));
         }
 
         return list;
@@ -249,13 +249,13 @@ public class Cuboid {
     }
 
     public boolean includedIn(Cuboid other, DimensionType dimensionType) {
-        if (!this.checkIntersect(this.min.getX(), this.max.getX(), other.getMin().getX(), other.getMax().getX()))
+        if (!this.checkIntersect(this.min.x(), this.max.x(), other.getMin().x(), other.getMax().x()))
             return false;
-        if (!this.checkIntersect(this.min.getZ(), this.max.getZ(), other.getMin().getZ(), other.getMax().getZ()))
+        if (!this.checkIntersect(this.min.z(), this.max.z(), other.getMin().z(), other.getMax().z()))
             return false;
 
         if (dimensionType == DimensionType._3D) {
-            return this.checkIntersect(this.min.getY(), this.max.getY(), other.getMin().getY(), other.getMax().getY());
+            return this.checkIntersect(this.min.y(), this.max.y(), other.getMin().y(), other.getMax().y());
         }
 
         return true;
@@ -277,10 +277,10 @@ public class Cuboid {
         List<ChunkPos> chunks = new ArrayList<>();
         if (this.isEmpty()) return chunks;
 
-        int minX = GeoUtils.shiftToChunk(this.min.getX());
-        int maxX = GeoUtils.shiftToChunk(this.max.getX());
-        int minZ = GeoUtils.shiftToChunk(this.min.getZ());
-        int maxZ = GeoUtils.shiftToChunk(this.max.getZ());
+        int minX = GeoUtils.shiftToChunk(this.min.x());
+        int maxX = GeoUtils.shiftToChunk(this.max.x());
+        int minZ = GeoUtils.shiftToChunk(this.min.z());
+        int maxZ = GeoUtils.shiftToChunk(this.max.z());
 
         for (int x = minX; x <= maxX; ++x) {
             for (int z = minZ; z <= maxZ; ++z) {
@@ -292,27 +292,27 @@ public class Cuboid {
     }
 
     public int minX() {
-        return this.min.getX();
+        return this.min.x();
     }
 
     public int minY() {
-        return this.min.getY();
+        return this.min.y();
     }
 
     public int minZ() {
-        return this.min.getZ();
+        return this.min.z();
     }
 
     public int maxX() {
-        return this.max.getX();
+        return this.max.x();
     }
 
     public int maxY() {
-        return this.max.getY();
+        return this.max.y();
     }
 
     public int maxZ() {
-        return this.max.getZ();
+        return this.max.z();
     }
 
     public BlockPos getMin() {
@@ -334,9 +334,9 @@ public class Cuboid {
     }
 
     public int getVolume(DimensionType dimensionType) {
-        int xLength = this.max.getX() - this.min.getX() + 1;
-        int yLength = dimensionType == DimensionType._2D ? 1 : this.max.getY() - this.min.getY() + 1;
-        int zLength = this.max.getZ() - this.min.getZ() + 1;
+        int xLength = this.max.x() - this.min.x() + 1;
+        int yLength = dimensionType == DimensionType._2D ? 1 : this.max.y() - this.min.y() + 1;
+        int zLength = this.max.z() - this.min.z() + 1;
 
         return xLength * zLength * yLength;
     }

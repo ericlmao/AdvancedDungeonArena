@@ -9,17 +9,7 @@ import su.nightexpress.dungeons.nightcore.config.FileConfig;
 import su.nightexpress.dungeons.nightcore.config.Writeable;
 import su.nightexpress.dungeons.nightcore.util.NumberUtil;
 
-import java.util.Objects;
-
-public class BlockPos implements Writeable {
-
-    private final int x, y, z;
-
-    public BlockPos(int x, int y, int z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
+public record BlockPos(int x, int y, int z) implements Writeable {
 
     @NonNull
     public static BlockPos read(@NonNull FileConfig config, @NonNull String path) {
@@ -71,7 +61,7 @@ public class BlockPos implements Writeable {
 
     @NonNull
     public static BlockPos from(@NonNull ExactPos pos) {
-        return new BlockPos((int) pos.getX(), (int) pos.getY(), (int) pos.getZ());
+        return new BlockPos((int) pos.x(), (int) pos.y(), (int) pos.z());
     }
 
 
@@ -99,42 +89,4 @@ public class BlockPos implements Writeable {
         return this.toChunkPos().isLoaded(world);
     }
 
-
-    public int getX() {
-        return this.x;
-    }
-
-    public int getY() {
-        return this.y;
-    }
-
-    public int getZ() {
-        return this.z;
-    }
-
-    @NonNull
-    public BlockPos copy() {
-        return new BlockPos(this.x, this.y, this.z);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof BlockPos other)) return false;
-        return x == other.x && y == other.y && z == other.z;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(x, y, z);
-    }
-
-    @Override
-    public String toString() {
-        return "BlockPos{" +
-            "x=" + x +
-            ", y=" + y +
-            ", z=" + z +
-            '}';
-    }
 }

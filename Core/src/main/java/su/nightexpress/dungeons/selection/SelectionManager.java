@@ -111,7 +111,7 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
             // Check if we should skip render.
             if (oldPlayerPos != null && !oldPlayerPos.isEmpty()) {
                 // Always shift rendering bounds to player's Y position.
-                if (Math.abs(oldPlayerPos.getY() - playerLocation.getBlockY()) < 3) {
+                if (Math.abs(oldPlayerPos.y() - playerLocation.getBlockY()) < 3) {
                     // Otherwise render only if player went to other chunk.
                     ChunkPos currentChunkPos = ChunkPos.from(playerLocation);
                     ChunkPos oldChunkPos = ChunkPos.from(oldPlayerPos);

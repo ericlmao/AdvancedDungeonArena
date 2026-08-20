@@ -80,7 +80,7 @@ public abstract class AreaTask implements Task {
     @Override
     public void onTaskAdd(@NonNull DungeonInstance dungeon, @NonNull StageTask stageTask, @NonNull TaskProgress progress) {
         World world = dungeon.getWorld();
-        int fixedY = this.targetPos.getY();
+        int fixedY = this.targetPos.y();
 
         this.forEachChunkOfArea((chunkX, chunkZ, columns) -> Scheduler.location().executeChunk(world, chunkX, chunkZ, () -> {
             columns.forEach(column -> {
@@ -118,8 +118,8 @@ public abstract class AreaTask implements Task {
     protected void forEachChunkOfArea(@NonNull ChunkConsumer consumer) {
         Map<Long, List<Column>> byChunk = new LinkedHashMap<>();
 
-        int centerX = this.targetPos.getX();
-        int centerZ = this.targetPos.getZ();
+        int centerX = this.targetPos.x();
+        int centerZ = this.targetPos.z();
 
         for (int x = centerX - radius; x <= centerX + radius; x++) {
             for (int z = centerZ - radius; z <= centerZ + radius; z++) {
@@ -155,15 +155,15 @@ public abstract class AreaTask implements Task {
         Location location = gamer.getLastKnownLocation();
         if (location == null) return false;
 
-        int yDiff = Math.abs(location.getBlockY() - this.targetPos.getY());
+        int yDiff = Math.abs(location.getBlockY() - this.targetPos.y());
         if (yDiff > this.height) return false;
 
         return this.isInsideCircle(location.getBlockX(), location.getBlockZ());
     }
 
     protected boolean isInsideCircle(int x, int z) {
-        int dx = this.targetPos.getX() - x;
-        int dz = this.targetPos.getZ() - z;
+        int dx = this.targetPos.x() - x;
+        int dz = this.targetPos.z() - z;
         return (dx * dx + dz * dz) <= (this.radius * this.radius);
     }
 }

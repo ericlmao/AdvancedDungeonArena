@@ -205,7 +205,7 @@ public class DungeonSetup extends AbstractManager<DungeonPlugin> {
             return false;
         }
 
-        positions = Lists.modify(positions, blockPos -> new BlockPos(blockPos.getX(), blockPos.getY() + 1, blockPos.getZ()));
+        positions = Lists.modify(positions, blockPos -> new BlockPos(blockPos.x(), blockPos.y() + 1, blockPos.z()));
 
         DungeonMobSpawner spawner = new DungeonMobSpawner(id, positions);
         config.addSpawner(spawner);

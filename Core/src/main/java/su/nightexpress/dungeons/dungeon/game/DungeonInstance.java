@@ -358,8 +358,8 @@ public class DungeonInstance implements Dungeon {
         if (world == null) return;
 
         this.config.getCuboid().getIntersectingChunkPositions().forEach(pos -> {
-            Scheduler.location().executeChunk(world, pos.getX(), pos.getZ(),
-                () -> world.getChunkAt(pos.getX(), pos.getZ()).addPluginChunkTicket(this.plugin));
+            Scheduler.location().executeChunk(world, pos.x(), pos.z(),
+                () -> world.getChunkAt(pos.x(), pos.z()).addPluginChunkTicket(this.plugin));
         });
     }
 
@@ -368,8 +368,8 @@ public class DungeonInstance implements Dungeon {
         if (world == null) return;
 
         this.config.getCuboid().getIntersectingChunkPositions().forEach(pos -> {
-            Scheduler.location().executeChunk(world, pos.getX(), pos.getZ(),
-                () -> world.getChunkAt(pos.getX(), pos.getZ()).removePluginChunkTicket(this.plugin));
+            Scheduler.location().executeChunk(world, pos.x(), pos.z(),
+                () -> world.getChunkAt(pos.x(), pos.z()).removePluginChunkTicket(this.plugin));
         });
     }
 
