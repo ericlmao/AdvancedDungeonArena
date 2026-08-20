@@ -37,7 +37,7 @@ public class HeadTagHandler extends ClassicTagHandler {
             try {
                 texture = Key.key(data);
             }
-            catch (IllegalArgumentException exception) {
+            catch (IllegalArgumentException _) {
                 return;
             }
             builder.texture(texture);

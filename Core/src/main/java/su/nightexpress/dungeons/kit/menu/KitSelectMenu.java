@@ -114,11 +114,11 @@ public class KitSelectMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> im
                             // Enter + close were two separate task submissions, which only stayed ordered
                             // because BukkitScheduler ran them FIFO on one thread. Merged into one task so
                             // the ordering is a property of the code rather than of the scheduler.
-                            .onAccept((viewer2, event1) -> plugin.runTask(player, () -> {
+                            .onAccept((_, _) -> plugin.runTask(player, () -> {
                                 plugin.getDungeonManager().enterInstance(player, dungeon, kit);
                                 player.closeInventory();
                             }))
-                            .onReturn((viewer2, event1) -> plugin.runTask(player, () -> plugin.getKitManager().openSelector(player, dungeon)))
+                            .onReturn((_, _) -> plugin.runTask(player, () -> plugin.getKitManager().openSelector(player, dungeon)))
                             .returnOnAccept(false)
                             .build());
                     });
@@ -176,7 +176,7 @@ public class KitSelectMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> im
             .toMenuItem()
             .setPriority(10)
             .setSlots(33)
-            .setHandler(new ItemHandler("kit_shop", (viewer, event) -> {
+            .setHandler(new ItemHandler("kit_shop", (viewer, _) -> {
                 this.runNextTick(viewer.getPlayer(), () -> plugin.getKitManager().openShop(viewer.getPlayer(), this.getLink(viewer)));
             })));
 
@@ -188,7 +188,7 @@ public class KitSelectMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> im
             .toMenuItem()
             .setPriority(10)
             .setSlots(29)
-            .setHandler(new ItemHandler("dungeons", (viewer, event) -> {
+            .setHandler(new ItemHandler("dungeons", (viewer, _) -> {
                 this.runNextTick(viewer.getPlayer(), () -> plugin.getDungeonManager().browseDungeons(viewer.getPlayer()));
             })));
     }

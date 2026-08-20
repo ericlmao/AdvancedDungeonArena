@@ -5,7 +5,7 @@ import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.level.Level;
 import su.nightexpress.dungeons.dungeon.event.DungeonEventType;
 
-public abstract class DungeonLevelEvent extends DungeonGameEvent {
+public abstract sealed class DungeonLevelEvent extends DungeonGameEvent permits DungeonLevelStartEvent {
 
     private final Level level;
 

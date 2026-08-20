@@ -3,6 +3,7 @@ package su.nightexpress.dungeons.nightcore.util;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -252,7 +253,7 @@ public class Players {
     @NonNull
     public static String getPrimaryGroup(@NonNull Player player, @NonNull String fallback) {
         String group = getPrimaryGroup(player);
-        return group == null ? fallback : group;
+        return Objects.requireNonNullElse(group, fallback);
     }
 
     @NonNull
@@ -316,7 +317,7 @@ public class Players {
     @NonNull
     public static String getPrefix(@NonNull Player player, @NonNull String fallback) {
         String prefix = getRawPrefix(player);
-        return prefix == null ? fallback : prefix;
+        return Objects.requireNonNullElse(prefix, fallback);
     }
 
     @NonNull
@@ -343,7 +344,7 @@ public class Players {
     @NonNull
     public static String getSuffix(@NonNull Player player, @NonNull String fallback) {
         String suffix = getRawSuffix(player);
-        return suffix == null ? fallback : suffix;
+        return Objects.requireNonNullElse(suffix, fallback);
     }
 
     @Deprecated

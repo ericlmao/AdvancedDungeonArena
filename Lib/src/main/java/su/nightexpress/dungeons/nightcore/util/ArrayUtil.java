@@ -107,7 +107,7 @@ public class ArrayUtil {
             try {
                 parsed.add(converter.apply(raw.trim()));
             }
-            catch (NumberFormatException | NoSuchElementException ignored) {
+            catch (NumberFormatException | NoSuchElementException _) {
                 // Ignore failures
             }
         }

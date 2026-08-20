@@ -113,7 +113,7 @@ public class KitPreviewMenu extends LinkedMenu<DungeonPlugin, KitPreviewMenu.Dat
 
         loader.addDefaultItem(NightItem.fromType(Material.BLACK_STAINED_GLASS_PANE).setHideTooltip(true).toMenuItem().setSlots(IntStream.range(9, 18).toArray()));
 
-        loader.addDefaultItem(MenuItem.buildReturn(this, 8, (viewer, event) -> {
+        loader.addDefaultItem(MenuItem.buildReturn(this, 8, (viewer, _) -> {
             this.handleReturn(viewer);
         }).setPriority(10));
     }

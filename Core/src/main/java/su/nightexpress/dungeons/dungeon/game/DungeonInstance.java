@@ -5,7 +5,6 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jspecify.annotations.NonNull;
@@ -375,8 +374,11 @@ public class DungeonInstance implements Dungeon {
     }
 
     private void broadcastEvent(@NonNull DungeonGameEvent event) {
+        // No cancellation check: game events report what the instance clock has already done, and sealing
+        // the hierarchy proved that none of them implement Cancellable, so the guard that used to sit here
+        // could never fire. Only the `normal` events (DungeonJoinEvent) are cancellable, and those are
+        // fired from DungeonManager, not from here.
         this.plugin.getPluginManager().callEvent(event);
-        if (event instanceof Cancellable cancellable && cancellable.isCancelled()) return;
 
         // Copy to prevent new stage/levels to handle that event if they were changed during it.
         List<DungeonEventReceiver> receivers = new ArrayList<>(this.eventReceivers);
@@ -529,7 +531,7 @@ public class DungeonInstance implements Dungeon {
         // Instance bookkeeping touches no Bukkit state, so it stays on the clock where the ordering
         // guarantees are.
         gamer.setState(GameState.INGAME);
-        this.taskProgress.forEach((stageTask, progress) -> progress.onPlayerJoined(gamer)); // Adjust task progress for new players amount.
+        this.taskProgress.forEach((_, progress) -> progress.onPlayerJoined(gamer)); // Adjust task progress for new players amount.
     }
 
     private void leavePlayer(@NonNull DungeonPlayer gamer) {
@@ -725,7 +727,7 @@ public class DungeonInstance implements Dungeon {
         this.players.remove(player.getUniqueId());
 
         if (this.state == GameState.INGAME && this.gameResult == null && gamer.isInGame()) {
-            this.taskProgress.forEach((stageTask, progress) -> progress.onPlayerLeft(gamer));
+            this.taskProgress.forEach((_, progress) -> progress.onPlayerLeft(gamer));
         }
 
         boolean wasInGame = this.state == GameState.INGAME;

@@ -5,7 +5,8 @@ import su.nightexpress.dungeons.api.dungeon.DungeonEntity;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.DungeonEventType;
 
-public abstract class DungeonMobEvent extends DungeonGameEvent implements MobEvent {
+public abstract sealed class DungeonMobEvent extends DungeonGameEvent implements MobEvent
+    permits DungeonMobEliminatedEvent, DungeonMobKilledEvent, DungeonMobSpawnedEvent {
 
     private final DungeonEntity dungeonMob;
 

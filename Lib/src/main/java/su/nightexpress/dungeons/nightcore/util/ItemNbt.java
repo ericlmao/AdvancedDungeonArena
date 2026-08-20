@@ -43,7 +43,7 @@ public class ItemNbt {
         try {
             return ItemTag.of(item);
         }
-        catch (IllegalStateException exception) {
+        catch (IllegalStateException _) {
             return null;
         }
     }

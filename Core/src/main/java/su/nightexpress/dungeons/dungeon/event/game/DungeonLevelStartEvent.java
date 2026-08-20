@@ -6,7 +6,7 @@ import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.level.Level;
 import su.nightexpress.dungeons.dungeon.event.DungeonEventType;
 
-public class DungeonLevelStartEvent extends DungeonLevelEvent {
+public final class DungeonLevelStartEvent extends DungeonLevelEvent {
 
     public static final HandlerList HANDLER_LIST = new HandlerList();
 

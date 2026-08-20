@@ -19,7 +19,7 @@ public class Enums {
         try {
             return str == null ? Optional.empty() : Optional.of(Enum.valueOf(type, str.toUpperCase()));
         }
-        catch (Exception exception) {
+        catch (Exception _) {
             return Optional.empty();
         }
     }

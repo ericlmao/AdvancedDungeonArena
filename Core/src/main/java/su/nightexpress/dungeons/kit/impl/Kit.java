@@ -161,7 +161,7 @@ public class Kit extends AbstractFileData<DungeonPlugin> {
             itemStack = ItemNbt.fromTagString(tag);
         }
 
-        return itemStack == null ? new ItemStack(Material.AIR) : itemStack;
+        return Objects.requireNonNullElseGet(itemStack, () -> new ItemStack(Material.AIR));
     }
 
     @NonNull
@@ -346,7 +346,7 @@ public class Kit extends AbstractFileData<DungeonPlugin> {
     }
 
     public void setEquipment(@NonNull EquipmentSlot slot, @Nullable ItemStack item) {
-        this.equipment.put(slot, item == null ? new ItemStack(Material.AIR) : item);
+        this.equipment.put(slot, Objects.requireNonNullElseGet(item, () -> new ItemStack(Material.AIR)));
     }
 
     @NonNull

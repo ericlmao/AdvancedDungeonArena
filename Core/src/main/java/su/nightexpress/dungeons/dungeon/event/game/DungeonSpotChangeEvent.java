@@ -7,7 +7,7 @@ import su.nightexpress.dungeons.dungeon.spot.SpotState;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.DungeonEventType;
 
-public class DungeonSpotChangeEvent extends DungeonGameEvent {
+public final class DungeonSpotChangeEvent extends DungeonGameEvent {
 
     public static final HandlerList HANDLER_LIST = new HandlerList();
 

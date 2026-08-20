@@ -5,7 +5,7 @@ import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.DungeonEventType;
 
-public class DungeonTickEvent extends DungeonGameEvent {
+public final class DungeonTickEvent extends DungeonGameEvent {
 
     public static final HandlerList HANDLER_LIST = new HandlerList();
 

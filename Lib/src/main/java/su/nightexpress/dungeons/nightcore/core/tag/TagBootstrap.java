@@ -1,5 +1,7 @@
 package su.nightexpress.dungeons.nightcore.core.tag;
 
+import java.util.Objects;
+
 import org.jspecify.annotations.NonNull;
 
 import net.kyori.adventure.text.format.TextDecoration;
@@ -49,7 +51,7 @@ public class TagBootstrap {
 
     @NonNull
     public static ColorScheme getColorScheme() {
-        return colorScheme == null ? ColorScheme.customScheme() : colorScheme;
+        return Objects.requireNonNullElseGet(colorScheme, ColorScheme::customScheme);
     }
 
     private static void registerColorTags() {

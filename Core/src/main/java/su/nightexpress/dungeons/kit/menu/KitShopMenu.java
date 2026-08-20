@@ -146,8 +146,8 @@ public class KitShopMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> impl
                         if (KitUtils.isPurchaseMode()) {
                             UIUtils.openConfirmation(player, Confirmation.builder()
                                 .setIcon(kit.getIcon().localized(Lang.UI_CONFIRMATION_KIT_PURCHASE).replacement(replacer -> replacer.replace(kit.replacePlaceholders())))
-                                .onAccept((viewer2, event1) -> plugin.getKitManager().purchase(player, kit))
-                                .onReturn((viewer2, event1) -> this.runNextTick(player, () -> plugin.getKitManager().openShop(player, dungeon)))
+                                .onAccept((_, _) -> plugin.getKitManager().purchase(player, kit))
+                                .onReturn((_, _) -> this.runNextTick(player, () -> plugin.getKitManager().openShop(player, dungeon)))
                                 .returnOnAccept(true)
                                 .build());
                         }
@@ -156,8 +156,8 @@ public class KitShopMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> impl
                                 .setIcon(dungeon.getConfig().getIcon()
                                     .localized(Lang.UI_CONFIRMATION_DUNGEON_ENTER_RENT_KIT)
                                     .replacement(replacer -> replacer.replace(dungeon.replacePlaceholders()).replace(kit.replacePlaceholders())))
-                                .onAccept((viewer2, event1) -> plugin.getDungeonManager().enterInstance(player, dungeon, kit))
-                                .onReturn((viewer2, event1) -> this.runNextTick(player, () -> plugin.getKitManager().openShop(player, dungeon)))
+                                .onAccept((_, _) -> plugin.getDungeonManager().enterInstance(player, dungeon, kit))
+                                .onReturn((_, _) -> this.runNextTick(player, () -> plugin.getKitManager().openShop(player, dungeon)))
                                 .returnOnAccept(false)
                                 .build());
                         }
@@ -231,7 +231,7 @@ public class KitShopMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> impl
             .toMenuItem()
             .setPriority(10)
             .setSlots(33)
-            .setHandler(new ItemHandler("kit_selection", (viewer, event) -> {
+            .setHandler(new ItemHandler("kit_selection", (viewer, _) -> {
                 this.runNextTick(viewer.getPlayer(), () -> plugin.getKitManager().openSelector(viewer.getPlayer(), this.getLink(viewer)));
             }, ItemOptions.builder().setVisibilityPolicy(viewer -> KitUtils.isPurchaseMode()).build())));
 
@@ -243,7 +243,7 @@ public class KitShopMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> impl
             .toMenuItem()
             .setPriority(10)
             .setSlots(29)
-            .setHandler(new ItemHandler("dungeons", (viewer, event) -> {
+            .setHandler(new ItemHandler("dungeons", (viewer, _) -> {
                 this.runNextTick(viewer.getPlayer(), () -> plugin.getDungeonManager().browseDungeons(viewer.getPlayer()));
             })));
     }

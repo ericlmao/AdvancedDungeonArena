@@ -224,7 +224,7 @@ public class Spot extends AbstractFileData<DungeonPlugin> {
 
     @NonNull
     public String getLastState() {
-        return this.lastState == null ? this.defaultStateId : this.lastState;
+        return Objects.requireNonNullElse(this.lastState, this.defaultStateId);
     }
 
     public void setLastState(@Nullable SpotState lastState) {

@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class NumberComparators {
 
-    public static final NumberComparator DUMMY = NumberComparator.create("dummy", (value, comapareWith) -> false);
+    public static final NumberComparator DUMMY = NumberComparator.create("dummy", (_, _) -> false);
 
     private static final Map<String, NumberComparator> BY_NAME = new HashMap<>();
     private static final Map<String, NumberComparator> BY_OPERATOR = new HashMap<>();

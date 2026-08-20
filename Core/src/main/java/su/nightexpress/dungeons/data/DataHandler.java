@@ -110,7 +110,7 @@ public class DataHandler extends SimpleManager<DungeonPlugin> implements UserDat
         try {
             connection.close();
         }
-        catch (SQLException ignored) {
+        catch (SQLException _) {
             // Nothing useful to do with a failed close.
         }
     }
@@ -137,16 +137,24 @@ public class DataHandler extends SimpleManager<DungeonPlugin> implements UserDat
         String idType = this.isSQLite() ? "INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT"
             : "int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT";
         String text = this.isSQLite() ? "TEXT NOT NULL" : "MEDIUMTEXT NOT NULL";
-        String bigint = "BIGINT NOT NULL";
 
-        this.execute("CREATE TABLE IF NOT EXISTS " + this.tableUsers + "("
-            + "`id` " + idType + ", "
-            + "`" + COLUMN_USER_ID + "` " + text + ", "
-            + "`" + COLUMN_USER_NAME + "` " + text + ", "
-            + "`" + COLUMN_USER_DATE_CREATED + "` " + bigint + ", "
-            + "`" + COLUMN_USER_LAST_ONLINE + "` " + bigint + ", "
-            + "`" + COLUMN_KITS + "` " + text + ", "
-            + "`" + COLUMN_COOLDOWN + "` " + text + ");");
+        this.execute("""
+            CREATE TABLE IF NOT EXISTS %s (
+                `id`  %s,
+                `%s`  %s,
+                `%s`  %s,
+                `%s`  BIGINT NOT NULL,
+                `%s`  BIGINT NOT NULL,
+                `%s`  %s,
+                `%s`  %s);"""
+            .formatted(this.tableUsers,
+                idType,
+                COLUMN_USER_ID, text,
+                COLUMN_USER_NAME, text,
+                COLUMN_USER_DATE_CREATED,
+                COLUMN_USER_LAST_ONLINE,
+                COLUMN_KITS, text,
+                COLUMN_COOLDOWN, text));
     }
 
     private void purge() {
@@ -285,11 +293,13 @@ public class DataHandler extends SimpleManager<DungeonPlugin> implements UserDat
         Connection connection = null;
         try {
             connection = this.openConnection();
-            try (PreparedStatement statement = connection.prepareStatement("INSERT INTO " + this.tableUsers
-                + " (`" + COLUMN_USER_ID + "`, `" + COLUMN_USER_NAME + "`, `" + COLUMN_USER_DATE_CREATED
-                + "`, `" + COLUMN_USER_LAST_ONLINE + "`, `" + COLUMN_KITS + "`, `" + COLUMN_COOLDOWN
-                + "`) VALUES (?, ?, ?, ?, ?, ?);")) {
+            String sql = """
+                INSERT INTO %s (`%s`, `%s`, `%s`, `%s`, `%s`, `%s`)
+                VALUES (?, ?, ?, ?, ?, ?);"""
+                .formatted(this.tableUsers, COLUMN_USER_ID, COLUMN_USER_NAME, COLUMN_USER_DATE_CREATED,
+                    COLUMN_USER_LAST_ONLINE, COLUMN_KITS, COLUMN_COOLDOWN);
 
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, user.getId().toString());
                 statement.setString(2, user.getName());
                 statement.setLong(3, user.getDateCreated());
@@ -320,10 +330,16 @@ public class DataHandler extends SimpleManager<DungeonPlugin> implements UserDat
     private void update(@NonNull Collection<DungeonUser> users, boolean full) {
         if (users.isEmpty()) return;
 
-        String sql = "UPDATE " + this.tableUsers + " SET `" + COLUMN_USER_NAME + "` = ?, `"
-            + COLUMN_USER_LAST_ONLINE + "` = ?"
-            + (full ? ", `" + COLUMN_KITS + "` = ?, `" + COLUMN_COOLDOWN + "` = ?" : "")
-            + " WHERE `" + COLUMN_USER_ID + "` = ?;";
+        // A partial save writes only the session columns; a full save also pushes the JSON payloads.
+        String payloadColumns = full
+            ? ", `%s` = ?, `%s` = ?".formatted(COLUMN_KITS, COLUMN_COOLDOWN)
+            : "";
+
+        String sql = """
+            UPDATE %s
+            SET `%s` = ?, `%s` = ?%s
+            WHERE `%s` = ?;"""
+            .formatted(this.tableUsers, COLUMN_USER_NAME, COLUMN_USER_LAST_ONLINE, payloadColumns, COLUMN_USER_ID);
 
         Connection connection = null;
         try {

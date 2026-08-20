@@ -33,7 +33,7 @@ public class SpriteTagHandler extends ClassicTagHandler {
 
             group.appendEntry(new SpriteEntry(group, atlasKey, Key.key(ParserUtils.unquoted(sprite))));
         }
-        catch (IllegalArgumentException exception) {
+        catch (IllegalArgumentException _) {
             // Malformed atlas/sprite key: render nothing rather than blowing up the whole message.
         }
     }

@@ -456,7 +456,7 @@ public class ConfigValue<T> {
 
 
     public T get() {
-        return this.value == null ? this.defaultValue : this.value;
+        return Objects.requireNonNullElse(this.value, this.defaultValue);
     }
 
     public void set(T value) {

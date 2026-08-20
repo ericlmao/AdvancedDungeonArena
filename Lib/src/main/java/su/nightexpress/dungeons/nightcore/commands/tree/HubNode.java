@@ -35,7 +35,7 @@ public class HubNode extends ExecutableNode {
         if (useHelpCommand) {
             this.addBranch(Commands.literal("help")
                 .description(CoreLang.COMMAND_HELP_DESC)
-                .executes((context, arguments) -> sendCommandList(context))
+                .executes((context, _) -> sendCommandList(context))
                 .build());
         }
     }

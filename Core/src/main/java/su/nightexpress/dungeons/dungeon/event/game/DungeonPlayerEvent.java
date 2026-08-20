@@ -6,7 +6,7 @@ import su.nightexpress.dungeons.dungeon.player.DungeonGamer;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.DungeonEventType;
 
-public abstract class DungeonPlayerEvent extends DungeonGameEvent implements GamerEvent {
+public abstract sealed class DungeonPlayerEvent extends DungeonGameEvent implements GamerEvent permits DungeonPlayerDeathEvent {
 
     protected DungeonGamer player;
 

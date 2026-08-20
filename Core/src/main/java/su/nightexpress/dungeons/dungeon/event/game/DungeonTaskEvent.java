@@ -6,7 +6,8 @@ import su.nightexpress.dungeons.dungeon.event.DungeonEventType;
 import su.nightexpress.dungeons.dungeon.stage.StageTask;
 import su.nightexpress.dungeons.dungeon.stage.task.TaskProgress;
 
-public abstract class DungeonTaskEvent extends DungeonGameEvent implements TaskEvent {
+public abstract sealed class DungeonTaskEvent extends DungeonGameEvent implements TaskEvent
+    permits DungeonTaskCreatedEvent, DungeonTaskFinishedEvent {
 
     private final StageTask stageTask;
     private final TaskProgress progress;

@@ -15,7 +15,7 @@ import org.joml.Vector3f;
 import su.nightexpress.dungeons.api.dungeon.DungeonPlayer;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
-import su.nightexpress.dungeons.dungeon.event.DungeonEventType;
+import su.nightexpress.dungeons.dungeon.event.game.DungeonTickEvent;
 import su.nightexpress.dungeons.dungeon.script.task.Task;
 import su.nightexpress.dungeons.dungeon.stage.StageTask;
 import su.nightexpress.dungeons.dungeon.stage.task.TaskProgress;
@@ -137,7 +137,7 @@ public abstract class AreaTask implements Task {
 
     @Override
     public void progress(@NonNull DungeonGameEvent event, @NonNull DungeonInstance dungeon, @NonNull StageTask stageTask, @NonNull TaskProgress progress) {
-        if (event.getType() != DungeonEventType.DUNGEON_TICK) return;
+        if (!(event instanceof DungeonTickEvent)) return;
 
         this.onTaskProgress(event, dungeon, stageTask, progress);
     }

@@ -7,7 +7,7 @@ import su.nightexpress.dungeons.dungeon.event.DungeonEventType;
 import su.nightexpress.dungeons.dungeon.stage.StageTask;
 import su.nightexpress.dungeons.dungeon.stage.task.TaskProgress;
 
-public class DungeonTaskFinishedEvent extends DungeonTaskEvent {
+public final class DungeonTaskFinishedEvent extends DungeonTaskEvent {
 
     public static final HandlerList HANDLER_LIST = new HandlerList();
 

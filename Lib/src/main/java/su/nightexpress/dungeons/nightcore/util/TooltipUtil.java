@@ -78,7 +78,7 @@ public class TooltipUtil {
             itemStack.setData(DataComponentTypes.TOOLTIP_DISPLAY,
                 TooltipDisplay.tooltipDisplay().hiddenComponents(types).build());
         }
-        catch (NoSuchElementException exception) {
+        catch (NoSuchElementException _) {
             // A component type that is not tooltip-displayable; nothing to hide.
         }
     }

@@ -14,6 +14,7 @@ import su.nightexpress.dungeons.nightcore.integration.item.impl.AdaptedItemStack
 import su.nightexpress.dungeons.nightcore.integration.item.impl.AdaptedVanillaStack;
 import su.nightexpress.dungeons.nightcore.util.ItemTag;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public class ItemHelper {
@@ -80,7 +81,7 @@ public class ItemHelper {
     public static AdaptedItem adapt(@NonNull ItemStack itemStack) {
         ItemAdapter<?> adapter = ItemBridge.getAdapterOrVanilla(itemStack);
         AdaptedItem item = adapter.adapt(itemStack).orElse(null);
-        return item == null ? vanilla(itemStack) : item;
+        return Objects.requireNonNullElseGet(item, () -> vanilla(itemStack));
     }
 
     @NonNull

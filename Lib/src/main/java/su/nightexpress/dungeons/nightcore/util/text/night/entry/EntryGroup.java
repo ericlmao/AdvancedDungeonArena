@@ -2,6 +2,7 @@ package su.nightexpress.dungeons.nightcore.util.text.night.entry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 import net.kyori.adventure.text.Component;
@@ -77,7 +78,7 @@ public class EntryGroup implements Entry {
             upperGroup = upperGroup.parent;
         }
 
-        return upperGroup == null ? this : upperGroup;
+        return Objects.requireNonNullElse(upperGroup, this);
     }
 
     @NonNull
@@ -89,7 +90,7 @@ public class EntryGroup implements Entry {
 
     @NonNull
     public EntryGroup upward() {
-        return this.parent == null ? this : this.parent;
+        return Objects.requireNonNullElse(this.parent, this);
     }
 
     @NonNull

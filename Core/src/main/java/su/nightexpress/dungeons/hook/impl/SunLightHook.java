@@ -79,7 +79,7 @@ public class SunLightHook implements GodPlugin, BoardPlugin {
             Method method = findMethod(module.getClass(), methodName, 1);
             if (method != null) method.invoke(module, player);
         }
-        catch (ReflectiveOperationException | RuntimeException ignored) {
+        catch (ReflectiveOperationException | RuntimeException _) {
             // SunLight changed its module API; treat the integration as unavailable.
         }
     }

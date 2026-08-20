@@ -25,7 +25,7 @@ public class ItemHandler {
      * A no-op click is the intent (a decorative, named, configurable item).
      */
     public ItemHandler(@NonNull String name) {
-        this(name, (viewer, event) -> {}, null);
+        this(name, (_, _) -> {}, null);
     }
 
     public ItemHandler(@NonNull String name, @Nullable ItemClick click) {
@@ -71,7 +71,7 @@ public class ItemHandler {
 
     @NonNull
     public static ItemHandler forUserSkin(@NonNull Menu menu) {
-        return new ItemHandler(USER_SKIN, (viewer, event) -> {
+        return new ItemHandler(USER_SKIN, (_, _) -> {
         }, ItemOptions.builder().setDisplayModifier((viewer, nightItem) -> nightItem.setPlayerProfile(viewer
             .getPlayer())).build()
         );

@@ -5,7 +5,8 @@ import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.DungeonEventType;
 import su.nightexpress.dungeons.dungeon.stage.Stage;
 
-public abstract class DungeonStageEvent extends DungeonGameEvent implements StageEvent {
+public abstract sealed class DungeonStageEvent extends DungeonGameEvent implements StageEvent
+    permits DungeonStageFinishEvent, DungeonStageStartEvent {
 
     private final Stage stage;
 

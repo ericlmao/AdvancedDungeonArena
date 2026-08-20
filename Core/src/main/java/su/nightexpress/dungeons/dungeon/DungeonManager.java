@@ -184,8 +184,8 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
                     .localized(Lang.UI_CONFIRMATION_DUNGEON_ENTER_NO_KITS)
                     .hideAllComponents()
                     .replacement(replacer -> replacer.replace(dungeon.replacePlaceholders())))
-                .onAccept((viewer, event) -> this.enterInstance(player, dungeon,null))
-                .onReturn((viewer, event) -> plugin.runTask(player, player::closeInventory))
+                .onAccept((_, _) -> this.enterInstance(player, dungeon,null))
+                .onReturn((_, _) -> plugin.runTask(player, player::closeInventory))
                 .build());
         }
     }

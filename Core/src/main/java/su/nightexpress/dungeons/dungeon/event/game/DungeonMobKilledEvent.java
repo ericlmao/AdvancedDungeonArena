@@ -8,7 +8,7 @@ import su.nightexpress.dungeons.dungeon.player.DungeonGamer;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.DungeonEventType;
 
-public class DungeonMobKilledEvent extends DungeonMobEvent implements GamerEvent {
+public final class DungeonMobKilledEvent extends DungeonMobEvent implements GamerEvent {
 
     public static final HandlerList HANDLER_LIST = new HandlerList();
 

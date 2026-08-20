@@ -55,7 +55,7 @@ public class SetupCommands {
                 .withArguments(
                     CommandArguments.forDungeon(plugin),
                     Arguments.string(CommandArguments.NAME).localized(CoreLang.COMMAND_ARGUMENT_NAME_NAME)
-                        .suggestions((reader, context) -> {
+                        .suggestions((_, context) -> {
                             DungeonConfig config = CommandArguments.getDungeonConfig(plugin, context);
                             return config == null ? Collections.emptyList() : new ArrayList<>(config.getSpawnerByIdMap().keySet());
                         })
@@ -82,7 +82,7 @@ public class SetupCommands {
                 .withArguments(
                     CommandArguments.forDungeon(plugin),
                     Arguments.string(CommandArguments.LEVEL).localized(Lang.COMMAND_ARGUMENT_NAME_LEVEL)
-                        .suggestions((reader, context) -> {
+                        .suggestions((_, context) -> {
                             DungeonConfig config = CommandArguments.getDungeonConfig(plugin, context);
                             return config == null ? Collections.emptyList() : new ArrayList<>(config.getLevelByIdMap().keySet());
                         })
@@ -122,7 +122,7 @@ public class SetupCommands {
                 .withArguments(
                     CommandArguments.forDungeon(plugin),
                     Arguments.string(CommandArguments.REWARD).localized(Lang.COMMAND_ARGUMENT_NAME_REWARD)
-                        .suggestions((reader, context) -> {
+                        .suggestions((_, context) -> {
                             DungeonConfig config = CommandArguments.getDungeonConfig(plugin, context);
                             return config == null ? Collections.emptyList() : new ArrayList<>(config.getRewardByIdMap().keySet());
                         })
@@ -135,7 +135,7 @@ public class SetupCommands {
                 .withArguments(
                     CommandArguments.forDungeon(plugin),
                     Arguments.string(CommandArguments.REWARD).localized(Lang.COMMAND_ARGUMENT_NAME_REWARD)
-                        .suggestions((reader, context) -> {
+                        .suggestions((_, context) -> {
                             DungeonConfig config = CommandArguments.getDungeonConfig(plugin, context);
                             return config == null ? Collections.emptyList() : new ArrayList<>(config.getRewardByIdMap().keySet());
                         })
@@ -161,7 +161,7 @@ public class SetupCommands {
                 .withArguments(
                     CommandArguments.forDungeon(plugin),
                     Arguments.string(CommandArguments.LOOT_CHEST).localized(Lang.COMMAND_ARGUMENT_NAME_LOOT_CHEST)
-                        .suggestions((reader, context) -> {
+                        .suggestions((_, context) -> {
                             DungeonConfig config = CommandArguments.getDungeonConfig(plugin, context);
                             return config == null ? Collections.emptyList() : new ArrayList<>(config.getLootChestByIdMap().keySet());
                         })
@@ -174,7 +174,7 @@ public class SetupCommands {
                 .withArguments(
                     CommandArguments.forDungeon(plugin),
                     Arguments.string(CommandArguments.LOOT_CHEST).localized(Lang.COMMAND_ARGUMENT_NAME_LOOT_CHEST)
-                        .suggestions((reader, context) -> {
+                        .suggestions((_, context) -> {
                             DungeonConfig config = CommandArguments.getDungeonConfig(plugin, context);
                             return config == null ? Collections.emptyList() : new ArrayList<>(config.getLootChestByIdMap().keySet());
                         }),
@@ -194,7 +194,7 @@ public class SetupCommands {
                 .withArguments(
                     CommandArguments.forDungeon(plugin),
                     Arguments.string(CommandArguments.NAME).localized(CoreLang.COMMAND_ARGUMENT_NAME_NAME)
-                        .suggestions((reader, context) -> {
+                        .suggestions((_, context) -> {
                             DungeonConfig config = CommandArguments.getDungeonConfig(plugin, context);
                             return config == null ? Collections.emptyList() : new ArrayList<>(config.getSpotByIdMap().keySet());
                         })
@@ -205,7 +205,7 @@ public class SetupCommands {
                 .description(Lang.COMMAND_SPOT_REMOVE_DESC)
                 .withArguments(
                     CommandArguments.forDungeon(plugin),
-                    Arguments.string(CommandArguments.SPOT).localized(Lang.COMMAND_ARGUMENT_NAME_SPOT).suggestions((reader, context)  -> {
+                    Arguments.string(CommandArguments.SPOT).localized(Lang.COMMAND_ARGUMENT_NAME_SPOT).suggestions((_, context)  -> {
                         DungeonConfig config = CommandArguments.getDungeonConfig(plugin, context);
                         return config == null ? Collections.emptyList() : new ArrayList<>(config.getSpotByIdMap().keySet());
                     })
@@ -217,11 +217,11 @@ public class SetupCommands {
                 .description(Lang.COMMAND_SPOT_ADD_STATE_DESC)
                 .withArguments(
                     CommandArguments.forDungeon(plugin),
-                    Arguments.string(CommandArguments.SPOT).localized(Lang.COMMAND_ARGUMENT_NAME_SPOT).suggestions((reader, context)  -> {
+                    Arguments.string(CommandArguments.SPOT).localized(Lang.COMMAND_ARGUMENT_NAME_SPOT).suggestions((_, context)  -> {
                         DungeonConfig config = CommandArguments.getDungeonConfig(plugin, context);
                         return config == null ? Collections.emptyList() : new ArrayList<>(config.getSpotByIdMap().keySet());
                     }),
-                    Arguments.string(CommandArguments.STATE).localized(CoreLang.COMMAND_ARGUMENT_NAME_NAME).suggestions((reader, context)  -> {
+                    Arguments.string(CommandArguments.STATE).localized(CoreLang.COMMAND_ARGUMENT_NAME_NAME).suggestions((_, context)  -> {
                         Spot spot = CommandArguments.getSpot(plugin, context);
                         return spot == null ? Collections.emptyList() : new ArrayList<>(spot.getStateByIdMap().keySet());
                     })

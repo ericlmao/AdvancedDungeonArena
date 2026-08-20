@@ -3,7 +3,7 @@ package su.nightexpress.dungeons.dungeon.script.task.impl;
 import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
-import su.nightexpress.dungeons.dungeon.event.DungeonEventType;
+import su.nightexpress.dungeons.dungeon.event.game.DungeonMobKilledEvent;
 import su.nightexpress.dungeons.dungeon.script.task.ProgressFormatter;
 import su.nightexpress.dungeons.dungeon.script.task.Task;
 import su.nightexpress.dungeons.dungeon.script.task.TaskId;
@@ -56,7 +56,7 @@ public class KillMobsTask implements Task {
 
     @Override
     public void progress(@NonNull DungeonGameEvent event, @NonNull DungeonInstance dungeon, @NonNull StageTask stageTask, @NonNull TaskProgress progress) {
-        if (event.getType() == DungeonEventType.MOB_KILLED) {
+        if (event instanceof DungeonMobKilledEvent) {
             progress.addProgress(1);
         }
     }

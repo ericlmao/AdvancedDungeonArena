@@ -42,7 +42,7 @@ public class CommandArguments {
                 .orElseThrow(() -> CommandSyntaxException.custom(Lang.ERROR_COMMAND_INVALID_SELECTION_ARGUMENT))
             )
             .localized(CoreLang.COMMAND_ARGUMENT_NAME_TYPE)
-            .suggestions((reader, context) -> Enums.getNames(SelectionType.class));
+            .suggestions((_, context) -> Enums.getNames(SelectionType.class));
     }
 
     @NonNull
@@ -51,7 +51,7 @@ public class CommandArguments {
                 .orElseThrow(() -> CommandSyntaxException.custom(Lang.ERROR_COMMAND_INVALID_DUNGEON_ARGUMENT))
             )
             .localized(Lang.COMMAND_ARGUMENT_NAME_DUNGEON)
-            .suggestions((reader, context) -> new ArrayList<>(plugin.getDungeonManager().getDungeonIds()));
+            .suggestions((_, context) -> new ArrayList<>(plugin.getDungeonManager().getDungeonIds()));
     }
 
     @NonNull
@@ -60,7 +60,7 @@ public class CommandArguments {
                 .orElseThrow(() -> CommandSyntaxException.custom(Lang.ERROR_COMMAND_INVALID_KIT_ARGUMENT))
             )
             .localized(Lang.COMMAND_ARGUMENT_NAME_KIT)
-            .suggestions((reader, context) -> new ArrayList<>(plugin.getKitManager().getKitIds()));
+            .suggestions((_, context) -> new ArrayList<>(plugin.getKitManager().getKitIds()));
     }
 
     @Nullable

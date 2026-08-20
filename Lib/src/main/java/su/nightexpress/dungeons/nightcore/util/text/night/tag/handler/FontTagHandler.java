@@ -16,7 +16,7 @@ public class FontTagHandler extends ClassicTagHandler {
         try {
             font = Key.key(tagContent);
         }
-        catch (IllegalArgumentException exception) {
+        catch (IllegalArgumentException _) {
             return;
         }
 

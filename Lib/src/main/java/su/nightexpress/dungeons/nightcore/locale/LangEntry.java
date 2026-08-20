@@ -11,6 +11,7 @@ import su.nightexpress.dungeons.nightcore.locale.entry.*;
 import su.nightexpress.dungeons.nightcore.locale.message.MessageData;
 import su.nightexpress.dungeons.nightcore.util.bridge.RegistryType;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 public class LangEntry<T extends LangValue> implements LangElement {
@@ -56,7 +57,7 @@ public class LangEntry<T extends LangValue> implements LangElement {
 
     @NonNull
     public T value() {
-        return this.value == null ? this.defaultValue : this.value;
+        return Objects.requireNonNullElse(this.value, this.defaultValue);
     }
 
     public static class Builder {

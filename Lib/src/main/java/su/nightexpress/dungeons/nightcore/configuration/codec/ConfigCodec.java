@@ -25,7 +25,7 @@ public interface ConfigCodec<T> {
         try {
             return Optional.ofNullable(this.read(config, path));
         }
-        catch (Exception e) {
+        catch (Exception _) {
             return Optional.empty();
         }
     }

@@ -77,7 +77,7 @@ public class BaseCommands {
             .playerOnly()
             .description(Lang.COMMAND_LEAVE_DESC)
             .permission(Perms.COMMAND_LEAVE)
-            .executes((context, arguments) -> leaveDungeon(plugin, context))
+            .executes((context, _) -> leaveDungeon(plugin, context))
         );
 
         root.branch(Commands.literal("setstage")
@@ -85,7 +85,7 @@ public class BaseCommands {
             .description(Lang.COMMAND_SET_STAGE_DESC)
             .permission(Perms.COMMAND_SET_STAGE)
             .withArguments(Arguments.string(CommandArguments.STAGE).localized(Lang.COMMAND_ARGUMENT_NAME_STAGE)
-                .suggestions((reader, context) -> {
+                .suggestions((_, context) -> {
                     DungeonInstance instance = CommandArguments.getDungeonInstance(plugin, context);
                     return instance == null ? Collections.emptyList() : new ArrayList<>(instance.getConfig().getStageByIdMap().keySet());
                 }))
@@ -97,7 +97,7 @@ public class BaseCommands {
             .description(Lang.COMMAND_SET_LEVEL_DESC)
             .permission(Perms.COMMAND_SET_LEVEL)
             .withArguments(Arguments.string(CommandArguments.LEVEL).localized(Lang.COMMAND_ARGUMENT_NAME_LEVEL)
-                .suggestions((reader, context) -> {
+                .suggestions((_, context) -> {
                     DungeonInstance instance = CommandArguments.getDungeonInstance(plugin, context);
                     return instance == null ? Collections.emptyList() : new ArrayList<>(instance.getConfig().getLevelByIdMap().keySet());
                 }))
@@ -110,12 +110,12 @@ public class BaseCommands {
             .withArguments(
                 CommandArguments.forDungeon(plugin),
                 Arguments.string(CommandArguments.SPOT).localized(Lang.COMMAND_ARGUMENT_NAME_SPOT)
-                    .suggestions((reader, context) -> {
+                    .suggestions((_, context) -> {
                         DungeonConfig config = CommandArguments.getDungeonConfig(plugin, context);
                         return config == null ? Collections.emptyList() : new ArrayList<>(config.getSpotByIdMap().keySet());
                     }),
                 Arguments.string(CommandArguments.STATE).localized(Lang.COMMAND_ARGUMENT_NAME_STATE)
-                    .suggestions((reader, context) -> {
+                    .suggestions((_, context) -> {
                         Spot spot = CommandArguments.getSpot(plugin, context);
                         return spot == null ? Collections.emptyList() : new ArrayList<>(spot.getStateByIdMap().keySet());
                     })

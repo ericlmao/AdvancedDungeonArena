@@ -92,7 +92,7 @@ public class Numbers {
             T value = converter.apply(input);
             return value == null ? Optional.empty() : Optional.of(value);
         }
-        catch (NumberFormatException ignored) {
+        catch (NumberFormatException _) {
             return Optional.empty();
         }
     }

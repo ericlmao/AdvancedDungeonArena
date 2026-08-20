@@ -312,7 +312,7 @@ public class FileConfig extends YamlConfiguration {
 
     public <T> T read(String path, ConfigCodec<T> codec, T defaultValue) throws CodecReadException {
         T value = this.read(path, codec);
-        return value == null ? defaultValue : value;
+        return Objects.requireNonNullElse(value, defaultValue);
     }
 
     public <T> @Nullable T read(String path, Class<T> type) throws CodecReadException {
