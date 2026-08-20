@@ -81,7 +81,10 @@ public class KitCommands {
         String playerName = arguments.getString(CommandArguments.PLAYER);
         Kit kit = arguments.get(CommandArguments.KIT, Kit.class);
 
-        plugin.getUserManager().manageUser(playerName, user -> {
+        // manageUser resumes on the ForkJoin common pool when the user is not cached - not a plugin thread at
+        // all, and one that outlives our disable. The Synchronized variant resumes on the global region
+        // instead, which is where mutating user data and replying to the command sender belong.
+        plugin.getUserManager().manageUserSynchronized(playerName, user -> {
             if (user == null) {
                 context.errorBadPlayer();
                 return;

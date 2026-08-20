@@ -106,24 +106,25 @@ public class KitSelectMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> im
                     if (!dungeon.isKitAllowed(kit)) return;
                     if (dungeon.isKitLimitReached(kit)) return;
 
-                    this.runNextTick(() -> {
+                    this.runNextTick(player, () -> {
                         UIUtils.openConfirmation(player, Confirmation.builder()
                             .setIcon(dungeon.getConfig().getIcon()
                                 .localized(Lang.UI_CONFIRMATION_DUNGEON_ENTER_OWN_KIT)
                                 .replacement(replacer -> replacer.replace(dungeon.replacePlaceholders()).replace(kit.replacePlaceholders())))
-                            .onAccept((viewer2, event1) -> {
+                            // Enter + close were two separate task submissions, which only stayed ordered
+                            // because BukkitScheduler ran them FIFO on one thread. Merged into one task so
+                            // the ordering is a property of the code rather than of the scheduler.
+                            .onAccept((viewer2, event1) -> plugin.runTask(player, () -> {
                                 plugin.getDungeonManager().enterInstance(player, dungeon, kit);
-                                plugin.runTask(() -> player.closeInventory());
-                            })
-                            .onReturn((viewer2, event1) -> {
-                                plugin.runTask(() -> plugin.getKitManager().openSelector(player, dungeon));
-                            })
+                                player.closeInventory();
+                            }))
+                            .onReturn((viewer2, event1) -> plugin.runTask(player, () -> plugin.getKitManager().openSelector(player, dungeon)))
                             .returnOnAccept(false)
                             .build());
                     });
                 }
                 else if (event.isRightClick()) {
-                    this.runNextTick(() -> plugin.getKitManager().openPreview(player, kit, dungeon));
+                    this.runNextTick(player, () -> plugin.getKitManager().openPreview(player, kit, dungeon));
                 }
             })
             .build();
@@ -176,7 +177,7 @@ public class KitSelectMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> im
             .setPriority(10)
             .setSlots(33)
             .setHandler(new ItemHandler("kit_shop", (viewer, event) -> {
-                this.runNextTick(() -> plugin.getKitManager().openShop(viewer.getPlayer(), this.getLink(viewer)));
+                this.runNextTick(viewer.getPlayer(), () -> plugin.getKitManager().openShop(viewer.getPlayer(), this.getLink(viewer)));
             })));
 
         loader.addDefaultItem(NightItem.asCustomHead("76d126affd03def502bfaa91a34e7c1562421490002a85c2b5815bdd4248e12")
@@ -188,7 +189,7 @@ public class KitSelectMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> im
             .setPriority(10)
             .setSlots(29)
             .setHandler(new ItemHandler("dungeons", (viewer, event) -> {
-                this.runNextTick(() -> plugin.getDungeonManager().browseDungeons(viewer.getPlayer()));
+                this.runNextTick(viewer.getPlayer(), () -> plugin.getDungeonManager().browseDungeons(viewer.getPlayer()));
             })));
     }
 }

@@ -35,7 +35,14 @@ public interface Menu {
 
     void close(@NonNull Player player);
 
-    void runNextTick(@NonNull Runnable runnable);
+    /**
+     * Defers {@code runnable} to the next tick of {@code player}'s scheduler.
+     * <p>
+     * The {@link Player} parameter is not decoration: on Folia inventory mutation is only legal from the
+     * thread that owns the player, and every caller of this method is doing inventory work. Taking the
+     * owner explicitly is what stops those call sites from silently landing on the global region.
+     */
+    void runNextTick(@NonNull Player player, @NonNull Runnable runnable);
 
     void onClick(@NonNull MenuViewer viewer, @NonNull ClickResult result, @NonNull InventoryClickEvent event);
 

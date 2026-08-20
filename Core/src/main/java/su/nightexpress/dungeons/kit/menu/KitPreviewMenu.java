@@ -51,10 +51,10 @@ public class KitPreviewMenu extends LinkedMenu<DungeonPlugin, KitPreviewMenu.Dat
         Data data = this.getLink(player);
 
         if (!KitUtils.isRentMode() && (user.hasKit(data.kit) || !data.kit.hasCost())) {
-            this.runNextTick(() -> plugin.getKitManager().openSelector(player, data.dungeon));
+            this.runNextTick(player, () -> plugin.getKitManager().openSelector(player, data.dungeon));
         }
         else {
-            this.runNextTick(() -> plugin.getKitManager().openShop(player, data.dungeon));
+            this.runNextTick(player, () -> plugin.getKitManager().openShop(player, data.dungeon));
         }
     }
 

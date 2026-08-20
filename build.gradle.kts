@@ -12,6 +12,7 @@ subprojects {
     repositories {
         mavenCentral()
         maven("https://repo.papermc.io/repository/maven-public/")
+        maven("https://repo.moonrise.gg/repository/maven-releases")
         maven("https://repo.nightexpressdev.com/releases")
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
         maven("https://jitpack.io")

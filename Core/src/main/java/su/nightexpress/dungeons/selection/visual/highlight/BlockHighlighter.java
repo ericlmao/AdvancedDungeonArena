@@ -10,6 +10,8 @@ import su.nightexpress.dungeons.selection.visual.FakeEntity;
 import su.nightexpress.dungeons.nightcore.util.EntityUtil;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class BlockHighlighter {
 
@@ -19,7 +21,9 @@ public abstract class BlockHighlighter {
 
     public BlockHighlighter(@NotNull DungeonPlugin plugin) {
         this.plugin = plugin;
-        this.entityMap = new HashMap<>();
+        // Mutated from the async highlight timer and from the selection listener on the player's own thread.
+        // The value lists are appended to from the timer and drained on removal, hence copy-on-write.
+        this.entityMap = new ConcurrentHashMap<>();
     }
 
     public void clear() {
@@ -29,7 +33,7 @@ public abstract class BlockHighlighter {
 
     @NotNull
     private List<FakeEntity> getEntityMap(@NotNull UUID playerId) {
-        return this.entityMap.computeIfAbsent(playerId, k -> new ArrayList<>());
+        return this.entityMap.computeIfAbsent(playerId, k -> new CopyOnWriteArrayList<>());
     }
 
     protected int nextEntityId() {

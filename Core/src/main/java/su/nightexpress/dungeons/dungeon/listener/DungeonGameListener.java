@@ -84,15 +84,21 @@ public class DungeonGameListener extends AbstractListener<DungeonPlugin> {
         event.setCancelled(true);
 
         DungeonInstance dungeon = gamer.getDungeon();
+        String message = event.getMessage();
 
-        String format = Replacer.create()
-            .replace(dungeon.replacePlaceholders())
-            .replace(gamer.replacePlaceholders())
-            .replace(Placeholders.forPlayerWithPAPI(player))
-            .replace(Placeholders.GENERIC_MESSAGE, event.getMessage())
-            .apply(Config.CHAT_FORMAT.get());
+        // This handler runs on a Netty thread. Resolving PAPI placeholders re-enters arbitrary third-party
+        // expansions, and broadcasting walks the instance's player set - neither is safe from here. Hop onto
+        // the speaker's own scheduler to build the line, then let broadcast() fan out per recipient.
+        this.plugin.runTask(player, () -> {
+            String format = Replacer.create()
+                .replace(dungeon.replacePlaceholders())
+                .replace(gamer.replacePlaceholders())
+                .replace(Placeholders.forPlayerWithPAPI(player))
+                .replace(Placeholders.GENERIC_MESSAGE, message)
+                .apply(Config.CHAT_FORMAT.get());
 
-        dungeon.broadcast(format);
+            dungeon.broadcast(format);
+        });
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -149,7 +155,7 @@ public class DungeonGameListener extends AbstractListener<DungeonPlugin> {
 
         dungeon.handlePlayerDeath(gamer);
 
-        this.plugin.runTask(() -> player.spigot().respawn());
+        this.plugin.runTask(player, () -> player.spigot().respawn());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -305,8 +311,10 @@ public class DungeonGameListener extends AbstractListener<DungeonPlugin> {
             return;
         }
 
-        // One tick delay, because custom mob's plugins don't have a way to distinguish an entity until it is spawned.
-        this.plugin.runTask(() -> dungeon.handleMobSpawn(entity));
+        // One tick delay, because custom mob's plugins don't have a way to distinguish an entity until it is
+        // spawned. Scheduling on the entity preserves that intent (its scheduler runs no earlier than the
+        // entity's next tick) and additionally guarantees we inspect the mob from the thread that owns it.
+        this.plugin.runTask(entity, () -> dungeon.handleMobSpawn(entity));
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)

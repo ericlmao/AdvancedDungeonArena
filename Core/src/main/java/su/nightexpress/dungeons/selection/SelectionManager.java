@@ -39,6 +39,15 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
 
     public static final float DISPLAY_SIZE = 0.998f;
 
+    // Hoisted out of the render path. `Material#createBlockData` parses a block-state string against the
+    // block registry, and the highlight render runs on the async scheduler - doing registry work there once
+    // per player per frame was both wasteful and off-thread. Building them once at class init makes the
+    // async render a pure read of immutable data.
+    private static final BlockData CORNER_DATA = Material.WHITE_STAINED_GLASS.createBlockData();
+    private static final BlockData WIRE_DATA   = Material.IRON_CHAIN.createBlockData();
+    private static final BlockData WIRE_DATA_X = createBlockData(Material.IRON_CHAIN, Axis.X);
+    private static final BlockData WIRE_DATA_Z = createBlockData(Material.IRON_CHAIN, Axis.Z);
+
     private final Map<UUID, Selection> selectionMap;
     private final Map<UUID, Tracker>   chunkTracker;
 
@@ -46,7 +55,9 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
 
     public SelectionManager(@NotNull DungeonPlugin plugin) {
         super(plugin);
-        this.selectionMap = new HashMap<>();
+        // Both are read from the async highlight timer and written from the selection listener on the
+        // player's own thread. chunkTracker was already concurrent; selectionMap was the same race, missed.
+        this.selectionMap = new ConcurrentHashMap<>();
         this.chunkTracker = new ConcurrentHashMap<>();
     }
 
@@ -76,6 +87,9 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
         }
         else return;
 
+        // `40L` is a long, so it really is 40 ticks / 2 seconds - unlike the `int` overloads elsewhere, which
+        // mean seconds. NightTask converts this to a 2 s wall-clock period on the async scheduler, so the
+        // real-time interval is unchanged.
         this.addAsyncTask(this::highlightBounds, 40L);
     }
 
@@ -130,7 +144,7 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
 
             Set<BlockInfo> dataSet = new HashSet<>();
             positionSelection.getPositions().forEach(blockPos -> {
-                dataSet.add(new BlockInfo(blockPos, Material.WHITE_STAINED_GLASS.createBlockData()));
+                dataSet.add(new BlockInfo(blockPos, CORNER_DATA));
             });
 
             this.highlightBlocks(player, dataSet);
@@ -158,20 +172,15 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
         }
 
         World world = player.getWorld();
-        Material cornerType = Material.WHITE_STAINED_GLASS;
-        Material wireType = Material.IRON_CHAIN;
         Set<BlockInfo> dataSet = new HashSet<>();
 
         // Draw corners of the chunk/region all the time.
-        this.collectBlockData(cuboid.getCorners(), dataSet, cornerType.createBlockData());
-        this.collectBlockData(cuboid.getCornerWiresY(), dataSet, wireType.createBlockData());
+        this.collectBlockData(cuboid.getCorners(), dataSet, CORNER_DATA);
+        this.collectBlockData(cuboid.getCornerWiresY(), dataSet, WIRE_DATA);
 
         // Draw connections only for regions or when player is inside a chunk.
-        BlockData dataX = this.createBlockData(wireType, Axis.X);
-        BlockData dataZ = this.createBlockData(wireType, Axis.Z);
-
-        this.collectBlockData(cuboid.getCornerWiresX(), dataSet, dataX);
-        this.collectBlockData(cuboid.getCornerWiresZ(), dataSet, dataZ);
+        this.collectBlockData(cuboid.getCornerWiresX(), dataSet, WIRE_DATA_X);
+        this.collectBlockData(cuboid.getCornerWiresZ(), dataSet, WIRE_DATA_Z);
 
         // Draw all visual blocks at prepated positions with prepared block data.
         dataSet.forEach(blockInfo -> {
@@ -214,7 +223,7 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
     }
 
     @NotNull
-    private BlockData createBlockData(@NotNull Material material, @NotNull Axis axis) {
+    private static BlockData createBlockData(@NotNull Material material, @NotNull Axis axis) {
         BlockData data = material.createBlockData();
         if (data instanceof Orientable orientable) {
             orientable.setAxis(axis);

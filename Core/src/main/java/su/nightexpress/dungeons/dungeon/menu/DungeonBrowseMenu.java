@@ -101,7 +101,7 @@ public class DungeonBrowseMenu extends NormalMenu<DungeonPlugin> implements Fill
 
     private void onDungeonClick(MenuViewer viewer, @NotNull DungeonConfig dungeonConfig) {
         Player player = viewer.getPlayer();
-        this.runNextTick(() -> this.plugin.getDungeonManager().prepareForInstance(player, dungeonConfig.getInstance()));
+        this.runNextTick(player, () -> this.plugin.getDungeonManager().prepareForInstance(player, dungeonConfig.getInstance()));
     }
 
     @NotNull

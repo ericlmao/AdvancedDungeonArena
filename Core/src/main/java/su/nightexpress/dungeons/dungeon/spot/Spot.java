@@ -1,14 +1,18 @@
 package su.nightexpress.dungeons.dungeon.spot;
 
+import gg.moonrise.scheduler.Scheduler;
+import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.Placeholders;
+import su.nightexpress.dungeons.api.schema.SchemaBlock;
 import su.nightexpress.dungeons.nightcore.config.FileConfig;
 import su.nightexpress.dungeons.nightcore.manager.AbstractFileData;
 import su.nightexpress.dungeons.nightcore.util.FileUtil;
+import su.nightexpress.dungeons.nightcore.util.geodata.pos.BlockPos;
 
 import java.io.File;
 import java.util.*;
@@ -63,9 +67,34 @@ public class Spot extends AbstractFileData<DungeonPlugin> {
         });
     }
 
+    /**
+     * Stamps a spot state back into the world.
+     * <p>
+     * {@code setSchemaBlock} is a raw NMS write - {@code CraftBlock#setBlockData} plus
+     * {@code BlockEntity#loadWithComponents} straight into the {@code ServerLevel}. A spot schema is an
+     * arbitrary cuboid and routinely spans several chunks, therefore potentially several Folia regions, so
+     * there is no single thread from which the whole loop is legal. Writing from the wrong region here is
+     * not a "might throw" - it is silent world corruption and a likely chunk-system crash.
+     * <p>
+     * The schema is therefore bucketed by chunk and each bucket is dispatched to the region that owns it.
+     * Blocks within one chunk keep their original relative order.
+     */
     public void build(@NotNull World world, @NotNull SpotState state) {
+        Map<Long, List<SchemaBlock>> byChunk = new LinkedHashMap<>();
+
         state.getSchema().forEach(schemaBlock -> {
-            this.plugin.getInternals().setSchemaBlock(world, schemaBlock);
+            BlockPos pos = schemaBlock.getBlockPos();
+            long chunkKey = Chunk.getChunkKey(pos.getX() >> 4, pos.getZ() >> 4);
+            byChunk.computeIfAbsent(chunkKey, key -> new ArrayList<>()).add(schemaBlock);
+        });
+
+        byChunk.forEach((chunkKey, blocks) -> {
+            int chunkX = (int) (long) chunkKey;
+            int chunkZ = (int) (chunkKey >> 32);
+
+            Scheduler.location().executeChunk(world, chunkX, chunkZ, () -> blocks.forEach(schemaBlock -> {
+                this.plugin.getInternals().setSchemaBlock(world, schemaBlock);
+            }));
         });
     }
 

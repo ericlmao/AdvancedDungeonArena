@@ -8,6 +8,10 @@ dependencies {
     compileOnly(libs.paper.api)
     compileOnly(libs.annotations)
 
+    // Folia region schedulers. `api` so :Core sees it too - the scheduling seams live here, but Core
+    // call sites need the same types. Shaded + relocated by :Core's shadowJar.
+    api(libs.folia.scheduler)
+
     // Soft dependencies of the vendored integration layer.
     compileOnly(libs.placeholderapi)
     compileOnly(libs.vault.api)

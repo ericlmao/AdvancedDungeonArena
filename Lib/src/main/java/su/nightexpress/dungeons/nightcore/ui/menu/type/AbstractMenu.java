@@ -91,8 +91,8 @@ public abstract class AbstractMenu<P extends NightPlugin> implements Menu {
     }
 
     @Override
-    public void runNextTick(@NonNull Runnable runnable) {
-        this.plugin.runTask(runnable);
+    public void runNextTick(@NonNull Player player, @NonNull Runnable runnable) {
+        this.plugin.runTask(player, runnable);
     }
 
     public void flush() {
@@ -132,7 +132,10 @@ public abstract class AbstractMenu<P extends NightPlugin> implements Menu {
             return false;
         }
 
-        plugin.runTask(player.getLocation(), () -> {
+        // The owner here is the player, not the block they happen to be standing on: this task builds and
+        // opens an inventory, which is player state. Anchoring it on a location would put it on whichever
+        // region owns that chunk, which is only coincidentally the region that owns the player.
+        plugin.runTask(player, () -> {
             MenuViewer viewer = this.getViewerOrCreate(player);
             viewer.removeItems();
             onViewSet.accept(viewer);

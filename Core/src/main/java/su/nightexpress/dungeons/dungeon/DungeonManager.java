@@ -47,6 +47,7 @@ import su.nightexpress.dungeons.nightcore.util.geodata.pos.ChunkPos;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DungeonManager extends AbstractManager<DungeonPlugin> {
 
@@ -59,10 +60,14 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
 
     public DungeonManager(@NotNull DungeonPlugin plugin) {
         super(plugin);
-        this.dungeonByIdMap = new HashMap<>();
-        this.dungeonByPosMap = new HashMap<>();
-        this.instanceByIdMap = new HashMap<>();
-        this.playerByIdMap = new HashMap<>();
+        // Read from the async chat listener, from PAPI's caller thread, and from every region thread that
+        // runs a dungeon listener; written from joins, leaves and the instance clock. Concurrent is the
+        // minimum bar here - the previous plain HashMaps were already racy on Paper, just narrowly enough
+        // that it rarely showed.
+        this.dungeonByIdMap = new ConcurrentHashMap<>();
+        this.dungeonByPosMap = new ConcurrentHashMap<>();
+        this.instanceByIdMap = new ConcurrentHashMap<>();
+        this.playerByIdMap = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -70,6 +75,10 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
         this.loadDungeons();
         this.loadUI();
 
+        // The game loop. Note the `int` overload: this is 1 SECOND (20 ticks), not 1 tick - the dungeon
+        // clock counts down in whole seconds (DungeonInstance#tickGame does `countdown--` once per call).
+        // It runs on the global region scheduler, which is the only scheduler guaranteed to tick regardless
+        // of which chunks happen to be loaded. See tickInstances for how the per-region work gets out.
         this.addTask(this::tickInstances, 1);
 
         this.addListener(new DungeonGenericListener(this.plugin, this));
@@ -127,6 +136,15 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
         dungeonConfig.getDungeonPositions().forEach(this.dungeonByPosMap::remove);
     }
 
+    /**
+     * Drives every dungeon instance, once per second, from the global region scheduler.
+     * <p>
+     * The instance clock itself is pure state arithmetic - countdowns, timers, task progress. Every piece of
+     * work that touches the world reaches its owning thread from inside {@link DungeonInstance#tick()}:
+     * players via their entity schedulers, blocks and chunk tickets via the region scheduler, mobs and
+     * ground items via their own entity schedulers. Keeping the clock global rather than giving each
+     * instance a region-anchored timer is deliberate; see the PR description for the reasoning.
+     */
     public void tickInstances() {
         this.getInstances().forEach(DungeonInstance::tick);
     }
@@ -158,7 +176,7 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
                     .hideAllComponents()
                     .replacement(replacer -> replacer.replace(dungeon.replacePlaceholders())))
                 .onAccept((viewer, event) -> this.enterInstance(player, dungeon,null))
-                .onReturn((viewer, event) -> plugin.runTask(() -> player.closeInventory()))
+                .onReturn((viewer, event) -> plugin.runTask(player, player::closeInventory))
                 .build());
         }
     }

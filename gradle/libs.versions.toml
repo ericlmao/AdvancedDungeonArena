@@ -8,6 +8,7 @@ shadow = "9.6.1"
 paperweight = "2.0.0-beta.22"
 
 # Libraries
+foliaScheduler = "1.0.1"
 vault = "1.7.1"
 annotations = "26.0.2"
 mythic = "5.10.0"
@@ -25,6 +26,9 @@ aurora = "2.1.6"
 
 [libraries]
 paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper" }
+
+# Shaded at runtime (relocated into su.nightexpress.dungeons.libs.foliascheduler) - see Core/build.gradle.kts.
+folia-scheduler = { module = "gg.moonrise.scheduler:folia-scheduler", version.ref = "foliaScheduler" }
 
 vault-api = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }
 annotations = { module = "org.jetbrains:annotations", version.ref = "annotations" }

@@ -12,3 +12,7 @@ softdepend:
   - SunLight
 
 api-version: 1.21
+
+# Every scheduling seam in the plugin runs on Paper's region schedulers (see NightPlugin#runTask*).
+# Requires Paper or Folia 1.21.11+; Spigot and CraftBukkit are not supported.
+folia-supported: true

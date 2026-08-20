@@ -4,9 +4,13 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-import org.bukkit.Bukkit;
+import gg.moonrise.scheduler.Scheduler;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -15,8 +19,8 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitScheduler;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import su.nightexpress.dungeons.nightcore.commands.CommandProvider;
 import su.nightexpress.dungeons.nightcore.commands.command.NightCommand;
@@ -39,9 +43,12 @@ import su.nightexpress.dungeons.nightcore.util.wrapper.UniPermission;
  * class drives from its own lifecycle.
  * <p>
  * Scheduling: upstream routed everything through {@code AdaptedScheduler} (Spigot/Folia). This vendored
- * version talks to {@link BukkitScheduler} directly - see the {@code runTask*} methods below, plus
- * {@code manager.AbstractManager#addTask} and {@code util.bukkit.NightTask}. Those are the only places the
- * plugin schedules anything, and they are the places a Folia migration has to touch.
+ * version talks to Paper's region schedulers through the shaded {@link Scheduler} facade - see the
+ * {@code runTask*} methods below, plus {@code manager.AbstractManager#addTask} and
+ * {@code util.bukkit.NightTask}. Those are the only places the plugin schedules anything.
+ * <p>
+ * {@code BukkitScheduler} is deliberately not exposed any more: it is unimplemented on Folia, so a single
+ * accessor would have been enough to reintroduce main-thread assumptions across the whole plugin.
  */
 public abstract class NightPlugin extends JavaPlugin {
 
@@ -59,12 +66,23 @@ public abstract class NightPlugin extends JavaPlugin {
     protected FileConfig    config;
     protected PluginDetails details;
 
+    /**
+     * Every repeating task this plugin owns. Folia has no {@code cancelTasks(plugin)} that reaches region
+     * and entity schedulers, so repeating handles are tracked here and cancelled explicitly on disable -
+     * otherwise a reload would leave the previous generation of timers running against dead state.
+     */
+    private final Set<ScheduledTask> trackedTasks = ConcurrentHashMap.newKeySet();
+
     protected NightPlugin() {
         this.commandProviders = new ArrayList<>();
     }
 
     @Override
     public void onEnable() {
+        // Must be the very first thing that happens: every Scheduler entrypoint throws
+        // IllegalStateException until init() has run, and onInit() already schedules.
+        Scheduler.init(this);
+
         if (!this.onInit()) {
             this.getPluginManager().disablePlugin(this);
             return;
@@ -221,7 +239,7 @@ public abstract class NightPlugin extends JavaPlugin {
     }
 
     protected void unloadManagers() {
-        Bukkit.getScheduler().cancelTasks(this); // Stop all plugin tasks.
+        this.cancelTrackedTasks(); // Stop all plugin tasks. Folia has no cancelTasks(plugin) equivalent.
 
         this.disable();
 
@@ -340,49 +358,105 @@ public abstract class NightPlugin extends JavaPlugin {
         return this.getServer().getPluginManager();
     }
 
-    @NonNull
-    public BukkitScheduler getScheduler() {
-        return this.getServer().getScheduler();
-    }
-
     // ---------------------------------------------------------------------------------------------
-    // Scheduling. Folia note: the entity/location/chunk overloads exist purely to preserve the
-    // upstream call shape; on Paper they all land on the single main-thread scheduler.
+    // Scheduling.
+    //
+    // Every one of these delegates to folia-scheduler, which talks to Paper's four region schedulers
+    // directly. Those exist on regular Paper since 1.20.1 as plain main-thread delegates, so this is a
+    // single code path for both Paper and Folia - there is no runtime platform check anywhere.
+    //
+    // Picking the right overload is not cosmetic on Folia:
+    //   runTask(Runnable)          -> global region. Plugin-wide state ONLY; no world/entity access.
+    //   runTask(Entity, Runnable)  -> that entity's scheduler. Messages, inventories, teleports, removal.
+    //   runTask(Location|Chunk, .) -> the owning region. Blocks, chunk tickets, world spawns.
+    //   runTaskAsync(Runnable)     -> async pool. Disk/DB/network/CPU; no Bukkit access at all.
     // ---------------------------------------------------------------------------------------------
 
     public void runTask(@NonNull Runnable runnable) {
-        this.getScheduler().runTask(this, runnable);
+        Scheduler.sync().run(task -> runnable.run());
     }
 
     public void runTask(@NonNull Entity entity, @NonNull Runnable runnable) {
-        this.runTask(runnable);
+        Scheduler.entity(entity).run(task -> runnable.run());
+    }
+
+    /**
+     * Entity-bound task with a retired callback.
+     *
+     * @param retired runs instead of {@code runnable} when the entity's scheduler is retired (entity
+     *                removed, player disconnected) and the task can therefore never fire. Use it wherever a
+     *                missed run would leave state inconsistent.
+     */
+    public void runTask(@NonNull Entity entity, @NonNull Runnable runnable, @NonNull Runnable retired) {
+        // Paper only invokes the retired callback for a task that was accepted and then orphaned. If the
+        // scheduler is *already* retired at submission time it returns null and drops the task on the floor
+        // without telling anyone - which is precisely the case a retired callback exists to cover.
+        if (Scheduler.entity(entity).run(task -> runnable.run(), retired) == null) {
+            retired.run();
+        }
     }
 
     public void runTask(@NonNull Location location, @NonNull Runnable runnable) {
-        this.runTask(runnable);
+        Scheduler.location().run(location, task -> runnable.run());
     }
 
     public void runTask(@NonNull Chunk chunk, @NonNull Runnable runnable) {
-        this.runTask(runnable);
+        Scheduler.location().run(chunk, task -> runnable.run());
     }
 
     public void runTaskAsync(@NonNull Runnable runnable) {
-        this.getScheduler().runTaskAsynchronously(this, runnable);
+        Scheduler.async().run(task -> runnable.run());
     }
 
     public void runTaskLater(@NonNull Runnable runnable, long delay) {
-        this.getScheduler().runTaskLater(this, runnable, delay);
+        Scheduler.sync().runDelayed(task -> runnable.run(), Math.max(1L, delay));
     }
 
+    public void runTaskLater(@NonNull Entity entity, @NonNull Runnable runnable, long delay) {
+        Scheduler.entity(entity).runDelayed(task -> runnable.run(), Math.max(1L, delay));
+    }
+
+    public void runTaskLater(@NonNull Location location, @NonNull Runnable runnable, long delay) {
+        Scheduler.location().runDelayed(location, Math.max(1L, delay), task -> runnable.run());
+    }
+
+    /** @param delay delay in <b>ticks</b>, converted to wall time at 50 ms/tick for the async scheduler. */
     public void runTaskLaterAsync(@NonNull Runnable runnable, long delay) {
-        this.getScheduler().runTaskLaterAsynchronously(this, runnable, delay);
+        Scheduler.async().runDelayed(task -> runnable.run(), Math.max(1L, delay) * 50L, TimeUnit.MILLISECONDS);
     }
 
     public void runTaskTimer(@NonNull Runnable runnable, long delay, long interval) {
-        this.getScheduler().runTaskTimer(this, runnable, delay, interval);
+        this.trackTask(Scheduler.sync().schedule(task -> runnable.run(), Math.max(1L, delay), interval));
     }
 
+    public void runTaskTimer(@NonNull Location location, @NonNull Runnable runnable, long delay, long interval) {
+        this.trackTask(Scheduler.location().schedule(location, Math.max(1L, delay), interval, task -> runnable.run()));
+    }
+
+    public void runTaskTimer(@NonNull Entity entity, @NonNull Runnable runnable, long delay, long interval) {
+        this.trackTask(Scheduler.entity(entity).schedule(task -> runnable.run(), Math.max(1L, delay), interval));
+    }
+
+    /** @param delay and {@code interval} in <b>ticks</b>, converted to wall time at 50 ms/tick. */
     public void runTaskTimerAsync(@NonNull Runnable runnable, long delay, long interval) {
-        this.getScheduler().runTaskTimerAsynchronously(this, runnable, delay, interval);
+        this.trackTask(Scheduler.async().schedule(task -> runnable.run(),
+            Math.max(1L, delay) * 50L, Math.max(1L, interval) * 50L, TimeUnit.MILLISECONDS));
+    }
+
+    /**
+     * Registers a repeating task handle so that {@link #unloadManagers()} can cancel it.
+     * <p>
+     * Only repeating tasks need this. One-shot tasks are already dropped by the server when the plugin is
+     * disabled, and tracking them would mean an unbounded set of handles that nothing ever removes.
+     */
+    public void trackTask(@Nullable ScheduledTask task) {
+        if (task != null) {
+            this.trackedTasks.add(task);
+        }
+    }
+
+    protected void cancelTrackedTasks() {
+        this.trackedTasks.forEach(ScheduledTask::cancel);
+        this.trackedTasks.clear();
     }
 }

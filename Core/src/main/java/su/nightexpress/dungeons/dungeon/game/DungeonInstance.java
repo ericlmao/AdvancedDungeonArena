@@ -1,5 +1,6 @@
 package su.nightexpress.dungeons.dungeon.game;
 
+import gg.moonrise.scheduler.Scheduler;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
@@ -65,6 +66,8 @@ import su.nightexpress.dungeons.nightcore.util.time.TimeFormats;
 import su.nightexpress.dungeons.nightcore.util.wrapper.UniParticle;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -87,16 +90,19 @@ public class DungeonInstance implements Dungeon {
 
     private final String prefix;
 
-    private World world;
+    // The instance clock runs on the global region scheduler, but these fields are read from player and mob
+    // schedulers (gamer ticks, board renders), from listener threads, and from PAPI's caller thread.
+    // They are single-writer, so volatile is enough - no lock is needed anywhere.
+    private volatile World world;
     private long  tickCount;
 
-    private GameState  state;
-    private GameResult gameResult;
-    private int  countdown;
-    private long timeLeft;
+    private volatile GameState  state;
+    private volatile GameResult gameResult;
+    private volatile int  countdown;
+    private volatile long timeLeft;
 
-    private Level level;
-    private Stage stage;
+    private volatile Level level;
+    private volatile Stage stage;
     private boolean stageCompleted;
 
     public DungeonInstance(@NotNull DungeonPlugin plugin, @NotNull DungeonConfig config) {
@@ -104,11 +110,16 @@ public class DungeonInstance implements Dungeon {
         this.config = config;
         this.stats = new DungeonStats(this);
         this.variables = new DungeonVariables();
-        this.eventReceivers = new ArrayList<>(); // List to keep receivers order.
-        this.taskProgress = new LinkedHashMap<>(); // Linked to keep tasks order.
-        this.players = new HashMap<>();
-        this.mobByIdMap = new HashMap<>();
-        this.groundItems = new HashSet<>();
+        // Concurrency note: the tick loop owns these, but listeners (mob death, item spawn, player quit) and
+        // the async chat handler all mutate them from whatever thread their event arrived on. On Paper that
+        // was one thread and the races were invisible; on Folia they are routine. Hence concurrent
+        // collections throughout - and synchronizedMap rather than ConcurrentHashMap for taskProgress,
+        // because the task order is load-bearing.
+        this.eventReceivers = new CopyOnWriteArrayList<>(); // List to keep receivers order.
+        this.taskProgress = Collections.synchronizedMap(new LinkedHashMap<>()); // Linked to keep tasks order.
+        this.players = new ConcurrentHashMap<>();
+        this.mobByIdMap = new ConcurrentHashMap<>();
+        this.groundItems = ConcurrentHashMap.newKeySet();
 
         this.reset();
 
@@ -207,6 +218,11 @@ public class DungeonInstance implements Dungeon {
         return this.world != null && !this.config.isBroken();
     }
 
+    @NotNull
+    public DungeonPlugin getPlugin() {
+        return this.plugin;
+    }
+
     private void updateListeners() {
         this.eventReceivers.clear();
         if (this.level != null) {
@@ -234,7 +250,10 @@ public class DungeonInstance implements Dungeon {
             this.tickLobby();
         }
 
-        this.getPlayers().forEach(DungeonGamer::tick);
+        // Per-player work leaves the instance clock here. DungeonGamer#tick reapplies kit potion effects and
+        // re-renders the scoreboard, both of which are entity mutations that must happen on the thread that
+        // owns that player - which on Folia is very often not the thread running this method.
+        this.getPlayers().forEach(gamer -> this.plugin.runTask(gamer.getPlayer(), gamer::tick));
         this.showStatus();
     }
 
@@ -330,19 +349,28 @@ public class DungeonInstance implements Dungeon {
         }
     }
 
+    // Chunk tickets are per-chunk region work, and the old `getIntersectingChunks(world)` helper forced a
+    // synchronous load of every chunk in the arena just to hand back Chunk objects. Both are illegal from
+    // the instance clock on Folia, so we work from the precomputed ChunkPos set (no loading) and hop to each
+    // chunk's own region to take or drop its ticket. A large arena spans several regions; one task per
+    // chunk is the only shape that is correct for all of them.
     private void holdChunks() {
-        this.config.getCuboid().getIntersectingChunks(this.world).forEach(chunk -> {
-            if (chunk.addPluginChunkTicket(this.plugin)) {
-                //this.plugin.info("Chunk ticket added: " + ChunkPos.from(chunk));
-            }
+        World world = this.world;
+        if (world == null) return;
+
+        this.config.getCuboid().getIntersectingChunkPositions().forEach(pos -> {
+            Scheduler.location().executeChunk(world, pos.getX(), pos.getZ(),
+                () -> world.getChunkAt(pos.getX(), pos.getZ()).addPluginChunkTicket(this.plugin));
         });
     }
 
     private void unholdChunks() {
-        this.config.getCuboid().getIntersectingChunks(this.world).forEach(chunk -> {
-            if (chunk.removePluginChunkTicket(this.plugin)) {
-                //this.plugin.info("Chunk ticket removed: " + ChunkPos.from(chunk));
-            }
+        World world = this.world;
+        if (world == null) return;
+
+        this.config.getCuboid().getIntersectingChunkPositions().forEach(pos -> {
+            Scheduler.location().executeChunk(world, pos.getX(), pos.getZ(),
+                () -> world.getChunkAt(pos.getX(), pos.getZ()).removePluginChunkTicket(this.plugin));
         });
     }
 
@@ -380,16 +408,23 @@ public class DungeonInstance implements Dungeon {
         });
     }
 
+    // Broadcasts fan out to players who may each be on a different region thread, and rendering a message
+    // can resolve PAPI placeholders (arbitrary third-party code) against the recipient. Every recipient is
+    // therefore messaged from their own scheduler rather than from whichever thread called broadcast.
+
     public void broadcast(@NotNull MessageLocale locale, @NotNull Consumer<Replacer> consumer) {
-        this.getPlayers().forEach(player -> this.getPrefixed(locale).send(player.getPlayer(), consumer));
+        this.getPlayers().forEach(gamer -> this.plugin.runTask(gamer.getPlayer(),
+            () -> this.getPrefixed(locale).send(gamer.getPlayer(), consumer)));
     }
 
     public void broadcast(@NotNull MessageLocale locale, @NotNull BiConsumer<Player, Replacer> consumer) {
-        this.getPlayers().forEach(gamer -> this.getPrefixed(locale).send(gamer.getPlayer(), replacer -> consumer.accept(gamer.getPlayer(), replacer)));
+        this.getPlayers().forEach(gamer -> this.plugin.runTask(gamer.getPlayer(),
+            () -> this.getPrefixed(locale).send(gamer.getPlayer(), replacer -> consumer.accept(gamer.getPlayer(), replacer))));
     }
 
     public void broadcast(@NotNull String message) {
-        this.getPlayers().forEach(gamer -> Players.sendMessage(gamer.getPlayer(), message));
+        this.getPlayers().forEach(gamer -> this.plugin.runTask(gamer.getPlayer(),
+            () -> Players.sendMessage(gamer.getPlayer(), message)));
     }
 
     public void sendMessage(@NotNull Player player, @NotNull MessageLocale locale, @NotNull Consumer<Replacer> consumer) {
@@ -398,13 +433,17 @@ public class DungeonInstance implements Dungeon {
 
     public void runCommand(@NotNull List<String> commands, @NotNull DungeonTarget target, @Nullable DungeonGameEvent event) {
         if (target == DungeonTarget.GLOBAL) {
-            commands.forEach(command -> {
+            // Console dispatch is global-region work: the command has no owning entity or location, and many
+            // command implementations assume they are on the "main" thread, which on Folia means global.
+            this.plugin.runTask(() -> commands.forEach(command -> {
                 this.plugin.getServer().dispatchCommand(this.plugin.getServer().getConsoleSender(), command);
-            });
+            }));
             return;
         }
 
-        this.runForPlayers(target, event, gamer -> Players.dispatchCommands(gamer.getPlayer(), commands));
+        // Player dispatch runs as the player, so it belongs on the player's scheduler.
+        this.runForPlayers(target, event, gamer ->
+            this.plugin.runTask(gamer.getPlayer(), () -> Players.dispatchCommands(gamer.getPlayer(), commands)));
     }
 
     public void giveReward(@NotNull GameReward reward, boolean instant, @NotNull DungeonTarget target, @Nullable DungeonGameEvent event) {
@@ -471,20 +510,26 @@ public class DungeonInstance implements Dungeon {
 
     private void spawnPlayer(@NotNull DungeonGamer gamer) {
         Player player = gamer.getPlayer();
-
         Kit kit = gamer.getKit();
-        if (this.isKitsMode() && kit != null) {
-            kit.applyPotionEffects(player);
-            kit.applyAttributeModifiers(player);
-        }
 
-        gamer.teleport(this.getSpawnLocation()); // Teleport to current level's spawn.
+        // Everything that touches the player waits for the move to land. Kit effects used to be applied
+        // before the teleport; applying them afterwards produces the same end state and keeps the whole
+        // player-facing sequence inside one entity task.
+        gamer.teleportThen(this.getSpawnLocation(), () -> { // Teleport to current level's spawn.
+            if (this.isKitsMode() && kit != null) {
+                kit.applyPotionEffects(player);
+                kit.applyAttributeModifiers(player);
+            }
+
+            player.setHealth(EntityUtil.getAttribute(player, Attribute.MAX_HEALTH)); // Restore health.
+
+            Lang.DUNGEON_GAME_STARTED.message().send(player);
+        });
+
+        // Instance bookkeeping touches no Bukkit state, so it stays on the clock where the ordering
+        // guarantees are.
         gamer.setState(GameState.INGAME);
-        player.setHealth(EntityUtil.getAttribute(player, Attribute.MAX_HEALTH)); // Restore health.
-
         this.taskProgress.forEach((stageTask, progress) -> progress.onPlayerJoined(gamer)); // Adjust task progress for new players amount.
-
-        Lang.DUNGEON_GAME_STARTED.message().send(player);
     }
 
     private void leavePlayer(@NotNull DungeonPlayer gamer) {
@@ -623,41 +668,44 @@ public class DungeonInstance implements Dungeon {
             }
         }
 
+        // A player joining a game already in progress used to be teleported twice - once to the lobby, then
+        // again to the spawn as a spectator. Two teleports issued back to back are two region changes whose
+        // continuations can interleave, so the destination is decided up front and the player moves once.
+        boolean joinInProgress = this.state == GameState.INGAME;
+        Location destination = joinInProgress ? this.getSpawnLocation() : this.getLobbyLocation();
+        if (joinInProgress) gamer.setDead(true);
+
         // Now clear all player's active effects, god modes, etc.
-        gamer.teleport(this.getLobbyLocation());
-        player.setGameMode(this.getGameMode());
-        PlayerSnapshot.clear(player);
-        Players.dispatchCommands(player, this.config.features().getEntranceCommands());
-        UniParticle.of(Particle.CLOUD).play(player.getLocation(), 0.25, 0.15, 30);
+        gamer.teleportThen(destination, () -> {
+            player.setGameMode(joinInProgress ? GameMode.SPECTATOR : this.getGameMode());
+            PlayerSnapshot.clear(player);
+            Players.dispatchCommands(player, this.config.features().getEntranceCommands());
+            UniParticle.of(Particle.CLOUD).play(player.getLocation(), 0.25, 0.15, 30);
 
-        if (this.isKitsMode() && kit != null) {
-            player.getInventory().clear();
-            kit.give(player);
-        }
-        else {
-            this.confiscateBadItems(player, snapshot.getConfiscate()); // TODO Permission?
-        }
+            if (this.isKitsMode() && kit != null) {
+                player.getInventory().clear();
+                kit.give(player);
+            }
+            else {
+                this.confiscateBadItems(player, snapshot.getConfiscate()); // TODO Permission?
+            }
 
-        this.sendMessage(player, Lang.DUNGEON_JOIN_LOBBY, replacer -> replacer.replace(this.replacePlaceholders()));
+            this.sendMessage(player, Lang.DUNGEON_JOIN_LOBBY, replacer -> replacer.replace(this.replacePlaceholders()));
+
+            // Disable external Scoreboard and God mode.
+            gamer.manageExternalBoard(boardPlugin -> boardPlugin.disableBoard(player));
+            gamer.manageExternalGod(godPlugin -> godPlugin.disableGod(player));
+
+            if (this.config.gameSettings().isScoreboardEnabled() && DungeonUtils.hasPacketLibrary()) {
+                gamer.addBoard();
+            }
+        });
+
         this.broadcast(Lang.DUNGEON_JOIN_NOTIFY, replacer -> replacer.replace(this.replacePlaceholders()).replace(gamer.replacePlaceholders()));
 
         this.players.put(player.getUniqueId(), gamer);
 
-        // Disable external Scoreboard and God mode.
-        gamer.manageExternalBoard(boardPlugin -> boardPlugin.disableBoard(player));
-        gamer.manageExternalGod(godPlugin -> godPlugin.disableGod(player));
-
-        if (this.config.gameSettings().isScoreboardEnabled() && DungeonUtils.hasPacketLibrary()) {
-            gamer.addBoard();
-        }
-
         // this.updateSigns();
-
-        if (this.state == GameState.INGAME) {
-            gamer.setDead(true);
-            player.setGameMode(GameMode.SPECTATOR);
-            gamer.teleport(this.getSpawnLocation());
-        }
     }
 
     @Override
@@ -673,6 +721,8 @@ public class DungeonInstance implements Dungeon {
             this.taskProgress.forEach((stageTask, progress) -> progress.onPlayerLeft(gamer));
         }
 
+        boolean wasInGame = this.state == GameState.INGAME;
+
         if (!this.isAboutToEnd() || this.gameResult == GameResult.DEFEAT) {
             gamer.takeDefeatRewards();
         }
@@ -684,31 +734,34 @@ public class DungeonInstance implements Dungeon {
             kit.resetAttributeModifiers(player);
         }
 
-        // Restore player data.
-        PlayerSnapshot.restore(gamer);
-        Players.dispatchCommands(player, this.config.features().getExitCommands());
+        // Restore player data. This is now asynchronous (cross-world teleportAsync + inventory restore), and
+        // everything below hands items to the player - so it MUST wait. Running the reward grant before the
+        // restore completes would have the snapshot's setContents() overwrite the rewards a moment later.
+        PlayerSnapshot.restore(gamer).thenRun(() -> {
+            Players.dispatchCommands(player, this.config.features().getExitCommands());
 
-        // Refund payments.
-        if (this.state != GameState.INGAME) {
-            if (!player.hasPermission(Perms.BYPASS_DUNGEON_ENTRANCE_COST)) {
-                this.refundEntrance(player);
+            // Refund payments.
+            if (!wasInGame) {
+                if (!player.hasPermission(Perms.BYPASS_DUNGEON_ENTRANCE_COST)) {
+                    this.refundEntrance(player);
+                }
+                if (kit != null && KitUtils.isRentMode() && kit.hasCost() && !player.hasPermission(Perms.BYPASS_KIT_COST)) {
+                    kit.refundCosts(player);
+                }
             }
-            if (kit != null && KitUtils.isRentMode() && kit.hasCost() && !player.hasPermission(Perms.BYPASS_KIT_COST)) {
-                kit.refundCosts(player);
-            }
-        }
-        else {
-            gamer.getRewards().forEach(reward -> reward.getReward().give(this, gamer));
+            else {
+                gamer.getRewards().forEach(reward -> reward.getReward().give(this, gamer));
 
-            // Set cooldown only if dungeon have been started.
-            if (!player.hasPermission(Perms.BYPASS_DUNGEON_COOLDOWN)) {
-                this.plugin.getDungeonManager().setJoinCooldown(player, this);
+                // Set cooldown only if dungeon have been started.
+                if (!player.hasPermission(Perms.BYPASS_DUNGEON_COOLDOWN)) {
+                    this.plugin.getDungeonManager().setJoinCooldown(player, this);
+                }
             }
-        }
 
-        // Enable back external Scoreboard and God mode.
-        gamer.manageExternalBoard(boardPlugin -> boardPlugin.enableBoard(player));
-        gamer.manageExternalGod(godPlugin -> godPlugin.enableGod(player));
+            // Enable back external Scoreboard and God mode.
+            gamer.manageExternalBoard(boardPlugin -> boardPlugin.enableBoard(player));
+            gamer.manageExternalGod(godPlugin -> godPlugin.enableGod(player));
+        });
     }
 
     public void handlePlayerDeath(@NotNull DungeonGamer gamer) {
@@ -717,7 +770,12 @@ public class DungeonInstance implements Dungeon {
         gamer.handleDeath();
 
         if (!hasExtraLives && this.config.gameSettings().isLeaveOnDeath()) {
-            this.plugin.runTask(() -> this.leavePlayer(gamer));
+            // Deferred so the death event finishes first. The retired callback is not optional: if the player
+            // disconnects before the next tick their entity scheduler never runs again, and without a
+            // fallback the instance would keep them in `players` and their snapshot in SNAPSHOTS forever.
+            this.plugin.runTask(gamer.getPlayer(),
+                () -> this.leavePlayer(gamer),
+                () -> Scheduler.sync().run(task -> this.leavePlayer(gamer)));
         }
 
         DungeonPlayerDeathEvent event = new DungeonPlayerDeathEvent(this, gamer);
@@ -845,7 +903,8 @@ public class DungeonInstance implements Dungeon {
 
     @Override
     public void killMobs() {
-        this.getMobs().forEach(dungeonMob -> dungeonMob.getBukkitEntity().remove());
+        // The redundant first pass (a bare remove() on every mob) is gone: eliminateMob already removes the
+        // entity, and doing it twice meant two wrong-thread entity mutations instead of one correct one.
         this.getMobs().forEach(this::eliminateMob);
         this.mobByIdMap.clear();
     }
@@ -884,11 +943,19 @@ public class DungeonInstance implements Dungeon {
 
     @Override
     public void eliminateMob(@NotNull DungeonEntity mob) {
-        mob.getBukkitEntity().getLocation().getChunk(); // Load chunk to remove entity lol.
-        mob.getBukkitEntity().setPersistent(false);
-        if (mob.isAlive()) {
-            mob.getBukkitEntity().remove();
-        }
+        LivingEntity entity = mob.getBukkitEntity();
+
+        // Was: `getLocation().getChunk()` - a synchronous chunk load whose only purpose was to force the
+        // entity resident so that remove() would take effect. On Folia that is both wrong-thread and
+        // unnecessary: scheduling on the entity guarantees it is loaded and owned when the task runs, and if
+        // the entity is already gone the scheduler is retired and the task is simply dropped.
+        this.plugin.runTask(entity, () -> {
+            entity.setPersistent(false);
+            if (!entity.isDead()) {
+                entity.remove();
+            }
+        });
+
         this.stats.addMobKill(mob);
         this.removeMob(mob);
         this.broadcastEvent(new DungeonMobEliminatedEvent(this, mob));
@@ -926,18 +993,22 @@ public class DungeonInstance implements Dungeon {
 
     @Override
     public void spawnMob(@NotNull MobProvider provider, @NotNull String mobId, @NotNull MobFaction faction, @NotNull Location location, int level) {
-        LivingEntity mob = provider.spawn(this, mobId, faction, location, level, entity -> {
-            // Probably don't need to store providerId and mobId, since these values are already stored in a DungeonMob.
+        // Spawning is world mutation: it has to happen on the region that owns the spawn point, which for a
+        // dungeon spanning several regions is not necessarily the one running the instance clock.
+        this.plugin.runTask(location, () -> {
+            LivingEntity mob = provider.spawn(this, mobId, faction, location, level, entity -> {
+                // Probably don't need to store providerId and mobId, since these values are already stored in a DungeonMob.
+            });
+            if (mob == null) {
+                ErrorHandler.error("Could not spawn mob '" + provider.getName() + ":" + mobId + "', spawned entity is null!", this);
+                return;
+            }
+
+            DungeonMob dungeonMob = new DungeonMob(this, mob, faction, provider, mobId);
+
+            this.addMob(dungeonMob);
+            this.broadcastEvent(new DungeonMobSpawnedEvent(this, dungeonMob));
         });
-        if (mob == null) {
-            ErrorHandler.error("Could not spawn mob '" + provider.getName() + ":" + mobId + "', spawned entity is null!", this);
-            return;
-        }
-
-        DungeonMob dungeonMob = new DungeonMob(this, mob, faction, provider, mobId);
-
-        this.addMob(dungeonMob);
-        this.broadcastEvent(new DungeonMobSpawnedEvent(this, dungeonMob));
     }
 
     @Override
@@ -1087,8 +1158,10 @@ public class DungeonInstance implements Dungeon {
         this.config.getLootChests().forEach(this::refillLootChest);
     }
 
+    // Loot chests are block entities scattered across the arena, so each one is touched on the region that
+    // owns its own block - not on whichever region happens to own the instance anchor.
     public void refillLootChest(@NotNull LootChest lootChest) {
-        lootChest.generateLoot(this);
+        this.atLootChest(lootChest, () -> lootChest.generateLoot(this));
     }
 
     public void clearLootChests() {
@@ -1096,7 +1169,14 @@ public class DungeonInstance implements Dungeon {
     }
 
     public void clearLootChest(@NotNull LootChest lootChest) {
-        lootChest.clearLoot(this);
+        this.atLootChest(lootChest, () -> lootChest.clearLoot(this));
+    }
+
+    private void atLootChest(@NotNull LootChest lootChest, @NotNull Runnable runnable) {
+        World world = this.world;
+        if (world == null) return;
+
+        this.plugin.runTask(lootChest.getBlockPos().toLocation(world), runnable);
     }
 
 
@@ -1207,19 +1287,27 @@ public class DungeonInstance implements Dungeon {
 
     public void burnGroundItems() {
         UniParticle particle = UniParticle.of(Particle.SMOKE);
-        this.groundItems.removeIf(item -> {
-            if (!item.isValid()) return true;
-            if (!item.isOnGround()) return false;
+
+        // isValid / isOnGround / getLocation / remove are all reads and writes of live entity state, so each
+        // item is inspected on its own scheduler rather than in one sweep from the instance clock. The set
+        // is concurrent precisely so these tasks can retire themselves out of it as they run.
+        this.groundItems.forEach(item -> this.plugin.runTask(item, () -> {
+            if (!item.isValid()) {
+                this.groundItems.remove(item);
+                return;
+            }
+            if (!item.isOnGround()) return;
 
             particle.play(item.getLocation(), 0.1, 0.05, 15);
             item.remove();
-            return true;
-        });
+            this.groundItems.remove(item);
+        }, () -> this.groundItems.remove(item))); // Retired: the item is already gone.
     }
 
     public void killGroundItems() {
-        this.groundItems.forEach(Entity::remove);
+        Set<Item> items = new HashSet<>(this.groundItems);
         this.groundItems.clear();
+        items.forEach(item -> this.plugin.runTask(item, item::remove));
     }
 
     @NotNull

@@ -52,10 +52,18 @@ tasks.shadowJar {
     archiveFileName = "${rootProject.name}-${project.version}.jar"
     destinationDirectory = rootProject.layout.buildDirectory.dir("libs")
 
-    // Mirrors the old maven-shade <include>su.nightexpress.dungeonarena:*</include>
+    // Mirrors the old maven-shade <include>su.nightexpress.dungeonarena:*</include>.
+    // This is an ALLOWLIST: anything not named here is silently dropped from the final jar.
     dependencies {
         include(dependency("su.nightexpress.dungeonarena:.*:.*"))
+        include(dependency("gg.moonrise.scheduler:folia-scheduler:.*"))
     }
+
+    // Relocation is correctness, not hygiene: folia-scheduler keeps its plugin instance in a static
+    // field, so an unrelocated copy from another plugin would win the classloader race and hand us a
+    // Scheduler owned by *that* plugin - every task would then be registered against the wrong plugin
+    // and survive our disable.
+    relocate("gg.moonrise.scheduler", "su.nightexpress.dungeons.libs.foliascheduler")
 
     mergeServiceFiles()
 }
