@@ -55,6 +55,10 @@ public class ConfigCodecs {
         ConfigCodecs.registry = registry;
     }
 
+    public static boolean isInitialized() {
+        return registry != null;
+    }
+
     public static CodecRegistry registry() {
         if (registry == null) {
             throw new IllegalStateException("ConfigCodecs is not initialized yet! Is NightCore loaded?");
