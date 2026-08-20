@@ -28,6 +28,10 @@ public class Arguments {
         Arguments.registry = registry;
     }
 
+    public static boolean isInitialized() {
+        return registry != null;
+    }
+
     public static ArgumentRegistry registry() {
         if (registry == null) {
             throw new IllegalStateException("ArgumentTypes is not initialized yet! Is NightCore loaded?");
