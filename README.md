@@ -55,8 +55,18 @@
 
 # Compatibility
 - **Java 25** or higher.
-- **Spigot** or **Paper**.
+- **Paper** (Spigot is no longer supported — the plugin builds against `paper-api` and mojang-mapped Paper internals).
 - **Server Version:** 1.21.11
+
+# Building
+```bash
+./gradlew build
+```
+The shaded plugin jar is written to `build/libs/AdvancedDungeonArena-<version>.jar`.
+
+The build uses the Gradle wrapper (9.7.1) and a Java 25 toolchain. NMS access is provided by
+[paperweight-userdev](https://github.com/PaperMC/paperweight), so no BuildTools run or local
+Spigot installation is required.
 
 # Dependencies
 **REQUIRED:**
