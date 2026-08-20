@@ -13,8 +13,7 @@ dependencies {
 
     compileOnly(libs.paper.api)
 
-    compileOnly(libs.sunlight.core)
-    compileOnly(libs.sunlight.api)
+    // SunLight is reached reflectively (its API extends nightcore types) - no compile dependency.
 
     compileOnly(libs.mythic.dist)
     compileOnly(libs.placeholderapi)

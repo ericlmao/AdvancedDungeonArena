@@ -55,13 +55,13 @@ public class CoreBootstrap {
 
         UIUtils.clear();
         CurrencyManager.unload();
-        PlayerProfiles.clear();
     }
 
     /**
      * Called once, on the final plugin disable.
      */
     public static void shutdown() {
+        PlayerProfiles.clear();
         TagBootstrap.unload();
     }
 }
