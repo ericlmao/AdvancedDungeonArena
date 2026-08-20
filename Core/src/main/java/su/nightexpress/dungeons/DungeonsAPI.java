@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import su.nightexpress.dungeons.data.DataHandler;
 import su.nightexpress.dungeons.dungeon.DungeonManager;
 import su.nightexpress.dungeons.dungeon.DungeonSetup;
-import su.nightexpress.dungeons.mob.MobManager;
 import su.nightexpress.dungeons.user.UserManager;
 import su.nightexpress.dungeons.kit.KitManager;
 import su.nightexpress.dungeons.nms.DungeonNMS;
@@ -44,11 +43,6 @@ public class DungeonsAPI {
     @NotNull
     public static DungeonSetup getDungeonSetup() {
         return plugin.getDungeonSetup();
-    }
-
-    @NotNull
-    public static MobManager getMobManager() {
-        return plugin.getMobManager();
     }
 
     @NotNull

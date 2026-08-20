@@ -1,7 +1,6 @@
 package su.nightexpress.dungeons.util;
 
 import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import su.nightexpress.dungeons.Placeholders;
@@ -30,7 +29,6 @@ import su.nightexpress.dungeons.dungeon.stage.Stage;
 import su.nightexpress.dungeons.dungeon.stage.StageTask;
 import su.nightexpress.dungeons.hook.HookId;
 import su.nightexpress.dungeons.registry.mob.MobProviderId;
-import su.nightexpress.nightcore.util.BukkitThing;
 import su.nightexpress.nightcore.util.Lists;
 import su.nightexpress.nightcore.util.Plugins;
 import su.nightexpress.nightcore.util.bukkit.NightItem;
@@ -68,7 +66,8 @@ public class DungeonUtils {
     }
 
     public static void setStageDefaults(@NotNull Stage stage) {
-        MobIdentifier zombieId = new MobIdentifier(MobProviderId.ADA, BukkitThing.toString(EntityType.ZOMBIE));
+        // Refers to a MythicMobs mob id. "SkeletalKnight" ships with MythicMobs' example configs.
+        MobIdentifier zombieId = new MobIdentifier(MobProviderId.MYTHIC_MOBS, "SkeletalKnight");
 
         Map<String, ConditionInfo> tickConditionMap = new LinkedHashMap<>();
         tickConditionMap.put("every_5_seconds", new ConditionInfo(false, new TickIntervalCondition(5)));

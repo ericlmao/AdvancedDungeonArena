@@ -22,13 +22,8 @@ import su.nightexpress.dungeons.hook.HookId;
 import su.nightexpress.dungeons.hook.impl.McMMOHook;
 import su.nightexpress.dungeons.hook.impl.PlaceholderHook;
 import su.nightexpress.dungeons.kit.KitManager;
-import su.nightexpress.dungeons.mob.MobManager;
-import su.nightexpress.dungeons.mob.variant.MobVariantRegistry;
 import su.nightexpress.dungeons.nms.DungeonNMS;
-import su.nightexpress.dungeons.nms.mc_1_21_10.MC_1_21_10;
 import su.nightexpress.dungeons.nms.mc_1_21_11.MC_1_21_11;
-import su.nightexpress.dungeons.nms.mc_1_21_3.MC_1_21_3;
-import su.nightexpress.dungeons.nms.mc_1_21_8.MC_1_21_8;
 import su.nightexpress.dungeons.registry.compat.BoardPluginRegistry;
 import su.nightexpress.dungeons.registry.compat.GodPluginRegistry;
 import su.nightexpress.dungeons.registry.level.LevelRegistry;
@@ -48,7 +43,6 @@ public class DungeonPlugin extends NightPlugin {
     private UserManager userManager;
 
     private SelectionManager selectionManager;
-    private MobManager       mobManager;
     private KitManager       kitManager;
     private DungeonManager   dungeonManager;
     private DungeonSetup dungeonSetup;
@@ -88,9 +82,6 @@ public class DungeonPlugin extends NightPlugin {
         this.selectionManager = new SelectionManager(this);
         this.selectionManager.setup();
 
-        this.mobManager = new MobManager(this);
-        this.mobManager.setup();
-
         this.kitManager = new KitManager(this);
         this.kitManager.setup();
 
@@ -118,7 +109,6 @@ public class DungeonPlugin extends NightPlugin {
 
         if (this.dungeonSetup != null) this.dungeonSetup.shutdown();
         if (this.dungeonManager != null) this.dungeonManager.shutdown();
-        if (this.mobManager != null) this.mobManager.shutdown();
         if (this.kitManager != null) this.kitManager.shutdown();
         if (this.selectionManager != null) this.selectionManager.shutdown();
 
@@ -134,7 +124,6 @@ public class DungeonPlugin extends NightPlugin {
         LevelRegistry.clear();
         PetRegistry.clear();
         DungeonEntityBridge.clear();
-        MobVariantRegistry.clear();
         CriteriaRegistry.clear();
         GodPluginRegistry.clear();
         BoardPluginRegistry.clear();
@@ -144,9 +133,6 @@ public class DungeonPlugin extends NightPlugin {
 
     private boolean loadInternals() {
         this.internals = switch (Version.getCurrent()) {
-            case MC_1_21_4 -> new MC_1_21_3();
-            case MC_1_21_8 -> new MC_1_21_8();
-            case MC_1_21_10 -> new MC_1_21_10();
             case MC_1_21_11 -> new MC_1_21_11();
             default -> null;
         };
@@ -169,7 +155,6 @@ public class DungeonPlugin extends NightPlugin {
         MobRegistry.load(this);
         LevelRegistry.load(this);
         PetRegistry.load(this);
-        MobVariantRegistry.load();
         NumberComparators.load();
         ConditionRegistry.load();
         ActionRegistry.load();
@@ -208,11 +193,6 @@ public class DungeonPlugin extends NightPlugin {
     @NotNull
     public DungeonSetup getDungeonSetup() {
         return this.dungeonSetup;
-    }
-
-    @NotNull
-    public MobManager getMobManager() {
-        return this.mobManager;
     }
 
     @NotNull

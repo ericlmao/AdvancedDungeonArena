@@ -335,15 +335,6 @@ public class DungeonGameListener extends AbstractListener<DungeonPlugin> {
         mob.getDungeon().handleMobDeath(mob, event);
     }
 
-//    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-//    public void onDungeonMobHealthBarDamage(EntityDamageEvent event) {
-//        if (!(event.getEntity() instanceof LivingEntity entity)) return;
-//
-//        this.plugin.runTask(task -> {
-//            this.plugin.getMobManager().updateMobBar(entity);
-//        });
-//    }
-
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onDungeonMobCombust(EntityCombustEvent event) {
         if (!(event.getEntity() instanceof LivingEntity entity)) return;

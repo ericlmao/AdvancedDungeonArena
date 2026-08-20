@@ -6,7 +6,6 @@ import org.jetbrains.annotations.Nullable;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.api.mob.MobProvider;
 import su.nightexpress.dungeons.hook.HookId;
-import su.nightexpress.dungeons.registry.mob.provider.DungeonMobProvider;
 import su.nightexpress.dungeons.registry.mob.provider.MythicMobProvider;
 import su.nightexpress.nightcore.util.Plugins;
 
@@ -14,7 +13,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 
 public class MobRegistry {
 
@@ -25,14 +23,17 @@ public class MobRegistry {
     public static void load(@NotNull DungeonPlugin dungeonPlugin) {
         plugin = dungeonPlugin;
 
-        register(new DungeonMobProvider(dungeonPlugin));
-        loadIntegration(HookId.MYTHIC_MOBS, MythicMobProvider::new);
-    }
-
-    private static void loadIntegration(@NotNull String pluginName, @NotNull Supplier<MobProvider> provider) {
-        if (!Plugins.isInstalled(pluginName)) return;
-
-        register(provider.get());
+        // MythicMobs is the one and only mob engine supported by the plugin.
+        if (Plugins.isInstalled(HookId.MYTHIC_MOBS)) {
+            register(new MythicMobProvider());
+        }
+        else {
+            plugin.warn("=".repeat(40));
+            plugin.warn(HookId.MYTHIC_MOBS + " is not installed!");
+            plugin.warn("It is the only supported mob engine, so no mobs will be available in dungeons.");
+            plugin.warn("Install " + HookId.MYTHIC_MOBS + " to be able to spawn mobs.");
+            plugin.warn("=".repeat(40));
+        }
     }
 
     public static void clear() {
@@ -43,6 +44,10 @@ public class MobRegistry {
     public static void register(@NotNull MobProvider provider) {
         BY_ID_MAP.put(provider.getName(), provider);
         plugin.info("Registered mob provider: " + provider.getName());
+    }
+
+    public static boolean hasProviders() {
+        return !BY_ID_MAP.isEmpty();
     }
 
     @Nullable

@@ -10,7 +10,6 @@ public class Keys {
     public static NamespacedKey dungeonWand;
     public static NamespacedKey kitModifier;
     public static NamespacedKey kitItem;
-    public static NamespacedKey mobTemplateId;
     public static NamespacedKey mobFaction;
     public static NamespacedKey mobDungeonId;
 
@@ -19,7 +18,6 @@ public class Keys {
         dungeonWand = new NamespacedKey(plugin, "dungeon_wand");
         kitModifier = new NamespacedKey(plugin, "kit_modifier");
         kitItem = new NamespacedKey(plugin, "kit_item");
-        mobTemplateId = new NamespacedKey(plugin, "mob_internal_id");
         mobFaction = new NamespacedKey(plugin, "mob_faction");
         mobDungeonId = new NamespacedKey(plugin, "mob_dungeon_id");
     }
@@ -29,7 +27,6 @@ public class Keys {
         dungeonWand = null;
         kitModifier = null;
         kitItem = null;
-        mobTemplateId = null;
         mobFaction = null;
         mobDungeonId = null;
     }

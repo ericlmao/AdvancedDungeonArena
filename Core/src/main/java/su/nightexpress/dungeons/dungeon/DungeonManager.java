@@ -520,7 +520,7 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
             }
         }
 
-        EntityType entityType = plugin.getInternals().getSpawnEggType(itemStack);
+        EntityType entityType = MobUitls.getSpawnEggType(itemStack);
         if (entityType != null && block != null && action == Action.RIGHT_CLICK_BLOCK) {
             DungeonInstance dungeon = gamer.getDungeon();
             Location location = LocationUtil.setCenter2D(block.getRelative(face).getLocation());
