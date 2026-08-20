@@ -1,20 +1,18 @@
 package su.nightexpress.dungeons.registry.mob;
 
 import org.bukkit.entity.LivingEntity;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.api.mob.MobProvider;
 import su.nightexpress.dungeons.hook.HookId;
-import su.nightexpress.dungeons.registry.mob.provider.DungeonMobProvider;
 import su.nightexpress.dungeons.registry.mob.provider.MythicMobProvider;
-import su.nightexpress.nightcore.util.Plugins;
+import su.nightexpress.dungeons.nightcore.util.Plugins;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 
 public class MobRegistry {
 
@@ -22,17 +20,20 @@ public class MobRegistry {
 
     private static DungeonPlugin plugin;
 
-    public static void load(@NotNull DungeonPlugin dungeonPlugin) {
+    public static void load(@NonNull DungeonPlugin dungeonPlugin) {
         plugin = dungeonPlugin;
 
-        register(new DungeonMobProvider(dungeonPlugin));
-        loadIntegration(HookId.MYTHIC_MOBS, MythicMobProvider::new);
-    }
-
-    private static void loadIntegration(@NotNull String pluginName, @NotNull Supplier<MobProvider> provider) {
-        if (!Plugins.isInstalled(pluginName)) return;
-
-        register(provider.get());
+        // MythicMobs is the one and only mob engine supported by the plugin.
+        if (Plugins.isInstalled(HookId.MYTHIC_MOBS)) {
+            register(new MythicMobProvider());
+        }
+        else {
+            plugin.warn("=".repeat(40));
+            plugin.warn(HookId.MYTHIC_MOBS + " is not installed!");
+            plugin.warn("It is the only supported mob engine, so no mobs will be available in dungeons.");
+            plugin.warn("Install " + HookId.MYTHIC_MOBS + " to be able to spawn mobs.");
+            plugin.warn("=".repeat(40));
+        }
     }
 
     public static void clear() {
@@ -40,28 +41,32 @@ public class MobRegistry {
         plugin = null;
     }
 
-    public static void register(@NotNull MobProvider provider) {
+    public static void register(@NonNull MobProvider provider) {
         BY_ID_MAP.put(provider.getName(), provider);
         plugin.info("Registered mob provider: " + provider.getName());
     }
 
+    public static boolean hasProviders() {
+        return !BY_ID_MAP.isEmpty();
+    }
+
     @Nullable
-    public static MobProvider getProviderByName(@NotNull String name) {
+    public static MobProvider getProviderByName(@NonNull String name) {
         return BY_ID_MAP.get(name.toLowerCase());
     }
 
-    @NotNull
+    @NonNull
     public static Map<String, MobProvider> getProviderByIdMap() {
         return BY_ID_MAP;
     }
 
-    @NotNull
+    @NonNull
     public static Set<MobProvider> getProviders() {
         return new HashSet<>(BY_ID_MAP.values());
     }
 
     @Nullable
-    public static MobProvider getProvider(@NotNull LivingEntity entity) {
+    public static MobProvider getProvider(@NonNull LivingEntity entity) {
         return getProviders().stream().filter(provider -> provider.isProducedBy(entity)).findFirst().orElse(null);
     }
 }

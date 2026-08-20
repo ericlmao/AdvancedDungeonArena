@@ -1,7 +1,7 @@
 package su.nightexpress.dungeons.api.dungeon;
 
 import org.bukkit.entity.LivingEntity;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.criteria.CriterionMob;
 import su.nightexpress.dungeons.api.mob.MobIdentifier;
 import su.nightexpress.dungeons.api.mob.MobProvider;
@@ -11,35 +11,35 @@ import java.util.UUID;
 
 public interface DungeonEntity extends CriterionMob {
 
-    @NotNull MobSnapshot getSnapshot();
+    @NonNull MobSnapshot getSnapshot();
 
-    @NotNull Dungeon getDungeon();
+    @NonNull Dungeon getDungeon();
 
-    @NotNull UUID getUniqueId();
+    @NonNull UUID getUniqueId();
 
-//    boolean isMob(@NotNull MobProvider provider, @NotNull String mobId);
+//    boolean isMob(@NonNull MobProvider provider, @NonNull String mobId);
 //
-//    boolean isMob(@NotNull MobIdentifier identifier);
+//    boolean isMob(@NonNull MobIdentifier identifier);
 //
-//    boolean isId(@NotNull String mobId);
+//    boolean isId(@NonNull String mobId);
 //
-//    boolean isProvider(@NotNull MobProvider provider);
+//    boolean isProvider(@NonNull MobProvider provider);
 //
-//    boolean isFaction(@NotNull MobFaction faction);
+//    boolean isFaction(@NonNull MobFaction faction);
 
     boolean isDead();
 
     boolean isAlive();
 
-//    @NotNull String getProviderId();
+//    @NonNull String getProviderId();
 
-    @NotNull LivingEntity getBukkitEntity();
+    @NonNull LivingEntity getBukkitEntity();
 
-//    @NotNull MobFaction getFaction();
+//    @NonNull MobFaction getFaction();
 
-    @NotNull MobProvider getProvider();
+    @NonNull MobProvider getProvider();
 
-    @NotNull MobIdentifier getIdentifier();
+    @NonNull MobIdentifier getIdentifier();
 
-//    @NotNull String getMobId();
+//    @NonNull String getMobId();
 }

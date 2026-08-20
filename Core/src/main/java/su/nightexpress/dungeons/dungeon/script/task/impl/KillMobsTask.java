@@ -1,15 +1,15 @@
 package su.nightexpress.dungeons.dungeon.script.task.impl;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
-import su.nightexpress.dungeons.dungeon.event.DungeonEventType;
+import su.nightexpress.dungeons.dungeon.event.game.DungeonMobKilledEvent;
 import su.nightexpress.dungeons.dungeon.script.task.ProgressFormatter;
 import su.nightexpress.dungeons.dungeon.script.task.Task;
 import su.nightexpress.dungeons.dungeon.script.task.TaskId;
 import su.nightexpress.dungeons.dungeon.stage.StageTask;
 import su.nightexpress.dungeons.dungeon.stage.task.TaskProgress;
-import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
 public class KillMobsTask implements Task {
 
@@ -17,23 +17,23 @@ public class KillMobsTask implements Task {
 
     }
 
-    @NotNull
-    public static KillMobsTask load(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static KillMobsTask load(@NonNull FileConfig config, @NonNull String path) {
         return new KillMobsTask();
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
 
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return TaskId.KILL_MOBS;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public ProgressFormatter getFormatter() {
         return ProgressFormatter.NORMAL;
@@ -45,18 +45,18 @@ public class KillMobsTask implements Task {
     }
 
     @Override
-    public void onTaskAdd(@NotNull DungeonInstance dungeon, @NotNull StageTask stageTask, @NotNull TaskProgress progress) {
+    public void onTaskAdd(@NonNull DungeonInstance dungeon, @NonNull StageTask stageTask, @NonNull TaskProgress progress) {
 
     }
 
     @Override
-    public void onTaskRemove(@NotNull DungeonInstance dungeon, @NotNull StageTask stageTask, @NotNull TaskProgress progress) {
+    public void onTaskRemove(@NonNull DungeonInstance dungeon, @NonNull StageTask stageTask, @NonNull TaskProgress progress) {
 
     }
 
     @Override
-    public void progress(@NotNull DungeonGameEvent event, @NotNull DungeonInstance dungeon, @NotNull StageTask stageTask, @NotNull TaskProgress progress) {
-        if (event.getType() == DungeonEventType.MOB_KILLED) {
+    public void progress(@NonNull DungeonGameEvent event, @NonNull DungeonInstance dungeon, @NonNull StageTask stageTask, @NonNull TaskProgress progress) {
+        if (event instanceof DungeonMobKilledEvent) {
             progress.addProgress(1);
         }
     }

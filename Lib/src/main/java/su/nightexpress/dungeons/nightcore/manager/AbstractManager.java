@@ -1,0 +1,91 @@
+package su.nightexpress.dungeons.nightcore.manager;
+
+import org.jspecify.annotations.NonNull;
+import su.nightexpress.dungeons.nightcore.NightPlugin;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.ui.menu.Menu;
+import su.nightexpress.dungeons.nightcore.ui.menu.data.ConfigBased;
+import su.nightexpress.dungeons.nightcore.util.bukkit.NightTask;
+
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+public abstract class AbstractManager<P extends NightPlugin> extends SimpleManager<P> {
+
+    protected final Set<SimpleListener> listeners;
+    @Deprecated protected final Set<Menu> menus;
+    protected final List<NightTask> taskList;
+
+    public AbstractManager(@NonNull P plugin) {
+        super(plugin);
+        this.listeners = new HashSet<>();
+        this.menus = new HashSet<>();
+        this.taskList = new ArrayList<>();
+    }
+
+    @Override
+    public void shutdown() {
+        this.taskList.forEach(NightTask::stop);
+        this.taskList.clear();
+        this.menus.forEach(Menu::clear);
+        this.menus.clear();
+        this.listeners.forEach(SimpleListener::unregisterListeners);
+        this.listeners.clear();
+        super.shutdown();
+    }
+
+    protected void addListener(@NonNull SimpleListener listener) {
+        if (this.listeners.add(listener)) {
+            listener.registerListeners();
+        }
+    }
+
+    @NonNull
+    @Deprecated
+    protected <T extends Menu> T addMenu(@NonNull T menu) {
+        this.menus.add(menu);
+        return menu;
+    }
+
+    // -------------------------------------------------------------------------------------------------
+    // Repeating tasks.
+    //
+    // ⚠ The overloads differ in unit, not just in width: `int` means SECONDS and `long` means TICKS.
+    // `addTask(r, 1)` is once per second; `addTask(r, 1L)` is once per tick. This is inherited from
+    // upstream and is preserved exactly, so that changing a literal's type silently changes the period.
+    // Check the argument type before touching any call site.
+    //
+    // These run on the GLOBAL region scheduler (or the async pool). They are therefore only appropriate
+    // for plugin-wide state; anything that touches a world, block or entity has to reach its owning
+    // thread from inside the task - see NightPlugin#runTask's overloads.
+    // -------------------------------------------------------------------------------------------------
+
+    /** @param interval period in <b>seconds</b>. */
+    protected void addTask(@NonNull Runnable runnable, int interval) {
+        this.addTask(NightTask.create(plugin, runnable, interval));
+    }
+
+    /** @param interval period in <b>ticks</b>. */
+    protected void addTask(@NonNull Runnable runnable, long interval) {
+        this.addTask(NightTask.create(plugin, runnable, interval));
+    }
+
+    /** @param interval period in <b>seconds</b>. */
+    protected void addAsyncTask(@NonNull Runnable runnable, int interval) {
+        this.addTask(NightTask.createAsync(plugin, runnable, interval));
+    }
+
+    /** @param interval period in <b>ticks</b>, converted to wall time for the async scheduler. */
+    protected void addAsyncTask(@NonNull Runnable runnable, long interval) {
+        this.addTask(NightTask.createAsync(plugin, runnable, interval));
+    }
+
+    protected void addTask(@NonNull NightTask task) {
+        if (task.isValid()) {
+            this.taskList.add(task);
+        }
+    }
+}

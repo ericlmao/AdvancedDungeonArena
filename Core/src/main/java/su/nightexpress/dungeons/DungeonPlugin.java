@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.dungeon.DungeonEntityBridge;
 import su.nightexpress.dungeons.command.impl.BaseCommands;
 import su.nightexpress.dungeons.command.impl.KitCommands;
@@ -22,13 +22,8 @@ import su.nightexpress.dungeons.hook.HookId;
 import su.nightexpress.dungeons.hook.impl.McMMOHook;
 import su.nightexpress.dungeons.hook.impl.PlaceholderHook;
 import su.nightexpress.dungeons.kit.KitManager;
-import su.nightexpress.dungeons.mob.MobManager;
-import su.nightexpress.dungeons.mob.variant.MobVariantRegistry;
 import su.nightexpress.dungeons.nms.DungeonNMS;
-import su.nightexpress.dungeons.nms.mc_1_21_10.MC_1_21_10;
 import su.nightexpress.dungeons.nms.mc_1_21_11.MC_1_21_11;
-import su.nightexpress.dungeons.nms.mc_1_21_3.MC_1_21_3;
-import su.nightexpress.dungeons.nms.mc_1_21_8.MC_1_21_8;
 import su.nightexpress.dungeons.registry.compat.BoardPluginRegistry;
 import su.nightexpress.dungeons.registry.compat.GodPluginRegistry;
 import su.nightexpress.dungeons.registry.level.LevelRegistry;
@@ -36,11 +31,11 @@ import su.nightexpress.dungeons.registry.mob.MobRegistry;
 import su.nightexpress.dungeons.registry.pet.PetRegistry;
 import su.nightexpress.dungeons.selection.SelectionManager;
 import su.nightexpress.dungeons.user.UserManager;
-import su.nightexpress.nightcore.NightPlugin;
-import su.nightexpress.nightcore.commands.command.NightCommand;
-import su.nightexpress.nightcore.config.PluginDetails;
-import su.nightexpress.nightcore.util.Plugins;
-import su.nightexpress.nightcore.util.Version;
+import su.nightexpress.dungeons.nightcore.NightPlugin;
+import su.nightexpress.dungeons.nightcore.commands.command.NightCommand;
+import su.nightexpress.dungeons.nightcore.config.PluginDetails;
+import su.nightexpress.dungeons.nightcore.util.Plugins;
+import su.nightexpress.dungeons.nightcore.util.nbt.NbtBridge;
 
 public class DungeonPlugin extends NightPlugin {
 
@@ -48,7 +43,6 @@ public class DungeonPlugin extends NightPlugin {
     private UserManager userManager;
 
     private SelectionManager selectionManager;
-    private MobManager       mobManager;
     private KitManager       kitManager;
     private DungeonManager   dungeonManager;
     private DungeonSetup dungeonSetup;
@@ -56,7 +50,7 @@ public class DungeonPlugin extends NightPlugin {
     private DungeonNMS internals;
 
     @Override
-    @NotNull
+    @NonNull
     protected PluginDetails getDefaultDetails() {
         return PluginDetails.create("Dungeons", new String[]{"ada", "dungeon", "dungeons", "dungeonarena"})
             .setConfigClass(Config.class)
@@ -66,11 +60,6 @@ public class DungeonPlugin extends NightPlugin {
     @Override
     protected void addRegistries() {
         this.registerLang(Lang.class);
-    }
-
-    @Override
-    protected boolean disableCommandManager() {
-        return true;
     }
 
     @Override
@@ -87,9 +76,6 @@ public class DungeonPlugin extends NightPlugin {
 
         this.selectionManager = new SelectionManager(this);
         this.selectionManager.setup();
-
-        this.mobManager = new MobManager(this);
-        this.mobManager.setup();
 
         this.kitManager = new KitManager(this);
         this.kitManager.setup();
@@ -118,7 +104,6 @@ public class DungeonPlugin extends NightPlugin {
 
         if (this.dungeonSetup != null) this.dungeonSetup.shutdown();
         if (this.dungeonManager != null) this.dungeonManager.shutdown();
-        if (this.mobManager != null) this.mobManager.shutdown();
         if (this.kitManager != null) this.kitManager.shutdown();
         if (this.selectionManager != null) this.selectionManager.shutdown();
 
@@ -134,28 +119,19 @@ public class DungeonPlugin extends NightPlugin {
         LevelRegistry.clear();
         PetRegistry.clear();
         DungeonEntityBridge.clear();
-        MobVariantRegistry.clear();
         CriteriaRegistry.clear();
         GodPluginRegistry.clear();
         BoardPluginRegistry.clear();
         Keys.clear();
         DungeonsAPI.clear();
+        NbtBridge.clear();
     }
 
     private boolean loadInternals() {
-        this.internals = switch (Version.getCurrent()) {
-            case MC_1_21_4 -> new MC_1_21_3();
-            case MC_1_21_8 -> new MC_1_21_8();
-            case MC_1_21_10 -> new MC_1_21_10();
-            case MC_1_21_11 -> new MC_1_21_11();
-            default -> null;
-        };
-
-        if (this.internals == null) {
-            this.error("Unsupported server version.");
-            this.getPluginManager().disablePlugin(this);
-            return false;
-        }
+        // Single-version build: the module tree only contains MC_1_21_11, so there is nothing to switch on.
+        MC_1_21_11 internals = new MC_1_21_11();
+        this.internals = internals;
+        NbtBridge.register(internals);
 
         return true;
     }
@@ -169,7 +145,6 @@ public class DungeonPlugin extends NightPlugin {
         MobRegistry.load(this);
         LevelRegistry.load(this);
         PetRegistry.load(this);
-        MobVariantRegistry.load();
         NumberComparators.load();
         ConditionRegistry.load();
         ActionRegistry.load();
@@ -185,42 +160,37 @@ public class DungeonPlugin extends NightPlugin {
         });
     }
 
-    @NotNull
+    @NonNull
     public DataHandler getDataHandler() {
         return this.dataHandler;
     }
 
-    @NotNull
+    @NonNull
     public UserManager getUserManager() {
         return this.userManager;
     }
 
-    @NotNull
+    @NonNull
     public SelectionManager getSelectionManager() {
         return this.selectionManager;
     }
 
-    @NotNull
+    @NonNull
     public DungeonManager getDungeonManager() {
         return this.dungeonManager;
     }
 
-    @NotNull
+    @NonNull
     public DungeonSetup getDungeonSetup() {
         return this.dungeonSetup;
     }
 
-    @NotNull
-    public MobManager getMobManager() {
-        return this.mobManager;
-    }
-
-    @NotNull
+    @NonNull
     public KitManager getKitManager() {
         return this.kitManager;
     }
 
-    @NotNull
+    @NonNull
     public DungeonNMS getInternals() {
         return this.internals;
     }

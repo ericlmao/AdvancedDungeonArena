@@ -1,8 +1,8 @@
 package su.nightexpress.dungeons.dungeon.stage.task;
 
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.api.dungeon.DungeonPlayer;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.script.task.ProgressFormatter;
@@ -14,7 +14,7 @@ public class PersonalProgress extends AbstractProgress {
     private final Map<UUID, Integer> countMap;
     private final int perPlayerAmount;
 
-    public PersonalProgress(@NotNull DungeonInstance dungeon, @NotNull ProgressFormatter formatter, int requiredAmount, int perPlayerAmount) {
+    public PersonalProgress(@NonNull DungeonInstance dungeon, @NonNull ProgressFormatter formatter, int requiredAmount, int perPlayerAmount) {
         super(formatter, requiredAmount);
         this.countMap = new HashMap<>();
         this.perPlayerAmount = perPlayerAmount;
@@ -24,14 +24,14 @@ public class PersonalProgress extends AbstractProgress {
     }
 
     @Override
-    public void onPlayerJoined(@NotNull DungeonPlayer player) {
+    public void onPlayerJoined(@NonNull DungeonPlayer player) {
         this.countMap.put(player.getPlayer().getUniqueId(), 0);
         this.requiredAmount += this.perPlayerAmount;
         System.out.println("PLayer joined, task progress increased to " + this.requiredAmount);
     }
 
     @Override
-    public void onPlayerLeft(@NotNull DungeonPlayer player) {
+    public void onPlayerLeft(@NonNull DungeonPlayer player) {
         this.countMap.remove(player.getPlayer().getUniqueId());
         this.requiredAmount -= this.perPlayerAmount;
         System.out.println("PLayer left, task progress decreased to " + this.requiredAmount);
@@ -98,30 +98,30 @@ public class PersonalProgress extends AbstractProgress {
         return this.getLeftover(player.getUniqueId());
     }
 
-    @NotNull
+    @NonNull
     public Set<UUID> getPlayerIds() {
         return new HashSet<>(this.countMap.keySet());
     }
 
-    public int getProgress(@NotNull Player player) {
+    public int getProgress(@NonNull Player player) {
         return this.getProgress(player.getUniqueId());
     }
 
-    public void setProgress(@NotNull Player player, int amount) {
+    public void setProgress(@NonNull Player player, int amount) {
         this.setProgress(player.getUniqueId(), amount);
     }
 
-    public int getProgress(@NotNull UUID playerId) {
+    public int getProgress(@NonNull UUID playerId) {
         return this.countMap.getOrDefault(playerId, 0);
     }
 
-    public void setProgress(@NotNull UUID playerId, int amount) {
+    public void setProgress(@NonNull UUID playerId, int amount) {
         amount = Math.max(0, amount);
 
         this.countMap.put(playerId, Math.min(this.perPlayerAmount, amount));
     }
 
-    public int getLeftover(@NotNull UUID playerId) {
+    public int getLeftover(@NonNull UUID playerId) {
         return Math.max(0, this.perPlayerAmount - this.getProgress(playerId));
     }
 }

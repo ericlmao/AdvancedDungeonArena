@@ -1,7 +1,7 @@
 package su.nightexpress.dungeons.command.impl;
 
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.command.CommandArguments;
@@ -9,19 +9,19 @@ import su.nightexpress.dungeons.config.Lang;
 import su.nightexpress.dungeons.config.Perms;
 import su.nightexpress.dungeons.dungeon.config.DungeonConfig;
 import su.nightexpress.dungeons.dungeon.spot.Spot;
-import su.nightexpress.nightcore.commands.Arguments;
-import su.nightexpress.nightcore.commands.Commands;
-import su.nightexpress.nightcore.commands.builder.HubNodeBuilder;
-import su.nightexpress.nightcore.commands.context.CommandContext;
-import su.nightexpress.nightcore.commands.context.ParsedArguments;
-import su.nightexpress.nightcore.core.config.CoreLang;
+import su.nightexpress.dungeons.nightcore.commands.Arguments;
+import su.nightexpress.dungeons.nightcore.commands.Commands;
+import su.nightexpress.dungeons.nightcore.commands.builder.HubNodeBuilder;
+import su.nightexpress.dungeons.nightcore.commands.context.CommandContext;
+import su.nightexpress.dungeons.nightcore.commands.context.ParsedArguments;
+import su.nightexpress.dungeons.nightcore.core.config.CoreLang;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
 public class SetupCommands {
 
-    public static void load(@NotNull DungeonPlugin plugin, @NotNull HubNodeBuilder root) {
+    public static void load(@NonNull DungeonPlugin plugin, @NonNull HubNodeBuilder root) {
         root.branch(Commands.literal(Placeholders.ALIAS_CREATE)
             .playerOnly()
             .description(Lang.COMMAND_CREATE_DESC)
@@ -55,7 +55,7 @@ public class SetupCommands {
                 .withArguments(
                     CommandArguments.forDungeon(plugin),
                     Arguments.string(CommandArguments.NAME).localized(CoreLang.COMMAND_ARGUMENT_NAME_NAME)
-                        .suggestions((reader, context) -> {
+                        .suggestions((_, context) -> {
                             DungeonConfig config = CommandArguments.getDungeonConfig(plugin, context);
                             return config == null ? Collections.emptyList() : new ArrayList<>(config.getSpawnerByIdMap().keySet());
                         })
@@ -82,7 +82,7 @@ public class SetupCommands {
                 .withArguments(
                     CommandArguments.forDungeon(plugin),
                     Arguments.string(CommandArguments.LEVEL).localized(Lang.COMMAND_ARGUMENT_NAME_LEVEL)
-                        .suggestions((reader, context) -> {
+                        .suggestions((_, context) -> {
                             DungeonConfig config = CommandArguments.getDungeonConfig(plugin, context);
                             return config == null ? Collections.emptyList() : new ArrayList<>(config.getLevelByIdMap().keySet());
                         })
@@ -122,7 +122,7 @@ public class SetupCommands {
                 .withArguments(
                     CommandArguments.forDungeon(plugin),
                     Arguments.string(CommandArguments.REWARD).localized(Lang.COMMAND_ARGUMENT_NAME_REWARD)
-                        .suggestions((reader, context) -> {
+                        .suggestions((_, context) -> {
                             DungeonConfig config = CommandArguments.getDungeonConfig(plugin, context);
                             return config == null ? Collections.emptyList() : new ArrayList<>(config.getRewardByIdMap().keySet());
                         })
@@ -135,7 +135,7 @@ public class SetupCommands {
                 .withArguments(
                     CommandArguments.forDungeon(plugin),
                     Arguments.string(CommandArguments.REWARD).localized(Lang.COMMAND_ARGUMENT_NAME_REWARD)
-                        .suggestions((reader, context) -> {
+                        .suggestions((_, context) -> {
                             DungeonConfig config = CommandArguments.getDungeonConfig(plugin, context);
                             return config == null ? Collections.emptyList() : new ArrayList<>(config.getRewardByIdMap().keySet());
                         })
@@ -161,7 +161,7 @@ public class SetupCommands {
                 .withArguments(
                     CommandArguments.forDungeon(plugin),
                     Arguments.string(CommandArguments.LOOT_CHEST).localized(Lang.COMMAND_ARGUMENT_NAME_LOOT_CHEST)
-                        .suggestions((reader, context) -> {
+                        .suggestions((_, context) -> {
                             DungeonConfig config = CommandArguments.getDungeonConfig(plugin, context);
                             return config == null ? Collections.emptyList() : new ArrayList<>(config.getLootChestByIdMap().keySet());
                         })
@@ -174,7 +174,7 @@ public class SetupCommands {
                 .withArguments(
                     CommandArguments.forDungeon(plugin),
                     Arguments.string(CommandArguments.LOOT_CHEST).localized(Lang.COMMAND_ARGUMENT_NAME_LOOT_CHEST)
-                        .suggestions((reader, context) -> {
+                        .suggestions((_, context) -> {
                             DungeonConfig config = CommandArguments.getDungeonConfig(plugin, context);
                             return config == null ? Collections.emptyList() : new ArrayList<>(config.getLootChestByIdMap().keySet());
                         }),
@@ -194,7 +194,7 @@ public class SetupCommands {
                 .withArguments(
                     CommandArguments.forDungeon(plugin),
                     Arguments.string(CommandArguments.NAME).localized(CoreLang.COMMAND_ARGUMENT_NAME_NAME)
-                        .suggestions((reader, context) -> {
+                        .suggestions((_, context) -> {
                             DungeonConfig config = CommandArguments.getDungeonConfig(plugin, context);
                             return config == null ? Collections.emptyList() : new ArrayList<>(config.getSpotByIdMap().keySet());
                         })
@@ -205,7 +205,7 @@ public class SetupCommands {
                 .description(Lang.COMMAND_SPOT_REMOVE_DESC)
                 .withArguments(
                     CommandArguments.forDungeon(plugin),
-                    Arguments.string(CommandArguments.SPOT).localized(Lang.COMMAND_ARGUMENT_NAME_SPOT).suggestions((reader, context)  -> {
+                    Arguments.string(CommandArguments.SPOT).localized(Lang.COMMAND_ARGUMENT_NAME_SPOT).suggestions((_, context)  -> {
                         DungeonConfig config = CommandArguments.getDungeonConfig(plugin, context);
                         return config == null ? Collections.emptyList() : new ArrayList<>(config.getSpotByIdMap().keySet());
                     })
@@ -217,11 +217,11 @@ public class SetupCommands {
                 .description(Lang.COMMAND_SPOT_ADD_STATE_DESC)
                 .withArguments(
                     CommandArguments.forDungeon(plugin),
-                    Arguments.string(CommandArguments.SPOT).localized(Lang.COMMAND_ARGUMENT_NAME_SPOT).suggestions((reader, context)  -> {
+                    Arguments.string(CommandArguments.SPOT).localized(Lang.COMMAND_ARGUMENT_NAME_SPOT).suggestions((_, context)  -> {
                         DungeonConfig config = CommandArguments.getDungeonConfig(plugin, context);
                         return config == null ? Collections.emptyList() : new ArrayList<>(config.getSpotByIdMap().keySet());
                     }),
-                    Arguments.string(CommandArguments.STATE).localized(CoreLang.COMMAND_ARGUMENT_NAME_NAME).suggestions((reader, context)  -> {
+                    Arguments.string(CommandArguments.STATE).localized(CoreLang.COMMAND_ARGUMENT_NAME_NAME).suggestions((_, context)  -> {
                         Spot spot = CommandArguments.getSpot(plugin, context);
                         return spot == null ? Collections.emptyList() : new ArrayList<>(spot.getStateByIdMap().keySet());
                     })
@@ -231,7 +231,7 @@ public class SetupCommands {
         );
     }
 
-    private static boolean createDungeon(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean createDungeon(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         Player player = context.getPlayerOrThrow();
         String name = arguments.getString(CommandArguments.NAME);
 
@@ -239,7 +239,7 @@ public class SetupCommands {
         return true;
     }
 
-    private static boolean setProtection(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean setProtection(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         Player player = context.getPlayerOrThrow();
         DungeonConfig dungeon = arguments.get(CommandArguments.DUNGEON, DungeonConfig.class);
 
@@ -247,7 +247,7 @@ public class SetupCommands {
         return true;
     }
 
-    private static boolean setLobby(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean setLobby(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         Player player = context.getPlayerOrThrow();
         DungeonConfig dungeon = arguments.get(CommandArguments.DUNGEON, DungeonConfig.class);
 
@@ -255,7 +255,7 @@ public class SetupCommands {
         return true;
     }
 
-    private static boolean createSpawner(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean createSpawner(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         Player player = context.getPlayerOrThrow();
         DungeonConfig dungeon = arguments.get(CommandArguments.DUNGEON, DungeonConfig.class);
         String name = arguments.getString(CommandArguments.NAME);
@@ -264,7 +264,7 @@ public class SetupCommands {
         return true;
     }
 
-    private static boolean setLevelSpawn(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean setLevelSpawn(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         Player player = context.getPlayerOrThrow();
         DungeonConfig dungeon = arguments.get(CommandArguments.DUNGEON, DungeonConfig.class);
         String name = arguments.getString(CommandArguments.LEVEL);
@@ -273,7 +273,7 @@ public class SetupCommands {
         return true;
     }
 
-    private static boolean createLevel(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean createLevel(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         Player player = context.getPlayerOrThrow();
         DungeonConfig dungeon = arguments.get(CommandArguments.DUNGEON, DungeonConfig.class);
         String name = arguments.getString(CommandArguments.NAME);
@@ -282,7 +282,7 @@ public class SetupCommands {
         return true;
     }
 
-    private static boolean createStage(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean createStage(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         Player player = context.getPlayerOrThrow();
         DungeonConfig dungeon = arguments.get(CommandArguments.DUNGEON, DungeonConfig.class);
         String name = arguments.getString(CommandArguments.NAME);
@@ -291,7 +291,7 @@ public class SetupCommands {
         return true;
     }
 
-    private static boolean createReward(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean createReward(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         Player player = context.getPlayerOrThrow();
         DungeonConfig dungeonConfig = arguments.get(CommandArguments.DUNGEON, DungeonConfig.class);
         String name = arguments.getString(CommandArguments.NAME);
@@ -300,7 +300,7 @@ public class SetupCommands {
         return true;
     }
 
-    private static boolean removeReward(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean removeReward(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         Player player = context.getPlayerOrThrow();
         DungeonConfig dungeonConfig = arguments.get(CommandArguments.DUNGEON, DungeonConfig.class);
         String name = arguments.getString(CommandArguments.REWARD);
@@ -309,7 +309,7 @@ public class SetupCommands {
         return true;
     }
 
-    private static boolean addRewardItem(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean addRewardItem(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         Player player = context.getPlayerOrThrow();
         DungeonConfig dungeonConfig = arguments.get(CommandArguments.DUNGEON, DungeonConfig.class);
         String rewardId = arguments.getString(CommandArguments.REWARD);
@@ -318,7 +318,7 @@ public class SetupCommands {
         return true;
     }
 
-    private static boolean createLootChest(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean createLootChest(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         Player player = context.getPlayerOrThrow();
         DungeonConfig dungeonConfig = arguments.get(CommandArguments.DUNGEON, DungeonConfig.class);
         String name = arguments.getString(CommandArguments.NAME);
@@ -327,7 +327,7 @@ public class SetupCommands {
         return true;
     }
 
-    private static boolean removeLootChest(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean removeLootChest(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         Player player = context.getPlayerOrThrow();
         DungeonConfig dungeonConfig = arguments.get(CommandArguments.DUNGEON, DungeonConfig.class);
         String name = arguments.getString(CommandArguments.LOOT_CHEST);
@@ -336,7 +336,7 @@ public class SetupCommands {
         return true;
     }
 
-    private static boolean addLootChestItem(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean addLootChestItem(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         Player player = context.getPlayerOrThrow();
         DungeonConfig dungeonConfig = arguments.get(CommandArguments.DUNGEON, DungeonConfig.class);
         String lootdId = arguments.getString(CommandArguments.LOOT_CHEST);
@@ -347,7 +347,7 @@ public class SetupCommands {
         return true;
     }
 
-    private static boolean createSpot(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean createSpot(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         Player player = context.getPlayerOrThrow();
         DungeonConfig dungeonConfig = arguments.get(CommandArguments.DUNGEON, DungeonConfig.class);
         String name = arguments.getString(CommandArguments.NAME);
@@ -356,7 +356,7 @@ public class SetupCommands {
         return true;
     }
 
-    private static boolean removeSpot(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean removeSpot(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         Player player = context.getPlayerOrThrow();
         DungeonConfig dungeonConfig = arguments.get(CommandArguments.DUNGEON, DungeonConfig.class);
         String name = arguments.getString(CommandArguments.SPOT);
@@ -365,7 +365,7 @@ public class SetupCommands {
         return true;
     }
 
-    private static boolean addSpotState(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean addSpotState(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         Player player = context.getPlayerOrThrow();
         DungeonConfig dungeonConfig = arguments.get(CommandArguments.DUNGEON, DungeonConfig.class);
         String spotId = arguments.getString(CommandArguments.SPOT);

@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.criteria.registry;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.dungeon.criteria.registry.mob.MobCriteria;
 import su.nightexpress.dungeons.dungeon.criteria.registry.mob.MobCriterias;
@@ -12,7 +12,7 @@ public class CriteriaRegistry {
     public static final CriteriaHolder<MobCriteria<?>> MOB = new CriteriaHolder<>();
     public static final CriteriaHolder<StageCriteria<?>> STAGE = new CriteriaHolder<>();
 
-    public static void load(@NotNull DungeonPlugin plugin) {
+    public static void load(@NonNull DungeonPlugin plugin) {
         MobCriterias.setup(MOB);
         StageCriterias.setup(STAGE);
     }

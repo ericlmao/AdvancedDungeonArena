@@ -4,12 +4,14 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.selection.visual.FakeEntity;
-import su.nightexpress.nightcore.util.EntityUtil;
+import su.nightexpress.dungeons.nightcore.util.EntityUtil;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class BlockHighlighter {
 
@@ -17,9 +19,11 @@ public abstract class BlockHighlighter {
 
     private final Map<UUID, List<FakeEntity>> entityMap;
 
-    public BlockHighlighter(@NotNull DungeonPlugin plugin) {
+    public BlockHighlighter(@NonNull DungeonPlugin plugin) {
         this.plugin = plugin;
-        this.entityMap = new HashMap<>();
+        // Mutated from the async highlight timer and from the selection listener on the player's own thread.
+        // The value lists are appended to from the timer and drained on removal, hence copy-on-write.
+        this.entityMap = new ConcurrentHashMap<>();
     }
 
     public void clear() {
@@ -27,23 +31,23 @@ public abstract class BlockHighlighter {
         this.entityMap.clear();
     }
 
-    @NotNull
-    private List<FakeEntity> getEntityMap(@NotNull UUID playerId) {
-        return this.entityMap.computeIfAbsent(playerId, k -> new ArrayList<>());
+    @NonNull
+    private List<FakeEntity> getEntityMap(@NonNull UUID playerId) {
+        return this.entityMap.computeIfAbsent(playerId, k -> new CopyOnWriteArrayList<>());
     }
 
     protected int nextEntityId() {
         return EntityUtil.nextEntityId();
     }
 
-    public void removeVisuals(@NotNull Player player) {
+    public void removeVisuals(@NonNull Player player) {
         List<FakeEntity> entities = this.entityMap.remove(player.getUniqueId());
         if (entities == null) return;
 
         this.destroyEntity(player, new ArrayList<>(entities));
     }
 
-    public void addVisualBlock(@NotNull Player player, @NotNull Location location, @NotNull BlockData blockData, @NotNull ChatColor color, float size) {
+    public void addVisualBlock(@NonNull Player player, @NonNull Location location, @NonNull BlockData blockData, @NonNull ChatColor color, float size) {
         List<FakeEntity> entities = this.getEntityMap(player.getUniqueId());
 
         // To shift scaled down/up displays to the center of a block location.
@@ -61,8 +65,8 @@ public abstract class BlockHighlighter {
         entities.add(entity);
     }
 
-    @NotNull
-    protected abstract FakeEntity spawnVisualBlock(int entityID, @NotNull Player player, @NotNull Location location, @NotNull BlockData blockData, @NotNull ChatColor color, float size);
+    @NonNull
+    protected abstract FakeEntity spawnVisualBlock(int entityID, @NonNull Player player, @NonNull Location location, @NonNull BlockData blockData, @NonNull ChatColor color, float size);
 
-    protected abstract void destroyEntity(@NotNull Player player, @NotNull List<FakeEntity> idList);
+    protected abstract void destroyEntity(@NonNull Player player, @NonNull List<FakeEntity> idList);
 }

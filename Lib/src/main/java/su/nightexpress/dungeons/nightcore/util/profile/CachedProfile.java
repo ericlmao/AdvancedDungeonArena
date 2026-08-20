@@ -1,0 +1,124 @@
+package su.nightexpress.dungeons.nightcore.util.profile;
+
+import org.jspecify.annotations.NonNull;
+import com.destroystokyo.paper.profile.PlayerProfile;
+
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeUnit;
+
+@Deprecated
+public class CachedProfile {
+
+    /** Upstream {@code Profiles.Cache.UpdateTime} default, in minutes. */
+    private static final int PROFILE_CACHE_UPDATE_TIME = 360;
+    /** Upstream {@code Profiles.Cache.PurgeTime} default, in minutes. */
+    private static final int PROFILE_CACHE_PURGE_TIME  = 180;
+
+
+    private static final ConcurrentLinkedQueue<CachedProfile> UPDATE_CANDIDATES = new ConcurrentLinkedQueue<>();
+
+    private final boolean permanent;
+    private final boolean noUpdate;
+
+    private PlayerProfile profile;
+    private long         lastQueried;
+    private long         lastUpdated;
+    private boolean      inUpdate;
+
+    public CachedProfile(@NonNull PlayerProfile profile, boolean permanent, boolean noUpdate) {
+        this.profile = profile;
+        this.lastQueried = 0L;
+        this.lastUpdated = 0L;
+        this.permanent = permanent;
+        this.noUpdate = noUpdate;
+    }
+
+    public static void updateCandidates(int amount) {
+        for (int i = 0; i < amount; i++) {
+            if (UPDATE_CANDIDATES.isEmpty()) break;
+
+            UPDATE_CANDIDATES.poll().update();
+        }
+    }
+
+    @NonNull
+    public PlayerProfile query() {
+        if (this.isUpdateTime()) {
+            this.scheduleUpdate();
+        }
+
+        return this.queryNoUpdate();
+    }
+
+    @NonNull
+    public PlayerProfile queryNoUpdate() {
+        this.updateQueryTime();
+        return this.profile;
+    }
+
+    public void scheduleUpdate() {
+        if (this.noUpdate || this.inUpdate) return;
+
+        this.inUpdate = true;
+        UPDATE_CANDIDATES.add(this);
+    }
+
+    @NonNull
+    public CompletableFuture<CachedProfile> update() {
+        return this.profile.update().thenApply(updated -> {
+            this.update(updated);
+            return this;
+        });
+    }
+
+    public void update(@NonNull PlayerProfile updated) {
+        this.profile = updated;
+        this.inUpdate = false;
+        this.updateUpdateTime();
+    }
+
+    /*@NonNull
+    public CompletableFuture<CachedProfile> update() {
+        if (this.noUpdate || this.inUpdate) {
+            return CompletableFuture.supplyAsync(() -> this);
+        }
+    
+        this.inUpdate = true;
+        this.updateQueryTime();
+        this.updateUpdateTime();
+        UPDATE_CANDIDATES.add(this);
+    
+        return this.profile.update().thenApply(updated -> {
+            this.profile = updated;
+            this.inUpdate = false;
+            return this;
+        });
+    }*/
+
+    private void updateQueryTime() {
+        this.lastQueried = System.currentTimeMillis();
+    }
+
+    private void updateUpdateTime() {
+        this.lastUpdated = System.currentTimeMillis();
+    }
+
+    public boolean isUpdateTime() {
+        return !this.inUpdate && !this.noUpdate && this.checkTime(this.lastUpdated, PROFILE_CACHE_UPDATE_TIME);
+    }
+
+    public boolean isPurgeTime() {
+        return !this.permanent && this.checkTime(this.lastQueried, PROFILE_CACHE_PURGE_TIME);
+    }
+
+    private boolean checkTime(long timestamp, int minutes) {
+        if (minutes < 0) return false;
+
+        long timeSince = (System.currentTimeMillis() - timestamp);
+        long timeThreshold = TimeUnit.MILLISECONDS.convert(minutes, TimeUnit.MINUTES);
+
+        return timeSince >= timeThreshold;
+    }
+}

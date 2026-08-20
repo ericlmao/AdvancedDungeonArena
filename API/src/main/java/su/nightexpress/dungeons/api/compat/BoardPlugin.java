@@ -1,13 +1,13 @@
 package su.nightexpress.dungeons.api.compat;
 
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public interface BoardPlugin {
 
-    boolean isBoardEnabled(@NotNull Player player);
+    boolean isBoardEnabled(@NonNull Player player);
 
-    void disableBoard(@NotNull Player player);
+    void disableBoard(@NonNull Player player);
 
-    void enableBoard(@NotNull Player player);
+    void enableBoard(@NonNull Player player);
 }

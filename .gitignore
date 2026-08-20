@@ -1,5 +1,6 @@
 /.idea/
-**/pom.xml.versionsBackup
-**/target/
-!src/**/target/
-/Core/dependency-reduced-pom.xml
+*.iml
+.gradle/
+**/build/
+!src/**/build/
+!gradle/wrapper/gradle-wrapper.jar

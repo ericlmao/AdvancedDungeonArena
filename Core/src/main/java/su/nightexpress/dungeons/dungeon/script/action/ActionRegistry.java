@@ -1,9 +1,9 @@
 package su.nightexpress.dungeons.dungeon.script.action;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.dungeon.script.action.impl.*;
-import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +37,7 @@ public class ActionRegistry {
     }
 
     @Nullable
-    public static Action loadAction(@NotNull String name, @NotNull FileConfig config, @NotNull String path) {
+    public static Action loadAction(@NonNull String name, @NonNull FileConfig config, @NonNull String path) {
         Loader loader = getLoader(name);
         if (loader == null) return null;
 
@@ -45,17 +45,17 @@ public class ActionRegistry {
     }
 
     @Nullable
-    public static Loader getLoader(@NotNull String name) {
+    public static Loader getLoader(@NonNull String name) {
         return ACTION_LOADERS.get(name.toLowerCase());
     }
 
-    public static void addLoader(@NotNull String name, @NotNull Loader loader) {
+    public static void addLoader(@NonNull String name, @NonNull Loader loader) {
         ACTION_LOADERS.put(name.toLowerCase(), loader);
     }
 
     public interface Loader {
 
-        Action load(@NotNull FileConfig config, @NotNull String path);
+        Action load(@NonNull FileConfig config, @NonNull String path);
 
     }
 }

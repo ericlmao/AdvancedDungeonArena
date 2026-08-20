@@ -5,34 +5,34 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.MenuType;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.config.Config;
 import su.nightexpress.dungeons.config.Lang;
 import su.nightexpress.dungeons.user.DungeonUser;
 import su.nightexpress.dungeons.kit.impl.Kit;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.ui.UIUtils;
-import su.nightexpress.nightcore.ui.menu.MenuViewer;
-import su.nightexpress.nightcore.ui.menu.confirmation.Confirmation;
-import su.nightexpress.nightcore.ui.menu.data.ConfigBased;
-import su.nightexpress.nightcore.ui.menu.data.Filled;
-import su.nightexpress.nightcore.ui.menu.data.MenuFiller;
-import su.nightexpress.nightcore.ui.menu.data.MenuLoader;
-import su.nightexpress.nightcore.ui.menu.item.ItemHandler;
-import su.nightexpress.nightcore.ui.menu.item.MenuItem;
-import su.nightexpress.nightcore.ui.menu.type.LinkedMenu;
-import su.nightexpress.nightcore.util.Lists;
-import su.nightexpress.nightcore.util.bukkit.NightItem;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.ui.UIUtils;
+import su.nightexpress.dungeons.nightcore.ui.menu.MenuViewer;
+import su.nightexpress.dungeons.nightcore.ui.menu.confirmation.Confirmation;
+import su.nightexpress.dungeons.nightcore.ui.menu.data.ConfigBased;
+import su.nightexpress.dungeons.nightcore.ui.menu.data.Filled;
+import su.nightexpress.dungeons.nightcore.ui.menu.data.MenuFiller;
+import su.nightexpress.dungeons.nightcore.ui.menu.data.MenuLoader;
+import su.nightexpress.dungeons.nightcore.ui.menu.item.ItemHandler;
+import su.nightexpress.dungeons.nightcore.ui.menu.item.MenuItem;
+import su.nightexpress.dungeons.nightcore.ui.menu.type.LinkedMenu;
+import su.nightexpress.dungeons.nightcore.util.Lists;
+import su.nightexpress.dungeons.nightcore.util.bukkit.NightItem;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 import static su.nightexpress.dungeons.Placeholders.*;
-import static su.nightexpress.nightcore.util.text.tag.Tags.*;
+import static su.nightexpress.dungeons.nightcore.util.text.night.wrapper.TagWrappers.*;
 
 @SuppressWarnings("UnstableApiUsage")
 public class KitSelectMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> implements Filled<Kit>, ConfigBased {
@@ -46,25 +46,25 @@ public class KitSelectMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> im
     private List<String> kitLoreMaxUses;
     private int[]        kitSlots;
 
-    public KitSelectMenu(@NotNull DungeonPlugin plugin) {
+    public KitSelectMenu(@NonNull DungeonPlugin plugin) {
         super(plugin, MenuType.GENERIC_9X4, BLACK.wrap("Kit Selection"));
 
         this.load(FileConfig.loadOrExtract(plugin, Config.DIR_MENU, FILE_NAME));
     }
 
     @Override
-    public void onPrepare(@NotNull MenuViewer viewer, @NotNull InventoryView view) {
+    public void onPrepare(@NonNull MenuViewer viewer, @NonNull InventoryView view) {
         this.autoFill(viewer);
     }
 
     @Override
-    protected void onReady(@NotNull MenuViewer viewer, @NotNull Inventory inventory) {
+    protected void onReady(@NonNull MenuViewer viewer, @NonNull Inventory inventory) {
 
     }
 
     @Override
-    @NotNull
-    public MenuFiller<Kit> createFiller(@NotNull MenuViewer viewer) {
+    @NonNull
+    public MenuFiller<Kit> createFiller(@NonNull MenuViewer viewer) {
         Player player = viewer.getPlayer();
         DungeonUser user = plugin.getUserManager().getOrFetch(player);
         DungeonInstance dungeon = this.getLink(player);
@@ -106,31 +106,32 @@ public class KitSelectMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> im
                     if (!dungeon.isKitAllowed(kit)) return;
                     if (dungeon.isKitLimitReached(kit)) return;
 
-                    this.runNextTick(() -> {
+                    this.runNextTick(player, () -> {
                         UIUtils.openConfirmation(player, Confirmation.builder()
                             .setIcon(dungeon.getConfig().getIcon()
                                 .localized(Lang.UI_CONFIRMATION_DUNGEON_ENTER_OWN_KIT)
                                 .replacement(replacer -> replacer.replace(dungeon.replacePlaceholders()).replace(kit.replacePlaceholders())))
-                            .onAccept((viewer2, event1) -> {
+                            // Enter + close were two separate task submissions, which only stayed ordered
+                            // because BukkitScheduler ran them FIFO on one thread. Merged into one task so
+                            // the ordering is a property of the code rather than of the scheduler.
+                            .onAccept((_, _) -> plugin.runTask(player, () -> {
                                 plugin.getDungeonManager().enterInstance(player, dungeon, kit);
-                                plugin.runTask(task -> player.closeInventory());
-                            })
-                            .onReturn((viewer2, event1) -> {
-                                plugin.runTask(task -> plugin.getKitManager().openSelector(player, dungeon));
-                            })
+                                player.closeInventory();
+                            }))
+                            .onReturn((_, _) -> plugin.runTask(player, () -> plugin.getKitManager().openSelector(player, dungeon)))
                             .returnOnAccept(false)
                             .build());
                     });
                 }
                 else if (event.isRightClick()) {
-                    this.runNextTick(() -> plugin.getKitManager().openPreview(player, kit, dungeon));
+                    this.runNextTick(player, () -> plugin.getKitManager().openPreview(player, kit, dungeon));
                 }
             })
             .build();
     }
 
     @Override
-    public void loadConfiguration(@NotNull FileConfig config, @NotNull MenuLoader loader) {
+    public void loadConfiguration(@NonNull FileConfig config, @NonNull MenuLoader loader) {
         this.kitName = ConfigValue.create("Kit.Name", KIT_NAME).read(config);
 
         this.kitLore = ConfigValue.create("Kit.Lore.Unlocked", Lists.newList(
@@ -175,8 +176,8 @@ public class KitSelectMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> im
             .toMenuItem()
             .setPriority(10)
             .setSlots(33)
-            .setHandler(new ItemHandler("kit_shop", (viewer, event) -> {
-                this.runNextTick(() -> plugin.getKitManager().openShop(viewer.getPlayer(), this.getLink(viewer)));
+            .setHandler(new ItemHandler("kit_shop", (viewer, _) -> {
+                this.runNextTick(viewer.getPlayer(), () -> plugin.getKitManager().openShop(viewer.getPlayer(), this.getLink(viewer)));
             })));
 
         loader.addDefaultItem(NightItem.asCustomHead("76d126affd03def502bfaa91a34e7c1562421490002a85c2b5815bdd4248e12")
@@ -187,8 +188,8 @@ public class KitSelectMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> im
             .toMenuItem()
             .setPriority(10)
             .setSlots(29)
-            .setHandler(new ItemHandler("dungeons", (viewer, event) -> {
-                this.runNextTick(() -> plugin.getDungeonManager().browseDungeons(viewer.getPlayer()));
+            .setHandler(new ItemHandler("dungeons", (viewer, _) -> {
+                this.runNextTick(viewer.getPlayer(), () -> plugin.getDungeonManager().browseDungeons(viewer.getPlayer()));
             })));
     }
 }

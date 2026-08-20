@@ -1,19 +1,19 @@
 package su.nightexpress.dungeons.dungeon.module;
 
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.config.Config;
 import su.nightexpress.dungeons.dungeon.config.DungeonConfig;
 import su.nightexpress.dungeons.dungeon.feature.board.BoardLayout;
 import su.nightexpress.dungeons.kit.impl.Kit;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.config.Writeable;
-import su.nightexpress.nightcore.util.CommandUtil;
-import su.nightexpress.nightcore.util.Lists;
-import su.nightexpress.nightcore.util.StringUtil;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.Writeable;
+import su.nightexpress.dungeons.nightcore.util.CommandUtil;
+import su.nightexpress.dungeons.nightcore.util.Lists;
+import su.nightexpress.dungeons.nightcore.util.StringUtil;
 
 import java.util.*;
 
@@ -58,7 +58,7 @@ public class GameSettings implements Writeable {
     private boolean petsAllowed;
     private boolean mcmmoAllowed;
 
-    public GameSettings(@NotNull DungeonConfig dungeonConfig) {
+    public GameSettings(@NonNull DungeonConfig dungeonConfig) {
         //this.bannedItems = Lists.newSet(Material.ENDER_PEARL);
         this.allowedExternalMobSpawns = Lists.newSet(CreatureSpawnEvent.SpawnReason.CUSTOM);
         this.allowedCommands = new HashSet<>();
@@ -100,7 +100,7 @@ public class GameSettings implements Writeable {
         this.setKitsEnabled(false);
     }
 
-    public void load(@NotNull FileConfig config, @NotNull String path) {
+    public void load(@NonNull FileConfig config, @NonNull String path) {
         if (config.contains(path + ".General.Keep_Inventory")) {
             boolean oldValue = config.getBoolean(path + ".General.Keep_Inventory");
             config.set(path + ".General.KeepInventory.Enabled", oldValue);
@@ -152,7 +152,7 @@ public class GameSettings implements Writeable {
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".General.Timeleft", this.timeleft);
         config.set(path + ".General.Lobby_Prepare_Time", this.lobbyTime);
         config.set(path + ".General.Leave_On_Death", this.leaveOnDeath);
@@ -199,11 +199,11 @@ public class GameSettings implements Writeable {
     }
 
     /*@Deprecated
-    public boolean isBannedItem(@NotNull ItemStack item) {
+    public boolean isBannedItem(@NonNull ItemStack item) {
         return this.bannedItems.contains(item.getType());
     }*/
 
-    public boolean isAllowedCommand(@NotNull String command) {
+    public boolean isAllowedCommand(@NonNull String command) {
         if (this.allowedCommands.isEmpty()) return false;
         if (this.allowedCommands.contains(Placeholders.WILDCARD)) return true;
 
@@ -211,15 +211,15 @@ public class GameSettings implements Writeable {
         return aliases.stream().anyMatch(alias -> this.allowedCommands.contains(alias));
     }
 
-    public boolean isAllowedExternalSpawn(@NotNull CreatureSpawnEvent.SpawnReason reason) {
+    public boolean isAllowedExternalSpawn(CreatureSpawnEvent.@NonNull SpawnReason reason) {
         return this.allowedExternalMobSpawns.contains(reason);
     }
 
-    public boolean isKitAllowed(@NotNull Kit kit) {
+    public boolean isKitAllowed(@NonNull Kit kit) {
         return this.isKitAllowed(kit.getId());
     }
 
-    public boolean isKitAllowed(@NotNull String id) {
+    public boolean isKitAllowed(@NonNull String id) {
         return this.getKitLimit(id) != 0;
     }
 
@@ -227,11 +227,11 @@ public class GameSettings implements Writeable {
         return !this.kitsLimits.isEmpty();
     }
 
-    public int getKitLimit(@NotNull Kit kit) {
+    public int getKitLimit(@NonNull Kit kit) {
         return this.getKitLimit(kit.getId());
     }
 
-    public int getKitLimit(@NotNull String id) {
+    public int getKitLimit(@NonNull String id) {
         // If nothing defined, then noting to limit.
 //        if (this.kitsLimits.isEmpty()) return -1;
 //
@@ -318,12 +318,12 @@ public class GameSettings implements Writeable {
         this.keepInventoryRequiresLives = keepInventoryRequiresLives;
     }
 
-    @NotNull
+    @NonNull
     public Set<String> getAllowedCommands() {
         return this.allowedCommands;
     }
 
-    public void setAllowedCommands(@NotNull Set<String> allowedCommands) {
+    public void setAllowedCommands(@NonNull Set<String> allowedCommands) {
         this.allowedCommands = allowedCommands;
     }
 
@@ -362,12 +362,12 @@ public class GameSettings implements Writeable {
         this.scoreboardEnabled = scoreboardEnabled;
     }
 
-    @NotNull
+    @NonNull
     public String getScoreboardLayoutId() {
         return this.scoreboardLayoutId;
     }
 
-    public void setScoreboardLayoutId(@NotNull String scoreboardLayoutId) {
+    public void setScoreboardLayoutId(@NonNull String scoreboardLayoutId) {
         this.scoreboardLayoutId = scoreboardLayoutId;
     }
 
@@ -471,7 +471,7 @@ public class GameSettings implements Writeable {
         this.mobsDropLoot = mobsDropLoot;
     }
 
-    @NotNull
+    @NonNull
     public Set<CreatureSpawnEvent.SpawnReason> getAllowedExternalMobSpawns() {
         return this.allowedExternalMobSpawns;
     }
@@ -488,7 +488,7 @@ public class GameSettings implements Writeable {
         this.kitsEnabled = kitsEnabled;
     }
 
-    @NotNull
+    @NonNull
     public Map<String, Integer> getKitsLimits() {
         return this.kitsLimits;
     }

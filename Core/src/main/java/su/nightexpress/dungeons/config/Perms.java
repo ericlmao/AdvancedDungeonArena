@@ -1,7 +1,7 @@
 package su.nightexpress.dungeons.config;
 
 import su.nightexpress.dungeons.Placeholders;
-import su.nightexpress.nightcore.util.wrapper.UniPermission;
+import su.nightexpress.dungeons.nightcore.util.wrapper.UniPermission;
 
 public class Perms {
 

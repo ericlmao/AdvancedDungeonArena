@@ -1,13 +1,13 @@
 package su.nightexpress.dungeons.dungeon.criteria.registry.mob;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.criteria.CriterionMob;
 import su.nightexpress.dungeons.dungeon.criteria.AbstractCriteria;
 import su.nightexpress.dungeons.api.criteria.CriteriaValidator;
 
 public abstract class MobCriteria<T> extends AbstractCriteria<T, CriterionMob> {
 
-    public MobCriteria(@NotNull CriteriaValidator<T> parser, @NotNull String name) {
+    public MobCriteria(@NonNull CriteriaValidator<T> parser, @NonNull String name) {
         super(parser, name);
     }
 }

@@ -1,12 +1,12 @@
 package su.nightexpress.dungeons.dungeon.event;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
 
 public interface DungeonEventReceiver {
 
-    void addHandler(@NotNull DungeonEventHandler handler);
+    void addHandler(@NonNull DungeonEventHandler handler);
 
-    boolean onDungeonEventBroadcastReceive(@NotNull DungeonGameEvent event, @NotNull DungeonEventType eventType, @NotNull DungeonInstance dungeon);
+    boolean onDungeonEventBroadcastReceive(@NonNull DungeonGameEvent event, @NonNull DungeonEventType eventType, @NonNull DungeonInstance dungeon);
 }

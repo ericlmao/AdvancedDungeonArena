@@ -1,31 +1,31 @@
 package su.nightexpress.dungeons.dungeon.script.condition.impl;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.script.condition.ConditionId;
 import su.nightexpress.dungeons.dungeon.script.condition.type.MobsAmountCondition;
-import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
 @Deprecated
 public class KilledMobsAmountCondition extends MobsAmountCondition {
 
-    public KilledMobsAmountCondition(@NotNull MobsData data) {
+    public KilledMobsAmountCondition(@NonNull MobsData data) {
         super(data);
     }
 
-    @NotNull
-    public static KilledMobsAmountCondition read(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static KilledMobsAmountCondition read(@NonNull FileConfig config, @NonNull String path) {
         return new KilledMobsAmountCondition(readMobsData(config, path));
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return ConditionId.KILLED_MOBS_AMOUNT;
     }
 
     @Override
-    protected double getDungeonValue(@NotNull DungeonInstance dungeon) {
+    protected double getDungeonValue(@NonNull DungeonInstance dungeon) {
         return dungeon.getStats().countMobKills(stage -> true, byFaction(this.getFactionLookup()));
     }
 }

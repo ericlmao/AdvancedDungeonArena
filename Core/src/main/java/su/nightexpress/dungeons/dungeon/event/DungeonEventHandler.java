@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.event;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.script.action.Action;
@@ -11,9 +11,9 @@ import su.nightexpress.dungeons.dungeon.script.condition.ConditionInfo;
 import su.nightexpress.dungeons.dungeon.script.condition.ConditionRegistry;
 import su.nightexpress.dungeons.util.ErrorHandler;
 import su.nightexpress.dungeons.util.PredicateParser;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.config.Writeable;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.Writeable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,15 +26,15 @@ public class DungeonEventHandler implements Writeable {
 
     private DungeonEventType eventType;
 
-    public DungeonEventHandler(@NotNull String id, @NotNull DungeonEventType eventType, @NotNull Map<String, ConditionInfo> conditions, @NotNull Map<String, ActionInfo> actionMap) {
+    public DungeonEventHandler(@NonNull String id, @NonNull DungeonEventType eventType, @NonNull Map<String, ConditionInfo> conditions, @NonNull Map<String, ActionInfo> actionMap) {
         this.id = id;
         this.setEventType(eventType);
         this.conditions = conditions;
         this.actionMap = actionMap;
     }
 
-    @NotNull
-    public static DungeonEventHandler read(@NotNull FileConfig config, @NotNull String path, @NotNull String id) {
+    @NonNull
+    public static DungeonEventHandler read(@NonNull FileConfig config, @NonNull String path, @NonNull String id) {
         DungeonEventType eventType = config.getEnum(path + ".Event", DungeonEventType.class, DungeonEventType.DUNGEON_TICK);
 
         // --------- CONVERT OLD CONDITIONS - START ---------
@@ -106,45 +106,45 @@ public class DungeonEventHandler implements Writeable {
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".Event", this.eventType.name());
 
         config.remove(path + ".Conditions");
         this.conditions.forEach((name, info) -> {
             String conditionPath = path + ".Conditions." + name;
 
-            config.set(conditionPath + ".Type", info.getCondition().getName());
-            config.set(conditionPath + ".Cached", info.isCached());
-            config.set(conditionPath, info.getCondition());
+            config.set(conditionPath + ".Type", info.condition().getName());
+            config.set(conditionPath + ".Cached", info.cached());
+            config.set(conditionPath, info.condition());
         });
 
         config.remove(path + ".Actions");
         this.actionMap.forEach((id, action) -> {
             String actionPath = path + ".Actions." + id;
 
-            config.set(actionPath + ".Type", action.getAction().getName());
-            config.set(actionPath + ".RunIf", action.getRunIfCondition());
-            config.set(actionPath + ".Chance", action.getChance());
-            config.set(actionPath, action.getAction());
+            config.set(actionPath + ".Type", action.action().getName());
+            config.set(actionPath + ".RunIf", action.runIfCondition());
+            config.set(actionPath + ".Chance", action.chance());
+            config.set(actionPath, action.action());
         });
     }
 
-    public boolean handleEvent(@NotNull DungeonGameEvent event, @NotNull DungeonEventType eventType, @NotNull DungeonInstance dungeon) {
+    public boolean handleEvent(@NonNull DungeonGameEvent event, @NonNull DungeonEventType eventType, @NonNull DungeonInstance dungeon) {
         if (!this.canHandle(eventType)) return false;
 
         PredicateParser parser = new PredicateParser();
         this.conditions.forEach((name, condition) -> {
-            if (condition.isCached()) {
-                boolean result = condition.getCondition().test(dungeon, event);
+            if (condition.cached()) {
+                boolean result = condition.condition().test(dungeon, event);
                 parser.register(name,  o -> result);
             }
             else {
-                parser.register(name, o -> condition.getCondition().test(dungeon, event));
+                parser.register(name, o -> condition.condition().test(dungeon, event));
             }
         });
 
         this.getActions().forEach(actionInfo -> {
-            String runIfCondition = actionInfo.getRunIfCondition();
+            String runIfCondition = actionInfo.runIfCondition();
             if (runIfCondition != null && !parser.parse(runIfCondition).test(null)) {
                 return;
             }
@@ -153,30 +153,30 @@ public class DungeonEventHandler implements Writeable {
         return true;
     }
 
-    public boolean canHandle(@NotNull DungeonEventType eventType) {
+    public boolean canHandle(@NonNull DungeonEventType eventType) {
         return this.eventType == eventType;
     }
 
-    @NotNull
+    @NonNull
     public String getId() {
         return this.id;
     }
 
-    @NotNull
+    @NonNull
     public DungeonEventType getEventType() {
         return this.eventType;
     }
 
-    public void setEventType(@NotNull DungeonEventType eventType) {
+    public void setEventType(@NonNull DungeonEventType eventType) {
         this.eventType = eventType;
     }
 
-    @NotNull
+    @NonNull
     public List<ActionInfo> getActions() {
         return new ArrayList<>(this.actionMap.values());
     }
 
-    @NotNull
+    @NonNull
     public List<ConditionInfo> getConditions() {
         return new ArrayList<>(this.conditions.values());
     }

@@ -7,25 +7,24 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDi
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerResetScore;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerScoreboardObjective;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateScore;
-import io.github.retrooper.packetevents.adventure.serializer.gson.GsonComponentSerializer;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.player.DungeonGamer;
 import su.nightexpress.dungeons.dungeon.feature.board.AbstractBoard;
 import su.nightexpress.dungeons.dungeon.feature.board.BoardLayout;
-import su.nightexpress.nightcore.util.text.NightMessage;
+import su.nightexpress.dungeons.nightcore.util.text.night.NightMessage;
 
 import java.util.Optional;
 
 public class PacketsBoard extends AbstractBoard<PacketWrapper<?>> {
 
-    public PacketsBoard(@NotNull DungeonGamer gamer, @NotNull BoardLayout boardConfig) {
+    public PacketsBoard(@NonNull DungeonGamer gamer, @NonNull BoardLayout boardConfig) {
         super(gamer, boardConfig);
     }
 
     @Override
-    @NotNull
-    protected WrapperPlayServerScoreboardObjective createObjectivePacket(ObjectiveMode mode, @NotNull String displayName) {
+    @NonNull
+    protected WrapperPlayServerScoreboardObjective createObjectivePacket(ObjectiveMode mode, @NonNull String displayName) {
         WrapperPlayServerScoreboardObjective.ObjectiveMode objectiveMode = switch (mode) {
             case CREATE -> WrapperPlayServerScoreboardObjective.ObjectiveMode.CREATE;
             case REMOVE -> WrapperPlayServerScoreboardObjective.ObjectiveMode.REMOVE;
@@ -35,21 +34,21 @@ public class PacketsBoard extends AbstractBoard<PacketWrapper<?>> {
         return new WrapperPlayServerScoreboardObjective(
             this.identifier,
             objectiveMode,
-            GsonComponentSerializer.gson().deserialize(NightMessage.asJson(displayName)),
+            NightMessage.parse(displayName),
             WrapperPlayServerScoreboardObjective.RenderType.INTEGER,
             ScoreFormat.blankScore()
         );
     }
 
     @Override
-    @NotNull
-    protected WrapperPlayServerResetScore createResetScorePacket(@NotNull String scoreId) {
+    @NonNull
+    protected WrapperPlayServerResetScore createResetScorePacket(@NonNull String scoreId) {
         return new WrapperPlayServerResetScore(scoreId, this.identifier);
     }
 
     @Override
-    @NotNull
-    protected WrapperPlayServerUpdateScore createScorePacket(@NotNull String scoreId, int score, @NotNull String text) {
+    @NonNull
+    protected WrapperPlayServerUpdateScore createScorePacket(@NonNull String scoreId, int score, @NonNull String text) {
         WrapperPlayServerUpdateScore scorePacket = new WrapperPlayServerUpdateScore(
             scoreId,
             WrapperPlayServerUpdateScore.Action.CREATE_OR_UPDATE_ITEM,
@@ -57,20 +56,20 @@ public class PacketsBoard extends AbstractBoard<PacketWrapper<?>> {
             Optional.of(score)
         );
 
-        scorePacket.setEntityDisplayName(GsonComponentSerializer.gson().deserialize(NightMessage.asJson(text)));
+        scorePacket.setEntityDisplayName(NightMessage.parse(text));
         scorePacket.setScoreFormat(ScoreFormat.blankScore());
 
         return scorePacket;
     }
 
     @Override
-    @NotNull
+    @NonNull
     protected WrapperPlayServerDisplayScoreboard createDisplayPacket() {
         return new WrapperPlayServerDisplayScoreboard(1, this.identifier);
     }
 
     @Override
-    protected void sendPacket(@NotNull Player player, @NotNull PacketWrapper<?> wrapper) {
+    protected void sendPacket(@NonNull Player player, @NonNull PacketWrapper<?> wrapper) {
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, wrapper);
     }
 }

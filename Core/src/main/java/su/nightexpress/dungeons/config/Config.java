@@ -1,8 +1,8 @@
 package su.nightexpress.dungeons.config;
 
 import org.bukkit.entity.EntityType;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.api.mob.MobIdentifier;
 import su.nightexpress.dungeons.dungeon.feature.board.BoardLayout;
@@ -10,17 +10,17 @@ import su.nightexpress.dungeons.registry.mob.MobProviderId;
 import su.nightexpress.dungeons.dungeon.feature.KillStreak;
 import su.nightexpress.dungeons.util.DungeonUtils;
 import su.nightexpress.dungeons.util.MobUitls;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.util.BukkitThing;
-import su.nightexpress.nightcore.util.Lists;
-import su.nightexpress.nightcore.util.Plugins;
-import su.nightexpress.nightcore.util.bukkit.NightItem;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.util.BukkitThing;
+import su.nightexpress.dungeons.nightcore.util.Lists;
+import su.nightexpress.dungeons.nightcore.util.Plugins;
+import su.nightexpress.dungeons.nightcore.util.bukkit.NightItem;
 
 import java.util.Map;
 import java.util.Set;
 
 import static su.nightexpress.dungeons.Placeholders.*;
-import static su.nightexpress.nightcore.util.text.tag.Tags.*;
+import static su.nightexpress.dungeons.nightcore.util.text.night.wrapper.TagWrappers.*;
 
 public class Config {
 
@@ -32,7 +32,6 @@ public class Config {
     public static final String DIR_SPOTS       = "/spots/";
     public static final String DIR_MENU        = "/menu/";
     public static final String DIR_KITS        = "/kits/";
-    public static final String DIR_MOBS        = "/mobs/";
 
     public static final ConfigValue<Boolean> CHAT_ENABLED = ConfigValue.create("Chat.Enabled",
         true,
@@ -140,15 +139,9 @@ public class Config {
 
     public static final ConfigValue<Boolean> MOBS_REMOVE_UNKNOWN_MOBS = ConfigValue.create("Mobs.Remove_Unknown_Mobs",
         false,
-        "When enabled, removes mobs spawned in a dungeon that are not natively supported by the plugin.",
-        "This means that any mob with unknown/missing Mob Provider and/or Mob Id will be removed.",
+        "When enabled, removes mobs spawned in a dungeon that are not managed by a mob provider.",
+        "This means that any mob that is not a MythicMobs mob will be removed.",
         LINK_WIKI_MOBS
-    );
-
-    public static final ConfigValue<String> MOBS_NAME_FORMAT = ConfigValue.create("Mobs.NameFormat",
-        LIGHT_YELLOW.wrap(GENERIC_NAME) + " " + GRAY.wrap("Lv. ") + RED.wrap(GENERIC_LEVEL),
-        "Sets name format for internal ADA's mobs.",
-        "Placeholders: " + GENERIC_NAME + ", " + GENERIC_LEVEL
     );
 
     public static final ConfigValue<Double> MOBS_SPAWN_OFFSET = ConfigValue.create("Mobs.SpawnOffset",
@@ -163,7 +156,8 @@ public class Config {
         MobIdentifier::read,
         map -> map.putAll(MobUitls.getDefaultEggAllies()),
         "List of mobs (Mob Identifiers) allowed to be spawned as ally mobs using spawn eggs.",
-        "Syntax: Mob Type -> Mob Identifier.",
+        "Syntax: Mob Type -> Mob Identifier, where Mob Identifier is 'mythicmobs:MythicMobId'.",
+        "Example: 'zombie: \"mythicmobs:SkeletalKnight\"'.",
         "Mob Types: " + "https://minecraft.wiki/w/Java_Edition_data_values#Entities",
         "Mob Identifiers: " + LINK_WIKI_MOBS
     );
@@ -201,7 +195,7 @@ public class Config {
     );
 
     @Nullable
-    public static BoardLayout getDungeonBoard(@NotNull String id) {
+    public static BoardLayout getDungeonBoard(@NonNull String id) {
         return SCOREBOARD_LAYOUTS.get().get(id.toLowerCase());
     }
 }

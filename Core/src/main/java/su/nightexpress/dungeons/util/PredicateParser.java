@@ -21,25 +21,20 @@ public class PredicateParser {
 
         for (String token : tokens) {
             switch (token) {
-                case "&&":
-                case "||":
-                case "!":
+                case "&&", "||", "!" -> {
                     while (!ops.isEmpty() && precedence(ops.peek()) >= precedence(token)) {
                         output.add(ops.pop());
                     }
                     ops.push(token);
-                    break;
-                case "(":
-                    ops.push(token);
-                    break;
-                case ")":
+                }
+                case "(" -> ops.push(token);
+                case ")" -> {
                     while (!ops.isEmpty() && !ops.peek().equals("(")) {
                         output.add(ops.pop());
                     }
                     ops.pop(); // discard "("
-                    break;
-                default:
-                    output.add(token); // predicate name
+                }
+                default -> output.add(token); // predicate name
             }
         }
         while (!ops.isEmpty()) {
@@ -49,31 +44,25 @@ public class PredicateParser {
         // --- Evaluate postfix ---
         Deque<Predicate<Object>> stack = new ArrayDeque<>();
         for (String token : output) {
-            switch (token) {
-                case "&&": {
+            // Operands come off the stack in reverse, so the right-hand side pops first.
+            stack.push(switch (token) {
+                case "&&" -> {
                     Predicate<Object> right = stack.pop();
-                    Predicate<Object> left = stack.pop();
-                    stack.push(left.and(right));
-                    break;
+                    yield stack.pop().and(right);
                 }
-                case "||": {
+                case "||" -> {
                     Predicate<Object> right = stack.pop();
-                    Predicate<Object> left = stack.pop();
-                    stack.push(left.or(right));
-                    break;
+                    yield stack.pop().or(right);
                 }
-                case "!": {
-                    Predicate<Object> operand = stack.pop();
-                    stack.push(operand.negate());
-                    break;
-                }
-                default:
+                case "!" -> stack.pop().negate();
+                default -> {
                     Predicate<Object> pred = registry.get(token);
                     if (pred == null) {
                         throw new IllegalArgumentException("Unknown predicate: " + token);
                     }
-                    stack.push(pred);
-            }
+                    yield pred;
+                }
+            });
         }
         return stack.pop();
     }

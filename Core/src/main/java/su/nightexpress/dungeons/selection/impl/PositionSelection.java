@@ -2,10 +2,10 @@ package su.nightexpress.dungeons.selection.impl;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.config.Lang;
 import su.nightexpress.dungeons.selection.SelectionType;
-import su.nightexpress.nightcore.util.geodata.pos.BlockPos;
+import su.nightexpress.dungeons.nightcore.util.geodata.pos.BlockPos;
 
 import java.util.LinkedHashSet;
 
@@ -29,7 +29,7 @@ public class PositionSelection extends Selection {
     }
 
     @Override
-    public void onSelect(@NotNull Player player, @NotNull BlockPos pos, @NotNull Action action) {
+    public void onSelect(@NonNull Player player, @NonNull BlockPos pos, @NonNull Action action) {
         if (action == Action.RIGHT_CLICK_BLOCK) {
             this.positions.remove(pos);
             Lang.SELECTION_INFO_POSITION_REMOVE.message().send(player);
@@ -40,7 +40,7 @@ public class PositionSelection extends Selection {
         }
     }
 
-    @NotNull
+    @NonNull
     public LinkedHashSet<BlockPos> getPositions() {
         return this.positions;
     }

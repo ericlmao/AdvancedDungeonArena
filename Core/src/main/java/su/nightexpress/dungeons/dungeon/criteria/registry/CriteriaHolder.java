@@ -1,7 +1,7 @@
 package su.nightexpress.dungeons.dungeon.criteria.registry;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.dungeon.criteria.AbstractCriteria;
 
 import java.util.HashMap;
@@ -21,18 +21,18 @@ public class CriteriaHolder<C extends AbstractCriteria<?, ?>> {
         this.byId.clear();
     }
 
-    @NotNull
-    public <T extends C> T register(@NotNull T criteria) {
+    @NonNull
+    public <T extends C> T register(@NonNull T criteria) {
         this.byId.put(criteria.getName().toLowerCase(), criteria);
         return criteria;
     }
 
     @Nullable
-    public C get(@NotNull String name) {
+    public C get(@NonNull String name) {
         return this.byId.get(name.toLowerCase());
     }
 
-    @NotNull
+    @NonNull
     public Set<C> values() {
         return new HashSet<>(this.byId.values());
     }

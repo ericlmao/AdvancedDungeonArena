@@ -1,9 +1,9 @@
 package su.nightexpress.dungeons.util;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import su.nightexpress.nightcore.util.NumberUtil;
-import su.nightexpress.nightcore.util.Numbers;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+import su.nightexpress.dungeons.nightcore.util.NumberUtil;
+import su.nightexpress.dungeons.nightcore.util.Numbers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,28 +20,28 @@ public class SectionedData {
 
     private final List<List<String>> data;
 
-    public SectionedData(@NotNull List<List<String>> data) {
+    public SectionedData(@NonNull List<List<String>> data) {
         this.data = data;
     }
 
-    @NotNull
+    @NonNull
     public static Builder builder() {
         return new Builder();
     }
 
-    @NotNull
-    public static SectionedData deserialize(@NotNull String source) {
+    @NonNull
+    public static SectionedData deserialize(@NonNull String source) {
         List<List<String>> data = Arrays.stream(source.split(DEF_GLOBAL_DELIMITER)).map(section -> Arrays.asList(section.split(DEF_SECTION_DELIMITER))).toList();
 
         return new SectionedData(data);
     }
 
-    @NotNull
+    @NonNull
     public String serialize() {
         return this.data.stream().map(values -> String.join(DEF_SECTION_DELIMITER, values)).collect(Collectors.joining(DEF_GLOBAL_DELIMITER));
     }
 
-    @NotNull
+    @NonNull
     public Optional<List<String>> section(int index) {
         return index >= this.data.size() ? Optional.empty() : Optional.of(this.data.get(index));
     }
@@ -55,13 +55,13 @@ public class SectionedData {
         return this.section(section).map(list -> index >= list.size() ? null : list.get(index)).orElse(null);
     }
 
-    @NotNull
+    @NonNull
     public Optional<String> at(int section, int index) {
         return Optional.ofNullable(this.getAt(section, index));
     }
 
-    @NotNull
-    public String getString(int section, int index, @NotNull String fallback) {
+    @NonNull
+    public String getString(int section, int index, @NonNull String fallback) {
         return this.at(section, index).orElse(fallback);
     }
 
@@ -81,30 +81,30 @@ public class SectionedData {
             this.data = new ArrayList<>();
         }
 
-        @NotNull
+        @NonNull
         public SectionedData build() {
             return new SectionedData(this.data);
         }
 
-        @NotNull
+        @NonNull
         public String serialize() {
             return this.build().serialize();
         }
 
-        @NotNull
+        @NonNull
         public Builder section(double... values) {
             this.data.add(DoubleStream.of(values).boxed().map(String::valueOf).toList());
             return this;
         }
 
-        @NotNull
+        @NonNull
         public Builder section(int... values) {
             this.data.add(IntStream.of(values).boxed().map(String::valueOf).toList());
             return this;
         }
 
-        @NotNull
-        public Builder section(@NotNull String... values) {
+        @NonNull
+        public Builder section(@NonNull String... values) {
             this.data.add(Arrays.asList(values));
             return this;
         }

@@ -14,10 +14,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.selection.SelectionManager;
-import su.nightexpress.nightcore.manager.AbstractListener;
+import su.nightexpress.dungeons.nightcore.manager.AbstractListener;
 
 import java.util.stream.Stream;
 
@@ -25,7 +25,7 @@ public class SelectionListener extends AbstractListener<DungeonPlugin> {
 
     private final SelectionManager manager;
 
-    public SelectionListener(@NotNull DungeonPlugin plugin, @NotNull SelectionManager manager) {
+    public SelectionListener(@NonNull DungeonPlugin plugin, @NonNull SelectionManager manager) {
         super(plugin);
         this.manager = manager;
     }

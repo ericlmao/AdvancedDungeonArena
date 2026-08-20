@@ -4,14 +4,14 @@ import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import su.nightexpress.dungeons.api.type.GameState;
 import su.nightexpress.dungeons.selection.SelectionType;
-import su.nightexpress.nightcore.locale.LangContainer;
-import su.nightexpress.nightcore.locale.LangEntry;
-import su.nightexpress.nightcore.locale.entry.*;
-import su.nightexpress.nightcore.locale.message.MessageData;
-import su.nightexpress.nightcore.util.bridge.RegistryType;
+import su.nightexpress.dungeons.nightcore.locale.LangContainer;
+import su.nightexpress.dungeons.nightcore.locale.LangEntry;
+import su.nightexpress.dungeons.nightcore.locale.entry.*;
+import su.nightexpress.dungeons.nightcore.locale.message.MessageData;
+import su.nightexpress.dungeons.nightcore.util.bridge.RegistryType;
 
 import static su.nightexpress.dungeons.Placeholders.*;
-import static su.nightexpress.nightcore.util.text.night.wrapper.TagWrappers.*;
+import static su.nightexpress.dungeons.nightcore.util.text.night.wrapper.TagWrappers.*;
 
 public class Lang implements LangContainer {
 

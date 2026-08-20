@@ -7,20 +7,23 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.api.dungeon.DungeonPlayer;
 import su.nightexpress.dungeons.config.Config;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
-import su.nightexpress.nightcore.util.EntityUtil;
-import su.nightexpress.nightcore.util.Players;
-import su.nightexpress.nightcore.util.geodata.pos.ExactPos;
+import su.nightexpress.dungeons.nightcore.util.EntityUtil;
+import su.nightexpress.dungeons.nightcore.util.Players;
+import su.nightexpress.dungeons.nightcore.util.geodata.pos.ExactPos;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerSnapshot {
 
-    private static final Map<UUID, PlayerSnapshot> SNAPSHOTS = new HashMap<>();
+    // Written from join/leave on whichever region thread owns the joining player - concurrent by necessity.
+    private static final Map<UUID, PlayerSnapshot> SNAPSHOTS = new ConcurrentHashMap<>();
 
     private final String                   worldName;
     private final ExactPos                 blockPos;
@@ -34,7 +37,7 @@ public class PlayerSnapshot {
     private final GameMode                 gameMode;
     private final List<ItemStack>          confiscate;
 
-    PlayerSnapshot(@NotNull Player player) {
+    PlayerSnapshot(@NonNull Player player) {
         this.worldName = player.getWorld().getName();
         this.blockPos = ExactPos.from(player.getLocation());
         this.foodLevel = player.getFoodLevel();
@@ -49,18 +52,18 @@ public class PlayerSnapshot {
     }
 
     @Nullable
-    public static PlayerSnapshot get(@NotNull Player player) {
+    public static PlayerSnapshot get(@NonNull Player player) {
         return SNAPSHOTS.get(player.getUniqueId());
     }
 
-    @NotNull
-    public static PlayerSnapshot doSnapshot(@NotNull Player player) {
+    @NonNull
+    public static PlayerSnapshot doSnapshot(@NonNull Player player) {
         PlayerSnapshot snapshot = new PlayerSnapshot(player);
         SNAPSHOTS.put(player.getUniqueId(), snapshot);
         return snapshot;
     }
 
-    public static void clear(@NotNull Player player) {
+    public static void clear(@NonNull Player player) {
         //player.setGameMode(GameMode.SURVIVAL);
         player.setAllowFlight(false);
         player.setFlying(false);
@@ -76,17 +79,47 @@ public class PlayerSnapshot {
         player.getActivePotionEffects().forEach(effect -> player.removePotionEffect(effect.getType()));
     }
 
-    public static void restore(@NotNull DungeonPlayer gamer) {
+    /**
+     * Puts the player back the way they were before entering the dungeon.
+     * <p>
+     * This is a <b>cross-world</b> teleport followed by a dozen player mutations, which makes it the single
+     * most dangerous sequence in the plugin on Folia: the player changes owning region part-way through, so
+     * running the restore body against the old region is exactly how inventories get duplicated or lost.
+     * Everything after the move therefore happens in the teleport continuation, on the player's scheduler.
+     *
+     * @return a future completing once the player has been fully restored, so that callers can order their
+     *         own follow-up work (rewards, refunds, exit commands) after it.
+     */
+    @NonNull
+    public static CompletableFuture<Void> restore(@NonNull DungeonPlayer gamer) {
         Player player = gamer.getPlayer();
         PlayerSnapshot snapshot = SNAPSHOTS.remove(player.getUniqueId());
-        if (snapshot == null) return;
+        if (snapshot == null) return CompletableFuture.completedFuture(null);
 
         DungeonInstance arena = (DungeonInstance) gamer.getDungeon();
 
         World world = Bukkit.getWorld(snapshot.getWorldName());
         if (world == null) world = Bukkit.getWorlds().getFirst();
 
-        gamer.teleport(snapshot.getBlockPos().toLocation(world));
+        // Shutdown path. Once the plugin is disabled no scheduler will ever run our continuation, so a purely
+        // asynchronous restore would silently drop every player's inventory on /reload or server stop. Apply
+        // the state inline instead and skip the move - getting the items back matters, the position does not.
+        if (!arena.getPlugin().isEnabled()) {
+            applyState(player, snapshot, arena);
+            return CompletableFuture.completedFuture(null);
+        }
+
+        CompletableFuture<Void> restored = new CompletableFuture<>();
+
+        gamer.teleportThen(snapshot.getBlockPos().toLocation(world), () -> {
+            applyState(player, snapshot, arena);
+            restored.complete(null);
+        });
+
+        return restored;
+    }
+
+    private static void applyState(@NonNull Player player, @NonNull PlayerSnapshot snapshot, @NonNull DungeonInstance arena) {
         player.setFoodLevel(snapshot.getFoodLevel());
         player.setSaturation(snapshot.getSaturation());
         player.setExhaustion(snapshot.getExhaustion());
@@ -110,12 +143,12 @@ public class PlayerSnapshot {
         }
     }
 
-    @NotNull
+    @NonNull
     public String getWorldName() {
         return this.worldName;
     }
 
-    @NotNull
+    @NonNull
     public ExactPos getBlockPos() {
         return this.blockPos;
     }
@@ -136,7 +169,7 @@ public class PlayerSnapshot {
         return health;
     }
 
-    @NotNull
+    @NonNull
     public ItemStack[] getInventory() {
         return this.inventory;
     }
@@ -145,17 +178,17 @@ public class PlayerSnapshot {
         return this.armor;
     }
 
-    @NotNull
+    @NonNull
     public Collection<PotionEffect> getPotionEffects() {
         return this.effects;
     }
 
-    @NotNull
+    @NonNull
     public GameMode getGameMode() {
         return this.gameMode;
     }
 
-    @NotNull
+    @NonNull
     public List<ItemStack> getConfiscate() {
         return confiscate;
     }

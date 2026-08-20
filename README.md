@@ -18,8 +18,7 @@
 - **Synchronization**. Sync user data across multiple servers!
 - [**Script Based**](https://nightexpressdev.com/dungeon-arena/dungeons/scripts/overview/). Code the whole dungeon logic/behavior by yourself!
 - **Unlimited Dungeons**. Create as many dungeons as you want!
-- [**60+ Supported Mobs**](https://nightexpressdev.com/dungeon-arena/mobs/overview/). Create custom variants of vanilla mobs for your dungeons!
-- [**Custom Mob Support**](https://nightexpressdev.com/dungeon-arena/mobs/overview/). Spawn mobs from your favorite plugins in dungeons!
+- [**MythicMobs Powered**](https://nightexpressdev.com/dungeon-arena/mobs/overview/). All dungeon mobs are MythicMobs mobs — design them with the full MythicMobs skill/AI system!
 - **Ally Mobs**. Summon ally mobs that fight for you in the dungeon!
 - **Dungeon Hub**. A place for players to prepare for the dungeon raid!
 - [**Dungeon Tasks**](https://nightexpressdev.com/dungeon-arena/dungeons/features/stage-tasks/). Create custom tasks for players to progress in a dungeon!
@@ -55,13 +54,24 @@
 
 
 # Compatibility
-- **Java 21** or higher.
-- **Spigot** or **Paper**.
-- **Server Version:** 1.21.4 / 1.21.5
+- **Java 25** or higher.
+- **Paper** (Spigot is no longer supported — the plugin builds against `paper-api` and mojang-mapped Paper internals).
+- **Server Version:** 1.21.11
+
+# Building
+```bash
+./gradlew build
+```
+The shaded plugin jar is written to `build/libs/AdvancedDungeonArena-<version>.jar`.
+
+The build uses the Gradle wrapper (9.7.1) and a Java 25 toolchain. NMS access is provided by
+[paperweight-userdev](https://github.com/PaperMC/paperweight), so no BuildTools run or local
+Spigot installation is required.
 
 # Dependencies
 **REQUIRED:**
 - [nightcore](https://nightexpressdev.com/nightcore/#downloads) - Plugin engine.
+- [MythicMobs](https://www.spigotmc.org/resources/5702/) - The mob engine. The plugin loads without it, but no mobs can be spawned in dungeons.
 
 **OPTIONAL:**
 - [EconomyBridge](https://nightexpressdev.com/economy-bridge/#downloads) - For custom item support and economy-related features.

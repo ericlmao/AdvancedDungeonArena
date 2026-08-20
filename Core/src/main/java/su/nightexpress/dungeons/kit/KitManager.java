@@ -4,8 +4,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.config.Config;
@@ -16,11 +16,11 @@ import su.nightexpress.dungeons.kit.impl.Kit;
 import su.nightexpress.dungeons.kit.menu.KitPreviewMenu;
 import su.nightexpress.dungeons.kit.menu.KitSelectMenu;
 import su.nightexpress.dungeons.kit.menu.KitShopMenu;
-import su.nightexpress.nightcore.manager.AbstractManager;
-import su.nightexpress.nightcore.util.FileUtil;
-import su.nightexpress.nightcore.util.PDCUtil;
-import su.nightexpress.nightcore.util.StringUtil;
-import su.nightexpress.nightcore.util.bukkit.NightItem;
+import su.nightexpress.dungeons.nightcore.manager.AbstractManager;
+import su.nightexpress.dungeons.nightcore.util.FileUtil;
+import su.nightexpress.dungeons.nightcore.util.PDCUtil;
+import su.nightexpress.dungeons.nightcore.util.StringUtil;
+import su.nightexpress.dungeons.nightcore.util.bukkit.NightItem;
 
 import java.io.File;
 import java.util.*;
@@ -35,7 +35,7 @@ public class KitManager extends AbstractManager<DungeonPlugin> {
     private KitSelectMenu selectMenu;
     private KitShopMenu   shopMenu;
 
-    public KitManager(@NotNull DungeonPlugin plugin) {
+    public KitManager(@NonNull DungeonPlugin plugin) {
         super(plugin);
         this.kitByIdMap = new HashMap<>();
     }
@@ -71,7 +71,7 @@ public class KitManager extends AbstractManager<DungeonPlugin> {
         this.plugin.info("Loaded " + this.kitByIdMap.size() + " kits.");
     }
 
-    private boolean loadKit(@NotNull Kit kit) {
+    private boolean loadKit(@NonNull Kit kit) {
         if (!kit.load()) {
             this.plugin.error("Kit not loaded: '" + kit.getFile().getPath() + "'.");
             return false;
@@ -98,7 +98,7 @@ public class KitManager extends AbstractManager<DungeonPlugin> {
         this.shopMenu = new KitShopMenu(this.plugin);
     }
 
-    public boolean hasAnyAccess(@NotNull Player player) {
+    public boolean hasAnyAccess(@NonNull Player player) {
         DungeonUser user = plugin.getUserManager().getOrFetch(player);
         if (user.getPurchasedKits().stream().anyMatch(has -> this.getKitById(has) != null)) {
             return true;
@@ -107,7 +107,7 @@ public class KitManager extends AbstractManager<DungeonPlugin> {
         return this.getKits().stream().anyMatch(Predicate.not(Kit::hasCost));
     }
 
-    public boolean createKit(@NotNull Player player, @NotNull String name) {
+    public boolean createKit(@NonNull Player player, @NonNull String name) {
         String id = StringUtil.transformForID(name);
         if (id.isBlank()) {
             Lang.SETUP_ERROR_INVALID_NAME.message().send(player);
@@ -124,7 +124,7 @@ public class KitManager extends AbstractManager<DungeonPlugin> {
         return true;
     }
 
-    public void updateKit(@NotNull Player player, @NotNull Kit kit) {
+    public void updateKit(@NonNull Player player, @NonNull Kit kit) {
         PlayerInventory inventory = player.getInventory();
 
         KitUtils.setKitContent(kit, inventory);
@@ -132,7 +132,7 @@ public class KitManager extends AbstractManager<DungeonPlugin> {
         Lang.KIT_CREATE_DONE_UPDATE.message().send(player, replacer -> replacer.replace(kit.replacePlaceholders()));
     }
 
-    private void createKit(@NotNull String id, @NotNull Consumer<Kit> consumer) {
+    private void createKit(@NonNull String id, @NonNull Consumer<Kit> consumer) {
         File file = new File(this.getKitsPath(), id + ".yml");
         Kit kit = new Kit(this.plugin, file);
         kit.setName(StringUtil.capitalizeUnderscored(id));
@@ -143,76 +143,76 @@ public class KitManager extends AbstractManager<DungeonPlugin> {
         this.loadKit(kit);
     }
 
-    public boolean deleteKit(@NotNull Kit kit) {
+    public boolean deleteKit(@NonNull Kit kit) {
         if (!kit.getFile().delete()) return false;
 
         this.kitByIdMap.remove(kit.getId());
         return true;
     }
 
-    @NotNull
+    @NonNull
     public String getKitsPath() {
         return this.plugin.getDataFolder() + Config.DIR_KITS;
     }
 
-    @NotNull
+    @NonNull
     public KitPreviewMenu getPreviewMenu() {
         return this.previewMenu;
     }
 
-    @NotNull
+    @NonNull
     public KitSelectMenu getSelectMenu() {
         return this.selectMenu;
     }
 
-    @NotNull
+    @NonNull
     public KitShopMenu getShopMenu() {
         return this.shopMenu;
     }
 
-    public boolean isKitExists(@NotNull String id) {
+    public boolean isKitExists(@NonNull String id) {
         return this.getKitById(id) != null;
     }
 
-    @NotNull
+    @NonNull
     public Map<String, Kit> getKitByIdMap() {
         return this.kitByIdMap;
     }
 
-    @NotNull
+    @NonNull
     public Set<Kit> getKits() {
         return new HashSet<>(this.kitByIdMap.values());
     }
 
-    @NotNull
+    @NonNull
     public List<String> getKitIds() {
         return new ArrayList<>(this.kitByIdMap.keySet());
     }
 
     @Nullable
-    public Kit getKitById(@NotNull String id) {
+    public Kit getKitById(@NonNull String id) {
         return this.kitByIdMap.get(id.toLowerCase());
     }
 
     @Nullable
-    public Kit getKitByItem(@NotNull ItemStack item) {
+    public Kit getKitByItem(@NonNull ItemStack item) {
         String id = PDCUtil.getString(item, Keys.kitItem).orElse(null);
         return id == null ? null : this.getKitById(id);
     }
 
-    public void openSelector(@NotNull Player player, @NotNull DungeonInstance dungeon) {
+    public void openSelector(@NonNull Player player, @NonNull DungeonInstance dungeon) {
         this.selectMenu.open(player, dungeon);
     }
 
-    public void openShop(@NotNull Player player, @NotNull DungeonInstance dungeon) {
+    public void openShop(@NonNull Player player, @NonNull DungeonInstance dungeon) {
         this.shopMenu.open(player, dungeon);
     }
 
-    public void openPreview(@NotNull Player player, @NotNull Kit kit, @NotNull DungeonInstance dungeon) {
+    public void openPreview(@NonNull Player player, @NonNull Kit kit, @NonNull DungeonInstance dungeon) {
         this.previewMenu.open(player, kit, dungeon);
     }
 
-    public boolean purchase(@NotNull Player player, @NotNull Kit kit) {
+    public boolean purchase(@NonNull Player player, @NonNull Kit kit) {
         DungeonUser user = this.plugin.getUserManager().getOrFetch(player);
         if (user.hasKit(kit)) {
             return false;

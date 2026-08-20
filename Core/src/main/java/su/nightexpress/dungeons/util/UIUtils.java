@@ -3,14 +3,14 @@ package su.nightexpress.dungeons.util;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.potion.PotionEffect;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.config.Lang;
-import su.nightexpress.nightcore.bridge.currency.Currency;
-import su.nightexpress.nightcore.integration.currency.EconomyBridge;
-import su.nightexpress.nightcore.language.LangAssets;
-import su.nightexpress.nightcore.locale.entry.TextLocale;
-import su.nightexpress.nightcore.util.NumberUtil;
-import su.nightexpress.nightcore.util.placeholder.Replacer;
+import su.nightexpress.dungeons.nightcore.bridge.currency.Currency;
+import su.nightexpress.dungeons.nightcore.integration.currency.EconomyBridge;
+import su.nightexpress.dungeons.nightcore.util.LangUtil;
+import su.nightexpress.dungeons.nightcore.locale.entry.TextLocale;
+import su.nightexpress.dungeons.nightcore.util.NumberUtil;
+import su.nightexpress.dungeons.nightcore.util.placeholder.Replacer;
 
 import static su.nightexpress.dungeons.Placeholders.*;
 
@@ -18,7 +18,7 @@ public class UIUtils {
 
 //    private static ConfirmMenu confirmMenu;
 //
-//    public static void load(@NotNull DungeonPlugin plugin) {
+//    public static void load(@NonNull DungeonPlugin plugin) {
 //        confirmMenu = new ConfirmMenu(plugin);
 //    }
 //
@@ -27,28 +27,28 @@ public class UIUtils {
 //        confirmMenu = null;
 //    }
 //
-//    public static void openConfirmation(@NotNull Player player, @NotNull Confirmation confirmation) {
+//    public static void openConfirmation(@NonNull Player player, @NonNull Confirmation confirmation) {
 //        confirmMenu.open(player, confirmation);
 //    }
 
-    @NotNull
-    public static String formatCostEntry(@NotNull String currencyId, double amount) {
+    @NonNull
+    public static String formatCostEntry(@NonNull String currencyId, double amount) {
         Currency currency = EconomyBridge.getCurrency(currencyId);
         if (currency == null) return currencyId;
 
         return currency.format(amount);
     }
 
-    @NotNull
-    public static String formatPotionEffectEntry(@NotNull PotionEffect effect) {
+    @NonNull
+    public static String formatPotionEffectEntry(@NonNull PotionEffect effect) {
         return Replacer.create()
-            .replace(GENERIC_NAME, LangAssets.get(effect.getType()))
+            .replace(GENERIC_NAME, LangUtil.getSerializedName(effect.getType()))
             .replace(GENERIC_AMOUNT, NumberUtil.toRoman(effect.getAmplifier() + 1))
             .apply(Lang.UI_POTION_EFFECT_ENTRY.text());
     }
 
-    @NotNull
-    public static String formatAttributeEntry(@NotNull Attribute attribute, @NotNull AttributeModifier modifier) {
+    @NonNull
+    public static String formatAttributeEntry(@NonNull Attribute attribute, @NonNull AttributeModifier modifier) {
         double amount = modifier.getAmount();
         boolean scalar = modifier.getOperation() == AttributeModifier.Operation.ADD_SCALAR;
         boolean negative = amount < 0D;

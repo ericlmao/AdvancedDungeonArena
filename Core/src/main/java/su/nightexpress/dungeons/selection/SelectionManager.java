@@ -7,8 +7,8 @@ import org.bukkit.block.data.Orientable;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.config.Config;
 import su.nightexpress.dungeons.config.Keys;
@@ -23,13 +23,13 @@ import su.nightexpress.dungeons.selection.visual.Tracker;
 import su.nightexpress.dungeons.selection.visual.highlight.BlockHighlighter;
 import su.nightexpress.dungeons.selection.visual.highlight.BlockPacketsHighlighter;
 import su.nightexpress.dungeons.selection.visual.highlight.BlockProtocolHighlighter;
-import su.nightexpress.nightcore.manager.AbstractManager;
-import su.nightexpress.nightcore.util.PDCUtil;
-import su.nightexpress.nightcore.util.Players;
-import su.nightexpress.nightcore.util.Plugins;
-import su.nightexpress.nightcore.util.geodata.Cuboid;
-import su.nightexpress.nightcore.util.geodata.pos.BlockPos;
-import su.nightexpress.nightcore.util.geodata.pos.ChunkPos;
+import su.nightexpress.dungeons.nightcore.manager.AbstractManager;
+import su.nightexpress.dungeons.nightcore.util.PDCUtil;
+import su.nightexpress.dungeons.nightcore.util.Players;
+import su.nightexpress.dungeons.nightcore.util.Plugins;
+import su.nightexpress.dungeons.nightcore.util.geodata.Cuboid;
+import su.nightexpress.dungeons.nightcore.util.geodata.pos.BlockPos;
+import su.nightexpress.dungeons.nightcore.util.geodata.pos.ChunkPos;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,14 +39,25 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
 
     public static final float DISPLAY_SIZE = 0.998f;
 
+    // Hoisted out of the render path. `Material#createBlockData` parses a block-state string against the
+    // block registry, and the highlight render runs on the async scheduler - doing registry work there once
+    // per player per frame was both wasteful and off-thread. Building them once at class init makes the
+    // async render a pure read of immutable data.
+    private static final BlockData CORNER_DATA = Material.WHITE_STAINED_GLASS.createBlockData();
+    private static final BlockData WIRE_DATA   = Material.IRON_CHAIN.createBlockData();
+    private static final BlockData WIRE_DATA_X = createBlockData(Material.IRON_CHAIN, Axis.X);
+    private static final BlockData WIRE_DATA_Z = createBlockData(Material.IRON_CHAIN, Axis.Z);
+
     private final Map<UUID, Selection> selectionMap;
     private final Map<UUID, Tracker>   chunkTracker;
 
     private BlockHighlighter highlighter;
 
-    public SelectionManager(@NotNull DungeonPlugin plugin) {
+    public SelectionManager(@NonNull DungeonPlugin plugin) {
         super(plugin);
-        this.selectionMap = new HashMap<>();
+        // Both are read from the async highlight timer and written from the selection listener on the
+        // player's own thread. chunkTracker was already concurrent; selectionMap was the same race, missed.
+        this.selectionMap = new ConcurrentHashMap<>();
         this.chunkTracker = new ConcurrentHashMap<>();
     }
 
@@ -76,6 +87,9 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
         }
         else return;
 
+        // `40L` is a long, so it really is 40 ticks / 2 seconds - unlike the `int` overloads elsewhere, which
+        // mean seconds. NightTask converts this to a 2 s wall-clock period on the async scheduler, so the
+        // real-time interval is unchanged.
         this.addAsyncTask(this::highlightBounds, 40L);
     }
 
@@ -97,7 +111,7 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
             // Check if we should skip render.
             if (oldPlayerPos != null && !oldPlayerPos.isEmpty()) {
                 // Always shift rendering bounds to player's Y position.
-                if (Math.abs(oldPlayerPos.getY() - playerLocation.getBlockY()) < 3) {
+                if (Math.abs(oldPlayerPos.y() - playerLocation.getBlockY()) < 3) {
                     // Otherwise render only if player went to other chunk.
                     ChunkPos currentChunkPos = ChunkPos.from(playerLocation);
                     ChunkPos oldChunkPos = ChunkPos.from(oldPlayerPos);
@@ -114,14 +128,14 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
         });
     }
 
-    public void highlightSelection(@NotNull Player player) {
+    public void highlightSelection(@NonNull Player player) {
         Selection selection = this.getSelection(player);
         if (selection == null) return;
 
         this.highlightSelection(player, selection);
     }
 
-    public void highlightSelection(@NotNull Player player, @NotNull Selection selection) {
+    public void highlightSelection(@NonNull Player player, @NonNull Selection selection) {
         if (selection instanceof CuboidSelection cuboidSelection) {
             this.highlightCuboid(player, cuboidSelection.getFirst(), cuboidSelection.getSecond());
         }
@@ -130,14 +144,14 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
 
             Set<BlockInfo> dataSet = new HashSet<>();
             positionSelection.getPositions().forEach(blockPos -> {
-                dataSet.add(new BlockInfo(blockPos, Material.WHITE_STAINED_GLASS.createBlockData()));
+                dataSet.add(new BlockInfo(blockPos, CORNER_DATA));
             });
 
             this.highlightBlocks(player, dataSet);
         }
     }
 
-    private void highlightCuboid(@NotNull Player player, @Nullable BlockPos min, @Nullable BlockPos max) {
+    private void highlightCuboid(@NonNull Player player, @Nullable BlockPos min, @Nullable BlockPos max) {
         if (min == null) min = BlockPos.empty();
         if (max == null) max = BlockPos.empty();
         if (min.isEmpty() && !max.isEmpty()) min = max;
@@ -146,11 +160,11 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
         this.highlightCuboid(player, new Cuboid(min, max));
     }
 
-    public void highlightCuboid(@NotNull Player player, @NotNull Cuboid cuboid) {
+    public void highlightCuboid(@NonNull Player player, @NonNull Cuboid cuboid) {
         this.highlightCuboid(player, cuboid, true/*, true*/);
     }
 
-    public void highlightCuboid(@NotNull Player player, @NotNull Cuboid cuboid, boolean reset/*, boolean checkIntersect*/) {
+    public void highlightCuboid(@NonNull Player player, @NonNull Cuboid cuboid, boolean reset/*, boolean checkIntersect*/) {
         if (this.highlighter == null) return;
 
         if (reset) {
@@ -158,20 +172,15 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
         }
 
         World world = player.getWorld();
-        Material cornerType = Material.WHITE_STAINED_GLASS;
-        Material wireType = Material.IRON_CHAIN;
         Set<BlockInfo> dataSet = new HashSet<>();
 
         // Draw corners of the chunk/region all the time.
-        this.collectBlockData(cuboid.getCorners(), dataSet, cornerType.createBlockData());
-        this.collectBlockData(cuboid.getCornerWiresY(), dataSet, wireType.createBlockData());
+        this.collectBlockData(cuboid.getCorners(), dataSet, CORNER_DATA);
+        this.collectBlockData(cuboid.getCornerWiresY(), dataSet, WIRE_DATA);
 
         // Draw connections only for regions or when player is inside a chunk.
-        BlockData dataX = this.createBlockData(wireType, Axis.X);
-        BlockData dataZ = this.createBlockData(wireType, Axis.Z);
-
-        this.collectBlockData(cuboid.getCornerWiresX(), dataSet, dataX);
-        this.collectBlockData(cuboid.getCornerWiresZ(), dataSet, dataZ);
+        this.collectBlockData(cuboid.getCornerWiresX(), dataSet, WIRE_DATA_X);
+        this.collectBlockData(cuboid.getCornerWiresZ(), dataSet, WIRE_DATA_Z);
 
         // Draw all visual blocks at prepated positions with prepared block data.
         dataSet.forEach(blockInfo -> {
@@ -183,7 +192,7 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
         });
     }
 
-    private void highlightBlocks(@NotNull Player player, @NotNull Set<BlockInfo> dataSet) {
+    private void highlightBlocks(@NonNull Player player, @NonNull Set<BlockInfo> dataSet) {
         World world = player.getWorld();
         ChatColor color = ChatColor.GREEN;
 
@@ -195,8 +204,8 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
         });
     }
 
-    @NotNull
-    private ChatColor getBlockColor(@NotNull BlockPos blockPos, @NotNull Cuboid cuboid) {
+    @NonNull
+    private ChatColor getBlockColor(@NonNull BlockPos blockPos, @NonNull Cuboid cuboid) {
         ChatColor color;
 
         color = ChatColor.WHITE;
@@ -207,14 +216,14 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
         return color;
     }
 
-    private void collectBlockData(@NotNull Collection<BlockPos> source, @NotNull Set<BlockInfo> target, @NotNull BlockData data) {
+    private void collectBlockData(@NonNull Collection<BlockPos> source, @NonNull Set<BlockInfo> target, @NonNull BlockData data) {
         if (data.getMaterial().isAir()) return;
 
         source.stream().filter(blockPos -> blockPos != null && !blockPos.isEmpty()).map(blockPos -> new BlockInfo(blockPos, data)).forEach(target::add);
     }
 
-    @NotNull
-    private BlockData createBlockData(@NotNull Material material, @NotNull Axis axis) {
+    @NonNull
+    private static BlockData createBlockData(@NonNull Material material, @NonNull Axis axis) {
         BlockData data = material.createBlockData();
         if (data instanceof Orientable orientable) {
             orientable.setAxis(axis);
@@ -224,58 +233,58 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
 
 
 
-    @NotNull
+    @NonNull
     public ItemStack getItem() {
         ItemStack itemStack = Config.ITEMS_WAND_ITEM.get().getItemStack();
         PDCUtil.set(itemStack, Keys.dungeonWand, true);
         return itemStack;
     }
 
-    public boolean isItem(@NotNull ItemStack itemStack) {
+    public boolean isItem(@NonNull ItemStack itemStack) {
         return PDCUtil.getBoolean(itemStack, Keys.dungeonWand).isPresent();
     }
 
-    public void onItemUse(@NotNull Player player, @NotNull Block block, @NotNull Action action) {
+    public void onItemUse(@NonNull Player player, @NonNull Block block, @NonNull Action action) {
         this.selectPosition(player, block.getLocation(), action);
     }
 
-    public void onItemDrop(@NotNull Player player) {
+    public void onItemDrop(@NonNull Player player) {
         this.stopSelection(player);
     }
 
-    public boolean isInSelection(@NotNull Player player) {
+    public boolean isInSelection(@NonNull Player player) {
         return this.getSelection(player) != null;
     }
 
     @Nullable
-    public Selection getSelection(@NotNull Player player) {
+    public Selection getSelection(@NonNull Player player) {
         return this.selectionMap.get(player.getUniqueId());
     }
 
-    public void removeAll(@NotNull Player player) {
+    public void removeAll(@NonNull Player player) {
         if (this.isInSelection(player)) {
             this.stopSelection(player);
         }
         this.chunkTracker.remove(player.getUniqueId());
     }
 
-    public void removeVisuals(@NotNull Player player) {
+    public void removeVisuals(@NonNull Player player) {
         if (this.highlighter != null) {
             this.highlighter.removeVisuals(player);
         }
     }
 
-    @NotNull
-    public Tracker addTracker(@NotNull Player player) {
+    @NonNull
+    public Tracker addTracker(@NonNull Player player) {
         return this.chunkTracker.computeIfAbsent(player.getUniqueId(), k -> new Tracker());
     }
 
     @Nullable
-    public Tracker getTracker(@NotNull Player player) {
+    public Tracker getTracker(@NonNull Player player) {
         return this.chunkTracker.get(player.getUniqueId());
     }
 
-    public void removeTracker(@NotNull Player player, @NotNull Consumer<Tracker> consumer) {
+    public void removeTracker(@NonNull Player player, @NonNull Consumer<Tracker> consumer) {
         Tracker tracker = this.getTracker(player);
         if (tracker == null) return;
 
@@ -286,14 +295,14 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
         }
     }
 
-    public void removeTracker(@NotNull Player player) {
+    public void removeTracker(@NonNull Player player) {
         this.chunkTracker.remove(player.getUniqueId());
     }
 
 
 
-    @NotNull
-    public Selection startSelection(@NotNull Player player, @NotNull SelectionType type) {
+    @NonNull
+    public Selection startSelection(@NonNull Player player, @NonNull SelectionType type) {
         this.stopSelection(player);
 
         Selection selection = Selection.create(type);
@@ -305,7 +314,7 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
         return selection;
     }
 
-    public void stopSelection(@NotNull Player player) {
+    public void stopSelection(@NonNull Player player) {
         this.removeVisuals(player);
         this.removeTracker(player, tracker -> tracker.setSelection(false));
 
@@ -313,7 +322,7 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
         this.selectionMap.remove(player.getUniqueId());
     }
 
-    public void selectPosition(@NotNull Player player, @NotNull Location location, @NotNull Action action) {
+    public void selectPosition(@NonNull Player player, @NonNull Location location, @NonNull Action action) {
         Selection selection = this.getSelection(player);
         if (selection == null) return;
 
@@ -321,7 +330,7 @@ public class SelectionManager extends AbstractManager<DungeonPlugin> {
 
         selection.onSelect(player, blockPos, action);
 
-        this.plugin.runTaskAsync(task -> {
+        this.plugin.runTaskAsync(() -> {
             this.highlightSelection(player);
         });
     }

@@ -1,9 +1,9 @@
 package su.nightexpress.dungeons.dungeon.script.condition.type;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.mob.MobIdentifier;
 import su.nightexpress.dungeons.dungeon.script.number.NumberComparator;
-import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
 @Deprecated
 public abstract class MobAmountCondition extends NumberCompareCondition {
@@ -12,17 +12,17 @@ public abstract class MobAmountCondition extends NumberCompareCondition {
 
     public record MobData(NumberComparator comparator, double compareValue, MobIdentifier identifier){}
 
-    protected MobAmountCondition(@NotNull MobData mobData) {
+    protected MobAmountCondition(@NonNull MobData mobData) {
         this(mobData.comparator, mobData.compareValue, mobData.identifier);
     }
 
-    public MobAmountCondition(@NotNull NumberComparator comparator, double compareValue, @NotNull MobIdentifier identifier) {
+    public MobAmountCondition(@NonNull NumberComparator comparator, double compareValue, @NonNull MobIdentifier identifier) {
         super(comparator, compareValue);
         this.identifier = identifier;
     }
 
-    @NotNull
-    public static MobData readMobData(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static MobData readMobData(@NonNull FileConfig config, @NonNull String path) {
         NumberData numberData = readNumberData(config, path);
         MobIdentifier mobId = MobIdentifier.read(config, path + ".MobId");
 
@@ -30,7 +30,7 @@ public abstract class MobAmountCondition extends NumberCompareCondition {
     }
 
     @Override
-    protected void writeAdditional(@NotNull FileConfig config, @NotNull String path) {
+    protected void writeAdditional(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".MobId", this.identifier.serialize());
     }
 }

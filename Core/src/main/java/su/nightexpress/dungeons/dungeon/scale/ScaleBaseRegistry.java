@@ -1,7 +1,7 @@
 package su.nightexpress.dungeons.dungeon.scale;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.dungeon.scale.impl.AlivePlayerAmountBase;
 import su.nightexpress.dungeons.dungeon.scale.impl.DeadPlayerAmountBase;
 import su.nightexpress.dungeons.dungeon.scale.impl.PlayerAmountBase;
@@ -23,15 +23,15 @@ public class ScaleBaseRegistry {
         SCALE_BASES.clear();
     }
 
-    @NotNull
-    public static ScaleBase register(@NotNull ScaleBase scaleBase) {
+    @NonNull
+    public static ScaleBase register(@NonNull ScaleBase scaleBase) {
         SCALE_BASES.put(scaleBase.getName().toLowerCase(), scaleBase);
 
         return scaleBase;
     }
 
     @Nullable
-    public static ScaleBase getByName(@NotNull String name) {
+    public static ScaleBase getByName(@NonNull String name) {
         return SCALE_BASES.get(name.toLowerCase());
     }
 }

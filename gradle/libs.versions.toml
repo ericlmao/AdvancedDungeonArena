@@ -1,0 +1,55 @@
+[versions]
+# Platform
+paper = "1.21.11-R0.1-SNAPSHOT"
+java = "25"
+
+# Build plugins
+shadow = "9.6.1"
+paperweight = "2.0.0-beta.22"
+
+# Libraries
+foliaScheduler = "1.0.1"
+vault = "1.7.1"
+jspecify = "1.0.0"
+mythic = "5.10.0"
+placeholderapi = "2.11.6"
+packetevents = "2.9.0"
+protocollib = "5.3.0"
+essentialsx = "2.21.2"
+tab = "5.2.5"
+mcmmo = "2.2.049"
+mythiclib = "1.6.2-SNAPSHOT"
+mmocore = "1.12.1-SNAPSHOT"
+combatpets = "2.8.1"
+auroraLevels = "2.0.0"
+aurora = "2.1.6"
+
+[libraries]
+paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper" }
+
+# Shaded at runtime (relocated into su.nightexpress.dungeons.libs.foliascheduler) - see Core/build.gradle.kts.
+folia-scheduler = { module = "gg.moonrise.scheduler:folia-scheduler", version.ref = "foliaScheduler" }
+
+vault-api = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }
+
+# Nullability annotations. Also arrives transitively via paper-api; declared so it is not accidental.
+jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
+
+mythic-dist = { module = "io.lumine:Mythic-Dist", version.ref = "mythic" }
+mythiclib-dist = { module = "io.lumine:MythicLib-dist", version.ref = "mythiclib" }
+mmocore-api = { module = "net.Indyuce:MMOCore-API", version.ref = "mmocore" }
+
+placeholderapi = { module = "me.clip:placeholderapi", version.ref = "placeholderapi" }
+packetevents-spigot = { module = "com.github.retrooper:packetevents-spigot", version.ref = "packetevents" }
+protocollib = { module = "com.comphenix.protocol:ProtocolLib", version.ref = "protocollib" }
+essentialsx = { module = "net.essentialsx:EssentialsX", version.ref = "essentialsx" }
+tab-api = { module = "com.github.NEZNAMY:TAB-API", version.ref = "tab" }
+mcmmo = { module = "com.gmail.nossr50.mcMMO:mcMMO", version.ref = "mcmmo" }
+combatpets-api = { module = "su.nightexpress.combatpets:API", version.ref = "combatpets" }
+
+aurora = { module = "gg.auroramc:Aurora", version.ref = "aurora" }
+aurora-levels = { module = "gg.auroramc:AuroraLevels", version.ref = "auroraLevels" }
+
+[plugins]
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+paperweight-userdev = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight" }

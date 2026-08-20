@@ -13,22 +13,22 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.config.Config;
 import su.nightexpress.dungeons.config.Keys;
 import su.nightexpress.dungeons.kit.impl.Kit;
 import su.nightexpress.dungeons.util.DungeonUtils;
-import su.nightexpress.nightcore.integration.currency.CurrencyId;
-import su.nightexpress.nightcore.util.ItemUtil;
-import su.nightexpress.nightcore.util.Lists;
-import su.nightexpress.nightcore.util.PDCUtil;
-import su.nightexpress.nightcore.util.bukkit.NightItem;
-import su.nightexpress.nightcore.util.text.NightMessage;
+import su.nightexpress.dungeons.nightcore.integration.currency.CurrencyId;
+import su.nightexpress.dungeons.nightcore.util.ItemUtil;
+import su.nightexpress.dungeons.nightcore.util.Lists;
+import su.nightexpress.dungeons.nightcore.util.PDCUtil;
+import su.nightexpress.dungeons.nightcore.util.bukkit.NightItem;
+import su.nightexpress.dungeons.nightcore.util.text.night.NightMessage;
 
 import java.util.HashSet;
 
-import static su.nightexpress.nightcore.util.text.tag.Tags.LIGHT_CYAN;
-import static su.nightexpress.nightcore.util.text.tag.Tags.WHITE;
+import static su.nightexpress.dungeons.nightcore.util.text.night.wrapper.TagWrappers.LIGHT_CYAN;
+import static su.nightexpress.dungeons.nightcore.util.text.night.wrapper.TagWrappers.WHITE;
 
 public class KitUtils {
 
@@ -46,19 +46,19 @@ public class KitUtils {
         return !Config.KITS_PREVENT_ITEM_SHARE.get();
     }
 
-    @NotNull
-    public static ItemStack assignKit(@NotNull Kit kit, @NotNull ItemStack itemStack) {
+    @NonNull
+    public static ItemStack assignKit(@NonNull Kit kit, @NonNull ItemStack itemStack) {
         ItemUtil.editMeta(itemStack, meta -> {
             PDCUtil.set(meta, Keys.kitItem, kit.getId());
         });
         return itemStack;
     }
 
-    public static boolean isKitItem(@NotNull ItemStack itemStack) {
+    public static boolean isKitItem(@NonNull ItemStack itemStack) {
         return PDCUtil.getString(itemStack, Keys.kitItem).isPresent();
     }
 
-    public static void setKitContent(@NotNull Kit kit, @NotNull PlayerInventory inventory) {
+    public static void setKitContent(@NonNull Kit kit, @NonNull PlayerInventory inventory) {
         kit.setItems(inventory.getStorageContents());
 
         for (EquipmentSlot slot : KitUtils.ARMOR_SLOTS) {
@@ -66,7 +66,7 @@ public class KitUtils {
         }
     }
 
-    public static void setWarriorKit(@NotNull Kit kit) {
+    public static void setWarriorKit(@NonNull Kit kit) {
         kit.setDescription(Lists.newList(
 
         ));
@@ -93,7 +93,7 @@ public class KitUtils {
             PotionMeta potionMeta = (PotionMeta) meta;
             potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.STRENGTH, 60 * 20, 0), true);
             potionMeta.setColor(Color.fromRGB(170, 10, 40));
-            potionMeta.setDisplayName(NightMessage.asLegacy(WHITE.enclose("Potion of Strength")));
+            potionMeta.setDisplayName(NightMessage.asLegacy(WHITE.wrap("Potion of Strength")));
         });
 
         ItemStack regenPotion = new ItemStack(Material.POTION);
@@ -101,7 +101,7 @@ public class KitUtils {
             PotionMeta potionMeta = (PotionMeta) meta;
             potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.REGENERATION, 30 * 20, 1), true);
             potionMeta.setColor(Color.fromRGB(230, 145, 195));
-            potionMeta.setDisplayName(NightMessage.asLegacy(WHITE.enclose("Potion of Resistance")));
+            potionMeta.setDisplayName(NightMessage.asLegacy(WHITE.wrap("Potion of Resistance")));
         });
 
         ItemStack sword = new ItemStack(Material.IRON_SWORD);
@@ -119,7 +119,7 @@ public class KitUtils {
         kit.setItems(items);
     }
 
-    public static void setTankKit(@NotNull Kit kit) {
+    public static void setTankKit(@NonNull Kit kit) {
         kit.setDescription(Lists.newList(
 
         ));
@@ -159,7 +159,7 @@ public class KitUtils {
             PotionMeta potionMeta = (PotionMeta) meta;
             potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.INSTANT_HEALTH, 1, 1), true);
             potionMeta.setColor(Color.fromRGB(240, 65, 100));
-            potionMeta.setDisplayName(NightMessage.asLegacy(WHITE.enclose("Potion of Heal")));
+            potionMeta.setDisplayName(NightMessage.asLegacy(WHITE.wrap("Potion of Heal")));
         });
 
         ItemStack defensePotion = new ItemStack(Material.POTION);
@@ -167,7 +167,7 @@ public class KitUtils {
             PotionMeta potionMeta = (PotionMeta) meta;
             potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.STRENGTH, 120 * 20, 1), true);
             potionMeta.setColor(Color.fromRGB(90, 80, 130));
-            potionMeta.setDisplayName(NightMessage.asLegacy(WHITE.enclose("Potion of Resistance")));
+            potionMeta.setDisplayName(NightMessage.asLegacy(WHITE.wrap("Potion of Resistance")));
         });
 
         ItemStack[] items = new ItemStack[Kit.INVENTORY_SIZE];
@@ -183,7 +183,7 @@ public class KitUtils {
         kit.setCost(CurrencyId.VAULT, 500);
     }
 
-    public static void setArcherKit(@NotNull Kit kit) {
+    public static void setArcherKit(@NonNull Kit kit) {
         kit.setDescription(Lists.newList(
 
         ));
@@ -221,7 +221,7 @@ public class KitUtils {
             PotionMeta potionMeta = (PotionMeta) meta;
             potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.SPEED, 60 * 20, 1), true);
             potionMeta.setColor(Color.fromRGB(150, 235, 250));
-            potionMeta.setDisplayName(NightMessage.asLegacy(WHITE.enclose("Potion of Swiftness")));
+            potionMeta.setDisplayName(NightMessage.asLegacy(WHITE.wrap("Potion of Swiftness")));
         });
 
         ItemStack bow = new ItemStack(Material.BOW);
@@ -249,7 +249,7 @@ public class KitUtils {
         kit.setCost(CurrencyId.VAULT, 1500);
     }
 
-    public static void setAssasinKit(@NotNull Kit kit) {
+    public static void setAssasinKit(@NonNull Kit kit) {
         kit.setDescription(Lists.newList(
 
         ));
@@ -287,7 +287,7 @@ public class KitUtils {
             PotionMeta potionMeta = (PotionMeta) meta;
             potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.POISON, 60 * 20, 1), true);
             potionMeta.setColor(Color.fromRGB(65, 140, 65));
-            potionMeta.setDisplayName(NightMessage.asLegacy(WHITE.enclose("Splash Potion of Poison")));
+            potionMeta.setDisplayName(NightMessage.asLegacy(WHITE.wrap("Splash Potion of Poison")));
         });
 
         ItemStack bow = new ItemStack(Material.CROSSBOW);
@@ -313,7 +313,7 @@ public class KitUtils {
         kit.setCost(CurrencyId.VAULT, 3500);
     }
 
-    public static void setSupportKit(@NotNull Kit kit) {
+    public static void setSupportKit(@NonNull Kit kit) {
         kit.setDescription(Lists.newList(
 
         ));
@@ -335,7 +335,7 @@ public class KitUtils {
             PotionMeta potionMeta = (PotionMeta) meta;
             potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.INSTANT_HEALTH, 1, 1), true);
             potionMeta.setColor(Color.fromRGB(240, 65, 100));
-            potionMeta.setDisplayName(NightMessage.asLegacy(WHITE.enclose("Potion of Heal")));
+            potionMeta.setDisplayName(NightMessage.asLegacy(WHITE.wrap("Potion of Heal")));
         });
 
         ItemStack firePotion = new ItemStack(Material.SPLASH_POTION, 8);
@@ -343,7 +343,7 @@ public class KitUtils {
             PotionMeta potionMeta = (PotionMeta) meta;
             potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 90 * 20, 1), true);
             potionMeta.setColor(Color.fromRGB(250, 170, 60));
-            potionMeta.setDisplayName(NightMessage.asLegacy(WHITE.enclose("Potion of Fire Resistance")));
+            potionMeta.setDisplayName(NightMessage.asLegacy(WHITE.wrap("Potion of Fire Resistance")));
         });
 
         ItemStack regenPotion = new ItemStack(Material.SPLASH_POTION, 8);
@@ -351,7 +351,7 @@ public class KitUtils {
             PotionMeta potionMeta = (PotionMeta) meta;
             potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.REGENERATION, 30 * 20, 1), true);
             potionMeta.setColor(Color.fromRGB(230, 145, 195));
-            potionMeta.setDisplayName(NightMessage.asLegacy(WHITE.enclose("Potion of Regeneration")));
+            potionMeta.setDisplayName(NightMessage.asLegacy(WHITE.wrap("Potion of Regeneration")));
         });
 
         ItemStack speedPotion = new ItemStack(Material.SPLASH_POTION, 8);
@@ -359,7 +359,7 @@ public class KitUtils {
             PotionMeta potionMeta = (PotionMeta) meta;
             potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.SPEED, 90 * 20, 0), true);
             potionMeta.setColor(Color.fromRGB(150, 235, 250));
-            potionMeta.setDisplayName(NightMessage.asLegacy(WHITE.enclose("Potion of Swiftness")));
+            potionMeta.setDisplayName(NightMessage.asLegacy(WHITE.wrap("Potion of Swiftness")));
         });
 
         ItemStack harmPotion = new ItemStack(Material.SPLASH_POTION, 8);
@@ -367,7 +367,7 @@ public class KitUtils {
             PotionMeta potionMeta = (PotionMeta) meta;
             potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.HASTE, 60 * 20, 1), true);
             potionMeta.setColor(Color.fromRGB(250, 240, 130));
-            potionMeta.setDisplayName(NightMessage.asLegacy(WHITE.enclose("Potion of Haste")));
+            potionMeta.setDisplayName(NightMessage.asLegacy(WHITE.wrap("Potion of Haste")));
         });
 
         ItemStack sword = new ItemStack(Material.GOLDEN_SWORD);
@@ -397,7 +397,7 @@ public class KitUtils {
         kit.setCost(CurrencyId.VAULT, 2500);
     }
 
-    public static void setPriestKit(@NotNull Kit kit) {
+    public static void setPriestKit(@NonNull Kit kit) {
         kit.setDescription(Lists.newList(
 
         ));
@@ -425,7 +425,7 @@ public class KitUtils {
             potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.INSTANT_HEALTH, 1, 2), true);
             potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.INSTANT_DAMAGE, 1, 2), true);
             potionMeta.setColor(Color.fromRGB(230, 250, 255));
-            potionMeta.setDisplayName(NightMessage.asLegacy(LIGHT_CYAN.enclose("Holy Potion of Smite")));
+            potionMeta.setDisplayName(NightMessage.asLegacy(LIGHT_CYAN.wrap("Holy Potion of Smite")));
         });
 
         ItemStack regenPotion = new ItemStack(Material.SPLASH_POTION, 10);
@@ -434,7 +434,7 @@ public class KitUtils {
             potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.INSTANT_HEALTH, 20, 1), true);
             potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.REGENERATION, 30 * 20, 1), true);
             potionMeta.setColor(Color.fromRGB(230, 145, 195));
-            potionMeta.setDisplayName(NightMessage.asLegacy(LIGHT_CYAN.enclose("Holy Potion of Regeneration")));
+            potionMeta.setDisplayName(NightMessage.asLegacy(LIGHT_CYAN.wrap("Holy Potion of Regeneration")));
         });
 
         ItemStack healthPotion = new ItemStack(Material.SPLASH_POTION, 10);
@@ -443,7 +443,7 @@ public class KitUtils {
             potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.ABSORPTION, 90 * 20, 1), true);
             potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 90 * 20, 1), true);
             potionMeta.setColor(Color.fromRGB(150, 235, 250));
-            potionMeta.setDisplayName(NightMessage.asLegacy(LIGHT_CYAN.enclose("Holy Potion of Health")));
+            potionMeta.setDisplayName(NightMessage.asLegacy(LIGHT_CYAN.wrap("Holy Potion of Health")));
         });
 
         // BOMBS
@@ -454,7 +454,7 @@ public class KitUtils {
             potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.INSTANT_HEALTH, 20, 1), true);
             potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.REGENERATION, 30 * 20, 1), true);
             potionMeta.setColor(Color.fromRGB(230, 145, 195));
-            potionMeta.setDisplayName(NightMessage.asLegacy(LIGHT_CYAN.enclose("Holy Bomb of Regeneration")));
+            potionMeta.setDisplayName(NightMessage.asLegacy(LIGHT_CYAN.wrap("Holy Bomb of Regeneration")));
         });
 
         ItemStack healthBomb = new ItemStack(Material.LINGERING_POTION, 10);
@@ -463,7 +463,7 @@ public class KitUtils {
             potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.ABSORPTION, 90 * 20, 1), true);
             potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 90 * 20, 1), true);
             potionMeta.setColor(Color.fromRGB(150, 235, 250));
-            potionMeta.setDisplayName(NightMessage.asLegacy(LIGHT_CYAN.enclose("Holy Bomb of Health")));
+            potionMeta.setDisplayName(NightMessage.asLegacy(LIGHT_CYAN.wrap("Holy Bomb of Health")));
         });
 
         // OTHER
@@ -495,7 +495,7 @@ public class KitUtils {
         kit.setCost(CurrencyId.VAULT, 4500);
     }
 
-    public static void setPyroKit(@NotNull Kit kit) {
+    public static void setPyroKit(@NonNull Kit kit) {
         kit.setDescription(Lists.newList(
 
         ));
@@ -548,7 +548,7 @@ public class KitUtils {
         kit.setCost(CurrencyId.VAULT, 5000);
     }
 
-    public static void setBomberKit(@NotNull Kit kit) {
+    public static void setBomberKit(@NonNull Kit kit) {
         kit.setDescription(Lists.newList(
 
         ));

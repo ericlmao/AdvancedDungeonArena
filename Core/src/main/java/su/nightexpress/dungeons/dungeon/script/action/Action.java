@@ -1,13 +1,13 @@
 package su.nightexpress.dungeons.dungeon.script.action;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
-import su.nightexpress.nightcore.config.Writeable;
+import su.nightexpress.dungeons.nightcore.config.Writeable;
 
 public interface Action extends Writeable {
 
-    @NotNull String getName();
+    @NonNull String getName();
 
-    void perform(@NotNull DungeonInstance dungeon, @NotNull DungeonGameEvent event);
+    void perform(@NonNull DungeonInstance dungeon, @NonNull DungeonGameEvent event);
 }

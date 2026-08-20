@@ -1,10 +1,9 @@
 package su.nightexpress.dungeons;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.data.DataHandler;
 import su.nightexpress.dungeons.dungeon.DungeonManager;
 import su.nightexpress.dungeons.dungeon.DungeonSetup;
-import su.nightexpress.dungeons.mob.MobManager;
 import su.nightexpress.dungeons.user.UserManager;
 import su.nightexpress.dungeons.kit.KitManager;
 import su.nightexpress.dungeons.nms.DungeonNMS;
@@ -13,7 +12,7 @@ public class DungeonsAPI {
 
     private static DungeonPlugin plugin;
 
-    static void load(@NotNull DungeonPlugin dungeonPlugin) {
+    static void load(@NonNull DungeonPlugin dungeonPlugin) {
         plugin = dungeonPlugin;
     }
 
@@ -21,42 +20,37 @@ public class DungeonsAPI {
         plugin = null;
     }
 
-    @NotNull
+    @NonNull
     public static DungeonPlugin getPlugin() {
         return plugin;
     }
 
-    @NotNull
+    @NonNull
     public static UserManager getUserManager() {
         return plugin.getUserManager();
     }
 
-    @NotNull
+    @NonNull
     public static DataHandler getDataHandler() {
         return plugin.getDataHandler();
     }
 
-    @NotNull
+    @NonNull
     public static DungeonManager getDungeonManager() {
         return plugin.getDungeonManager();
     }
 
-    @NotNull
+    @NonNull
     public static DungeonSetup getDungeonSetup() {
         return plugin.getDungeonSetup();
     }
 
-    @NotNull
-    public static MobManager getMobManager() {
-        return plugin.getMobManager();
-    }
-
-    @NotNull
+    @NonNull
     public static KitManager getKitManager() {
         return plugin.getKitManager();
     }
 
-    @NotNull
+    @NonNull
     public static DungeonNMS getArenaNMS() {
         return plugin.getInternals();
     }

@@ -1,30 +1,31 @@
 package su.nightexpress.dungeons.dungeon.event.game;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.DungeonEventType;
 import su.nightexpress.dungeons.dungeon.stage.StageTask;
 import su.nightexpress.dungeons.dungeon.stage.task.TaskProgress;
 
-public abstract class DungeonTaskEvent extends DungeonGameEvent implements TaskEvent {
+public abstract sealed class DungeonTaskEvent extends DungeonGameEvent implements TaskEvent
+    permits DungeonTaskCreatedEvent, DungeonTaskFinishedEvent {
 
     private final StageTask stageTask;
     private final TaskProgress progress;
 
-    public DungeonTaskEvent(@NotNull DungeonEventType type, @NotNull DungeonInstance dungeon, @NotNull StageTask stageTask, @NotNull TaskProgress progress) {
+    public DungeonTaskEvent(@NonNull DungeonEventType type, @NonNull DungeonInstance dungeon, @NonNull StageTask stageTask, @NonNull TaskProgress progress) {
         super(type, dungeon);
         this.stageTask = stageTask;
         this.progress = progress;
     }
 
     @Override
-    @NotNull
+    @NonNull
     public StageTask getStageTask() {
         return this.stageTask;
     }
 
     @Override
-    @NotNull
+    @NonNull
     public TaskProgress getProgress() {
         return this.progress;
     }

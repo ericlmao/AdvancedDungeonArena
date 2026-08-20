@@ -1,8 +1,8 @@
 package su.nightexpress.dungeons.dungeon.script.task;
 
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.dungeon.stage.task.TaskProgress;
 
 public interface ProgressFormatter {
@@ -24,5 +24,5 @@ public interface ProgressFormatter {
         return String.format("%02d:%02d", minutes, seconds);
     };
 
-    @NotNull String format(@NotNull TaskProgress progress, @Nullable Player target);
+    @NonNull String format(@NonNull TaskProgress progress, @Nullable Player target);
 }

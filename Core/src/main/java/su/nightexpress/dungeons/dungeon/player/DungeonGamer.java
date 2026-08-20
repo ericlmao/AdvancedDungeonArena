@@ -1,10 +1,12 @@
 package su.nightexpress.dungeons.dungeon.player;
 
+import gg.moonrise.scheduler.Scheduler;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.api.compat.BoardPlugin;
 import su.nightexpress.dungeons.api.compat.GodPlugin;
@@ -22,10 +24,11 @@ import su.nightexpress.dungeons.kit.impl.Kit;
 import su.nightexpress.dungeons.registry.compat.BoardPluginRegistry;
 import su.nightexpress.dungeons.registry.compat.GodPluginRegistry;
 import su.nightexpress.dungeons.util.DungeonUtils;
-import su.nightexpress.nightcore.locale.entry.MessageLocale;
+import su.nightexpress.dungeons.nightcore.locale.entry.MessageLocale;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
@@ -45,6 +48,19 @@ public class DungeonGamer implements DungeonPlayer {
 
     private Location deathLocation;
 
+    /** Snapshot of {@link #player}'s position, taken on the player's own scheduler. See {@link #tick()}. */
+    private volatile Location lastKnownLocation;
+
+    /**
+     * This player's line on <i>other</i> players' scoreboards, rendered on this player's own scheduler.
+     * <p>
+     * Same reasoning as {@link #lastKnownLocation}: every board in the instance lists every participant, so
+     * each render would otherwise read every peer's display name and state from a thread that does not own
+     * them. Each player renders their own line instead and publishes the finished string. At most one
+     * instance tick stale, which is the rate the boards refresh at anyway.
+     */
+    private volatile String boardEntry;
+
     private boolean dead;
     private long    deathTime;
     private int     lives;
@@ -53,9 +69,10 @@ public class DungeonGamer implements DungeonPlayer {
     private int     kills;
     private int     score;
 
-    private boolean teleporting;
+    /** Written from the teleport completion stage, read from the teleport listener on another thread. */
+    private volatile boolean teleporting;
 
-    public DungeonGamer(@NotNull Player player, @NotNull DungeonInstance dungeon) {
+    public DungeonGamer(@NonNull Player player, @NonNull DungeonInstance dungeon) {
         this.player = player;
         this.dungeon = dungeon;
         this.state = GameState.WAITING;
@@ -66,9 +83,26 @@ public class DungeonGamer implements DungeonPlayer {
 
         this.godPlugin = GodPluginRegistry.getGodProvider(player);
         this.boardPlugin = BoardPluginRegistry.getBoardProvider(player);
+
+        // Published up front so a peer rendering between this player joining and their first tick still has
+        // a line for them. The constructor runs on the joining player's own thread, like tick() does.
+        this.refreshBoardEntry();
     }
 
-    @NotNull
+    private void refreshBoardEntry() {
+        this.boardEntry = this.replacePlaceholders()
+            .apply((this.isReady() ? Lang.UI_BOARD_PLAYER_READY : Lang.UI_BOARD_PLAYER_NOT_READY).text());
+    }
+
+    /**
+     * This player's pre-rendered scoreboard line. Safe to read from any thread. See {@link #boardEntry}.
+     */
+    @NonNull
+    public String getBoardEntry() {
+        return this.boardEntry;
+    }
+
+    @NonNull
     public UnaryOperator<String> replacePlaceholders() {
         return Placeholders.DUNGEON_GAMER.replacer(this);
     }
@@ -90,6 +124,14 @@ public class DungeonGamer implements DungeonPlayer {
 
     @Override
     public void tick() {
+        // Published for code that needs this player's position but does not own this player - script area
+        // tasks, chiefly. Reading player.getLocation() from another region's thread is exactly the kind of
+        // cross-region access Folia exists to prevent, so the position is snapshotted here, on the only
+        // thread allowed to read it, and consumers take the snapshot instead. It is at most one instance
+        // tick (one second) stale, which is the same resolution the area tasks evaluate at anyway.
+        this.lastKnownLocation = this.player.getLocation();
+        this.refreshBoardEntry();
+
         if (this.isDead() && !this.dungeon.isAboutToEnd()) {
             (this.hasExtraLives() ? Lang.DUNGEON_STATUS_DEAD_LIVES : Lang.DUNGEON_STATUS_DEAD_NO_LIVES).message().send(this.player, replacer -> replacer
                 .replace(this.dungeon.replacePlaceholders())
@@ -110,10 +152,51 @@ public class DungeonGamer implements DungeonPlayer {
     }
 
     @Override
-    public void teleport(@NotNull Location location) {
+    @NonNull
+    public CompletableFuture<Boolean> teleport(@NonNull Location location) {
+        // The `teleporting` flag is what tells DungeonGameListener#onDungeonPlayerTeleport not to cancel our
+        // own boundary-crossing teleports. It therefore has to stay raised for the entire flight, not just
+        // for the duration of this method - PlayerTeleportEvent fires while teleportAsync is still in
+        // progress, and on Folia it fires on a different thread than this one. Hence `volatile`, and hence
+        // clearing the flag from the completion stage rather than on the next line.
         this.teleporting = true;
-        this.player.teleport(location);
-        this.teleporting = false;
+
+        CompletableFuture<Boolean> arrival = new CompletableFuture<>();
+
+        this.player.teleportAsync(location, PlayerTeleportEvent.TeleportCause.PLUGIN).whenComplete((success, error) -> {
+            this.teleporting = false;
+
+            boolean arrived = error == null && Boolean.TRUE.equals(success);
+
+            // Hand the continuation back on the player's own scheduler. teleportAsync completes on whichever
+            // region finished the move, and every caller goes on to mutate the player; completing the future
+            // from inside an entity task is what makes those mutations legal.
+            this.onPlayerThread(() -> arrival.complete(arrived));
+        });
+
+        return arrival;
+    }
+
+    @Override
+    public void teleportThen(@NonNull Location location, @NonNull Runnable onArrival) {
+        // teleport() already completes `arrival` on the player's scheduler, and completion is always at
+        // least one tick away, so the callback attached here cannot run inline on the calling thread.
+        this.teleport(location).thenRun(onArrival);
+    }
+
+    /**
+     * Runs on the thread that owns this player, or on the global region if the player is gone.
+     * <p>
+     * The fallback is what keeps the leave path from stalling: an entity scheduler that has already retired
+     * accepts nothing and reports nothing, so without it a player who disconnects mid-teleport would leave
+     * their instance bookkeeping, refunds and rewards permanently unfinished.
+     */
+    private void onPlayerThread(@NonNull Runnable runnable) {
+        Runnable fallback = () -> Scheduler.sync().run(task -> runnable.run());
+
+        if (Scheduler.entity(this.player).run(task -> runnable.run(), fallback) == null) {
+            fallback.run();
+        }
     }
 
     @Override
@@ -121,19 +204,20 @@ public class DungeonGamer implements DungeonPlayer {
         if (!this.isDead() || !this.hasExtraLives()) return;
 
         Level level = this.dungeon.getLevel();
-        this.teleport(level.getSpawnLocation(this.dungeon.getWorld()));
 
-        this.setDead(false);
-        this.player.setGameMode(this.dungeon.getGameMode());
+        this.teleportThen(level.getSpawnLocation(this.dungeon.getWorld()), () -> {
+            this.setDead(false);
+            this.player.setGameMode(this.dungeon.getGameMode());
 
-        if (this.kit != null) {
-            this.kit.applyPotionEffects(this.player);
-            this.kit.applyAttributeModifiers(this.player);
-        }
-        //this.player.playEffect(EntityEffect.TOTEM_RESURRECT);
+            if (this.kit != null) {
+                this.kit.applyPotionEffects(this.player);
+                this.kit.applyAttributeModifiers(this.player);
+            }
+            //this.player.playEffect(EntityEffect.TOTEM_RESURRECT);
 
-        MessageLocale locale = this.hasExtraLives() ? Lang.DUNGEON_REVIVE_WITH_LIFES : Lang.DUNGEON_REVIVE_NO_LIFES;
-        this.dungeon.sendMessage(this.player, locale, replacer -> replacer.replace(this.replacePlaceholders()));
+            MessageLocale locale = this.hasExtraLives() ? Lang.DUNGEON_REVIVE_WITH_LIFES : Lang.DUNGEON_REVIVE_NO_LIFES;
+            this.dungeon.sendMessage(this.player, locale, replacer -> replacer.replace(this.replacePlaceholders()));
+        });
     }
 
     @Override
@@ -179,14 +263,14 @@ public class DungeonGamer implements DungeonPlayer {
     }
 
     @Override
-    public void manageExternalGod(@NotNull Consumer<GodPlugin> consumer) {
+    public void manageExternalGod(@NonNull Consumer<GodPlugin> consumer) {
         if (this.godPlugin != null) {
             consumer.accept(this.godPlugin);
         }
     }
 
     @Override
-    public void manageExternalBoard(@NotNull Consumer<BoardPlugin> consumer) {
+    public void manageExternalBoard(@NonNull Consumer<BoardPlugin> consumer) {
         if (this.boardPlugin != null) {
             consumer.accept(this.boardPlugin);
         }
@@ -224,43 +308,43 @@ public class DungeonGamer implements DungeonPlayer {
     }
 
     @Override
-    @NotNull
+    @NonNull
     public Player getPlayer() {
         return this.player;
     }
 
     @Override
-    @NotNull
+    @NonNull
     public DungeonInstance getDungeon() {
         return this.dungeon;
     }
 
     @Override
-    @NotNull
+    @NonNull
     public GameState getState() {
         return this.state;
     }
 
     @Override
-    public void setState(@NotNull GameState state) {
+    public void setState(@NonNull GameState state) {
         this.state = state;
     }
 
-    @NotNull
+    @NonNull
     public List<GameReward> getRewards() {
         return this.rewards;
     }
 
-    public void addReward(@NotNull GameReward reward) {
+    public void addReward(@NonNull GameReward reward) {
         this.rewards.add(reward);
     }
 
     public void takeDeathRewards() {
-        this.rewards.removeIf(reward -> !reward.isKeepOnDeath());
+        this.rewards.removeIf(reward -> !reward.keepOnDeath());
     }
 
     public void takeDefeatRewards() {
-        this.rewards.removeIf(reward -> !reward.isKeepOnDefeat());
+        this.rewards.removeIf(reward -> !reward.keepOnDefeat());
     }
 
     public void clearRewards() {
@@ -280,7 +364,7 @@ public class DungeonGamer implements DungeonPlayer {
         return this.kit != null;
     }
 
-    public boolean isKit(@NotNull Kit kit) {
+    public boolean isKit(@NonNull Kit kit) {
         return this.kit == kit;
     }
 
@@ -291,6 +375,16 @@ public class DungeonGamer implements DungeonPlayer {
 
     public void setDead(boolean dead) {
         this.dead = dead;
+    }
+
+    /**
+     * @return the player's position as of their last tick, safe to read from any thread; {@code null} until
+     *         the player has ticked at least once.
+     */
+    @Override
+    @Nullable
+    public Location getLastKnownLocation() {
+        return this.lastKnownLocation;
     }
 
     @Nullable

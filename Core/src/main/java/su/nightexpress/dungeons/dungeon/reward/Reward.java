@@ -1,19 +1,19 @@
 package su.nightexpress.dungeons.dungeon.reward;
 
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.player.DungeonGamer;
 import su.nightexpress.dungeons.util.ItemHelper;
-import su.nightexpress.nightcore.bridge.item.AdaptedItem;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.manager.AbstractFileData;
-import su.nightexpress.nightcore.util.Players;
-import su.nightexpress.nightcore.util.StringUtil;
-import su.nightexpress.nightcore.util.placeholder.Replacer;
+import su.nightexpress.dungeons.nightcore.bridge.item.AdaptedItem;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.manager.AbstractFileData;
+import su.nightexpress.dungeons.nightcore.util.Players;
+import su.nightexpress.dungeons.nightcore.util.StringUtil;
+import su.nightexpress.dungeons.nightcore.util.placeholder.Replacer;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -27,12 +27,12 @@ public class Reward extends AbstractFileData<DungeonPlugin> {
     private List<AdaptedItem> items;
     private List<String>      commands;
 
-    public Reward(@NotNull DungeonPlugin plugin, @NotNull File file) {
+    public Reward(@NonNull DungeonPlugin plugin, @NonNull File file) {
         super(plugin, file);
     }
 
     @Override
-    protected boolean onLoad(@NotNull FileConfig config) {
+    protected boolean onLoad(@NonNull FileConfig config) {
         this.setName(ConfigValue.create("Name", StringUtil.capitalizeUnderscored(this.getId())).read(config));
         this.setDescription(ConfigValue.create("Description", new ArrayList<>()).read(config));
 
@@ -50,7 +50,7 @@ public class Reward extends AbstractFileData<DungeonPlugin> {
     }
 
     @Override
-    protected void onSave(@NotNull FileConfig config) {
+    protected void onSave(@NonNull FileConfig config) {
         config.set("Name", this.name);
         config.set("Description", this.description);
         config.remove("Items");
@@ -63,12 +63,12 @@ public class Reward extends AbstractFileData<DungeonPlugin> {
         config.set("Commands", this.commands);
     }
 
-    @NotNull
+    @NonNull
     public UnaryOperator<String> replacePlaceholders() {
         return Placeholders.REWARD.replacer(this);
     }
 
-    public void give(@NotNull DungeonInstance dungeon, @NotNull DungeonGamer gamer) {
+    public void give(@NonNull DungeonInstance dungeon, @NonNull DungeonGamer gamer) {
         Player player = gamer.getPlayer();
 
         this.items.forEach(adaptedItem -> {
@@ -80,39 +80,39 @@ public class Reward extends AbstractFileData<DungeonPlugin> {
         Players.dispatchCommands(player, Replacer.create().replace(dungeon.replacePlaceholders()).apply(this.commands));
     }
 
-    @NotNull
+    @NonNull
     public String getName() {
         return this.name;
     }
 
-    public void setName(@NotNull String name) {
+    public void setName(@NonNull String name) {
         this.name = name;
     }
 
-    @NotNull
+    @NonNull
     public List<String> getDescription() {
         return this.description;
     }
 
-    public void setDescription(@NotNull List<String> description) {
+    public void setDescription(@NonNull List<String> description) {
         this.description = description;
     }
 
-    @NotNull
+    @NonNull
     public List<AdaptedItem> getItems() {
         return this.items;
     }
 
-    public void setItems(@NotNull List<AdaptedItem> items) {
+    public void setItems(@NonNull List<AdaptedItem> items) {
         this.items = items;
     }
 
-    @NotNull
+    @NonNull
     public List<String> getCommands() {
         return this.commands;
     }
 
-    public void setCommands(@NotNull List<String> commands) {
+    public void setCommands(@NonNull List<String> commands) {
         this.commands = commands;
     }
 }

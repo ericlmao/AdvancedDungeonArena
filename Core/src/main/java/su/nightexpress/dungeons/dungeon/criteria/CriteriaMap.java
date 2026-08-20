@@ -1,11 +1,11 @@
 package su.nightexpress.dungeons.dungeon.criteria;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.criteria.CriteriaPredicate;
 import su.nightexpress.dungeons.api.criteria.CriteriaProvider;
 import su.nightexpress.dungeons.dungeon.criteria.registry.CriteriaHolder;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.config.Writeable;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.Writeable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,12 +15,12 @@ public class CriteriaMap<C extends AbstractCriteria<?, E>, E> implements Criteri
 
     private final Map<C, CriteriaPredicate<?, E>> criterias;
 
-    public CriteriaMap(@NotNull Map<C, CriteriaPredicate<?, E>> criterias) {
+    public CriteriaMap(@NonNull Map<C, CriteriaPredicate<?, E>> criterias) {
         this.criterias = criterias;
     }
 
-    @NotNull
-    public static <C extends AbstractCriteria<?, E>, E> CriteriaMap<C, E> read(@NotNull FileConfig config, @NotNull String path, @NotNull CriteriaHolder<C> holder) {
+    @NonNull
+    public static <C extends AbstractCriteria<?, E>, E> CriteriaMap<C, E> read(@NonNull FileConfig config, @NonNull String path, @NonNull CriteriaHolder<C> holder) {
         Map<C, CriteriaPredicate<?, E>> criterias = new HashMap<>();
 
         config.getSection(path).forEach(id -> {
@@ -38,20 +38,20 @@ public class CriteriaMap<C extends AbstractCriteria<?, E>, E> implements Criteri
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.remove(path);
         this.criterias.forEach((criteria, predicate) -> config.set(path + "." + criteria.getName(), predicate.getRawValue()));
     }
 
     @Override
-    @NotNull
+    @NonNull
     public Predicate<E> getPredicate() {
         return this.getPredicate(entity -> true);
     }
 
-    @NotNull
+    @NonNull
     @Override
-    public Predicate<E> getPredicate(@NotNull Predicate<E> fallback) {
+    public Predicate<E> getPredicate(@NonNull Predicate<E> fallback) {
         return this.criterias.values().stream().map(predicate -> (Predicate<E>) predicate).reduce(Predicate::and).orElse(fallback);
     }
 }

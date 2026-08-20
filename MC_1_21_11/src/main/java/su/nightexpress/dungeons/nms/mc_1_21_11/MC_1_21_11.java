@@ -1,178 +1,91 @@
 package su.nightexpress.dungeons.nms.mc_1_21_11;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ProblemReporter;
-import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.goal.*;
-import net.minecraft.world.entity.monster.EnderMan;
-import net.minecraft.world.entity.monster.zombie.Drowned;
-import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_21_R7.CraftWorld;
-import org.bukkit.craftbukkit.v1_21_R7.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_21_R7.block.CraftBlockState;
-import org.bukkit.craftbukkit.v1_21_R7.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_21_R7.entity.CraftEntityType;
-import org.bukkit.craftbukkit.v1_21_R7.inventory.CraftItemStack;
-import org.bukkit.entity.Animals;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import su.nightexpress.dungeons.api.dungeon.Dungeon;
+import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.block.CraftBlock;
+import org.bukkit.craftbukkit.block.CraftBlockState;
+import org.bukkit.craftbukkit.block.data.CraftBlockData;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.schema.SchemaBlock;
-import su.nightexpress.dungeons.api.type.MobFaction;
+import su.nightexpress.dungeons.nightcore.util.nbt.NbtProvider;
 import su.nightexpress.dungeons.nms.DungeonNMS;
-import su.nightexpress.dungeons.nms.mc_1_21_11.brain.goal.FollowPlayersGoal;
-import su.nightexpress.dungeons.nms.mc_1_21_11.brain.goal.LastDamagerTargetGoal;
-import su.nightexpress.dungeons.nms.mc_1_21_11.brain.goal.NearestFactionTargetGoal;
-import su.nightexpress.nightcore.util.Reflex;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 
-public class MC_1_21_11 implements DungeonNMS {
+public class MC_1_21_11 implements DungeonNMS, NbtProvider {
 
+    /**
+     * ItemStack &lt;-&gt; SNBT, on mojang-mapped internals.
+     * <p>
+     * Replaces nightcore's {@code util.nbt.NbtUtil}/{@code NbtSerializer}/{@code DataFixerUtil}, which
+     * reached the same code through obfuscation-mapped reflection - including a hardcoded
+     * {@code References.ITEM_STACK} field name ("u"/"t") that had to be re-checked every Minecraft
+     * release. The wire format is unchanged, so existing kit inventories and reward items still load.
+     */
+    // jspecify's annotations are TYPE_USE, so on a qualified name they bind to the simple name.
     @Override
-    public boolean isSupportedMob(@NotNull EntityType type) {
-        return EntityCreator.isSupported(type);
-    }
+    @NonNull
+    public String toTagString(org.bukkit.inventory.@NonNull ItemStack itemStack) {
+        net.minecraft.world.item.ItemStack nmsStack = org.bukkit.craftbukkit.inventory.CraftItemStack.asNMSCopy(itemStack);
+        net.minecraft.core.RegistryAccess registryAccess = net.minecraft.server.MinecraftServer.getServer().registryAccess();
 
-    @Override
-    @Nullable
-    public EntityType getSpawnEggType(@NotNull ItemStack itemStack) {
-        net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
-        if (!(nmsStack.getItem() instanceof SpawnEggItem eggItem)) return null;
+        Tag tag = net.minecraft.world.item.ItemStack.CODEC
+            .encodeStart(registryAccess.createSerializationContext(NbtOps.INSTANCE), nmsStack)
+            .getOrThrow(error -> new IllegalStateException("Could not encode ItemStack into NBT: " + error));
 
-        net.minecraft.world.entity.EntityType<?> type = eggItem.getType(nmsStack);
-        return type == null ? null : CraftEntityType.minecraftToBukkit(type);
-    }
-
-    @Override
-    public LivingEntity spawnMob(@NotNull Dungeon dungeon, @NotNull EntityType type, @NotNull MobFaction faction, @NotNull Location location, @NotNull Consumer<LivingEntity> function) {
-        ServerLevel level = ((CraftWorld) dungeon.getWorld()).getHandle();
-
-        net.minecraft.world.entity.Mob mob = EntityCreator.createEntity(/*dungeon, faction, */type, level);
-        if (mob == null) return null;
-
-        LivingEntity bukkitEntity = (LivingEntity) mob.getBukkitEntity();
-
-        this.registerAttribute(mob, Attributes.ARMOR);
-        this.registerAttribute(mob, Attributes.ARMOR_TOUGHNESS);
-        this.registerAttribute(mob, Attributes.ATTACK_DAMAGE);
-        this.registerAttribute(mob, Attributes.ATTACK_KNOCKBACK);
-        this.registerAttribute(mob, Attributes.ATTACK_SPEED);
-        this.setAttribute(mob, Attributes.FOLLOW_RANGE, 256D);
-        this.registerAttribute(mob, Attributes.FLYING_SPEED);
-        this.registerAttribute(mob, Attributes.JUMP_STRENGTH);
-        this.registerAttribute(mob, Attributes.KNOCKBACK_RESISTANCE);
-        this.registerAttribute(mob, Attributes.MAX_HEALTH);
-        this.registerAttribute(mob, Attributes.MOVEMENT_SPEED);
-
-        if (mob.getAttributeBaseValue(Attributes.ATTACK_DAMAGE) == 0) {
-            this.setAttribute(mob, Attributes.ATTACK_DAMAGE, 1);
-        }
-
-        boolean isAlly = faction == MobFaction.ALLY;
-
-        if (mob instanceof PathfinderMob pathfinderMob) {
-            if (isAlly && !EntityCreator.isCustom(type)) {
-                mob.goalSelector.addGoal(6, new FollowPlayersGoal(mob, dungeon));
-            }
-
-            if (bukkitEntity instanceof Animals || bukkitEntity instanceof org.bukkit.entity.IronGolem) {
-                mob.goalSelector.getAvailableGoals().clear();
-                mob.goalSelector.addGoal(0, new FloatGoal(mob));
-                mob.goalSelector.addGoal(2, new su.nightexpress.dungeons.nms.mc_1_21_11.brain.goal.MeleeAttackGoal(pathfinderMob, dungeon, faction));
-                mob.goalSelector.addGoal(8, new LookAtPlayerGoal(pathfinderMob, net.minecraft.world.entity.player.Player.class, 8.0F));
-            }
-            else {
-                if (mob instanceof Drowned drowned) {
-                    drowned.goalSelector.getAvailableGoals().removeIf(goal -> goal.getGoal() instanceof ZombieAttackGoal);
-                    drowned.goalSelector.addGoal(3, new ZombieAttackGoal(drowned, 1D, false));
-                }
-                else if (mob instanceof EnderMan ender) {
-                    ender.goalSelector.getAvailableGoals().removeIf(wrappedGoal -> wrappedGoal.getPriority() == 1); // EndermanFreezeWhenLookedAt
-                }
-                pathfinderMob.goalSelector.getAvailableGoals().removeIf(wrappedGoal -> {
-                    var goal = wrappedGoal.getGoal();
-                    return goal instanceof FleeSunGoal || goal instanceof AvoidEntityGoal<?> || goal instanceof RestrictSunGoal;
-                });
-            }
-        }
-
-        if (!EntityCreator.isCustom(type)) {
-            mob.targetSelector.getAvailableGoals().clear();
-            mob.targetSelector.addGoal(1, new LastDamagerTargetGoal(mob, dungeon, faction));
-            mob.targetSelector.addGoal(2, new NearestFactionTargetGoal(mob, dungeon, faction));
-            mob.setAggressive(true);
-        }
-
-        function.accept(bukkitEntity);
-
-        level.addFreshEntity(mob, null);
-        mob.snapTo(location.getX(), location.getY(), location.getZ());
-
-        return bukkitEntity;
-    }
-
-    private void registerAttribute(@NotNull net.minecraft.world.entity.LivingEntity handle, @NotNull Holder<Attribute> att) {
-        AttributeInstance instance = handle.getAttribute(att);
-
-        if (instance == null) {
-            // Hacks to register missing entity's attributes.
-            AttributeSupplier provider = (AttributeSupplier) Reflex.getFieldValue(handle.getAttributes(), "e");
-            if (provider == null) return;
-
-            @SuppressWarnings("unchecked")
-            Map<Holder<Attribute>, AttributeInstance> aMap = (Map<Holder<Attribute>, AttributeInstance>) Reflex.getFieldValue(provider, "a");
-            if (aMap == null) return;
-
-            Map<Holder<Attribute>, AttributeInstance> aMap2 = new HashMap<>(aMap);
-            aMap2.put(att, new AttributeInstance(att, var1 -> {
-
-            }));
-            Reflex.setFieldValue(provider, "a", aMap2);
-        }
-    }
-
-    private void setAttribute(@NotNull net.minecraft.world.entity.LivingEntity handle, @NotNull Holder<Attribute> attribute, double value) {
-        this.registerAttribute(handle, attribute);
-
-        AttributeInstance instance = handle.getAttribute(attribute);
-        if (instance == null) return;
-
-        instance.setBaseValue(value);
+        return tag.toString();
     }
 
     @Override
-    public void setSchemaBlock(@NotNull World world, @NotNull SchemaBlock schemaBlock) {
+    public org.bukkit.inventory.ItemStack fromTagString(@NonNull String tagString, int sourceDataVersion) {
+        CompoundTag tag;
+        try {
+            tag = TagParser.parseCompoundFully(tagString);
+        }
+        catch (Exception exception) {
+            return null;
+        }
+
+        net.minecraft.core.RegistryAccess registryAccess = net.minecraft.server.MinecraftServer.getServer().registryAccess();
+        int targetVersion = net.minecraft.SharedConstants.getCurrentVersion().dataVersion().version();
+
+        Tag fixed = tag;
+        if (sourceDataVersion > 0 && sourceDataVersion < targetVersion) {
+            com.mojang.serialization.Dynamic<Tag> dynamic = new com.mojang.serialization.Dynamic<>(NbtOps.INSTANCE, tag);
+            fixed = net.minecraft.util.datafix.DataFixers.getDataFixer()
+                .update(net.minecraft.util.datafix.fixes.References.ITEM_STACK, dynamic, sourceDataVersion, targetVersion)
+                .getValue();
+        }
+
+        return net.minecraft.world.item.ItemStack.CODEC
+            .parse(registryAccess.createSerializationContext(NbtOps.INSTANCE), fixed)
+            .result()
+            .map(org.bukkit.craftbukkit.inventory.CraftItemStack::asBukkitCopy)
+            .orElse(null);
+    }
+
+
+    @Override
+    public void setSchemaBlock(@NonNull World world, @NonNull SchemaBlock schemaBlock) {
         ServerLevel level = ((CraftWorld)world).getHandle();
 
-        CraftBlock craftBlock = (CraftBlock) schemaBlock.getBlockPos().toLocation(world).getBlock();
-        craftBlock.setBlockData(schemaBlock.getBlockData());
+        CraftBlock craftBlock = (CraftBlock) schemaBlock.blockPos().toLocation(world).getBlock();
+        craftBlock.setBlockData(schemaBlock.blockData());
 
-        if (schemaBlock.getNbt() instanceof CompoundTag tag) {
+        if (schemaBlock.nbt() instanceof CompoundTag tag) {
             BlockPos blockPos = craftBlock.getPosition();
             BlockEntity blockEntity = level.getBlockEntity(blockPos);
             if (blockEntity == null) return;
@@ -187,9 +100,9 @@ public class MC_1_21_11 implements DungeonNMS {
         }
     }
 
-    @NotNull
+    @NonNull
     @Override
-    public List<SchemaBlock> loadSchema(@NotNull File file, boolean compressed) {
+    public List<SchemaBlock> loadSchema(@NonNull File file, boolean compressed) {
         List<SchemaBlock> schemaBlocks = new ArrayList<>();
         CompoundTag schemTag;
 
@@ -216,7 +129,7 @@ public class MC_1_21_11 implements DungeonNMS {
             CompoundTag nbt = blockTag.getCompound("nbt").orElse(null);
 
             CraftBlockData craftBlockData = CraftBlockData.fromData(state);
-            su.nightexpress.nightcore.util.geodata.pos.BlockPos blockPos = new su.nightexpress.nightcore.util.geodata.pos.BlockPos(pos.getX(), pos.getY(), pos.getZ());
+            su.nightexpress.dungeons.nightcore.util.geodata.pos.BlockPos blockPos = new su.nightexpress.dungeons.nightcore.util.geodata.pos.BlockPos(pos.getX(), pos.getY(), pos.getZ());
 
             schemaBlocks.add(new SchemaBlock(blockPos, craftBlockData, nbt));
         });
@@ -225,7 +138,7 @@ public class MC_1_21_11 implements DungeonNMS {
     }
 
     @Override
-    public void saveSchema(@NotNull World world, @NotNull List<Block> blocks, @NotNull File file) {
+    public void saveSchema(@NonNull World world, @NonNull List<Block> blocks, @NonNull File file) {
         ServerLevel level = ((CraftWorld) world).getHandle();
 
         CompoundTag root = new CompoundTag();
@@ -257,7 +170,7 @@ public class MC_1_21_11 implements DungeonNMS {
         }
     }
 
-    @NotNull
+    @NonNull
     private ListTag newIntegerList(int... arr) {
         ListTag tag = new ListTag();
 

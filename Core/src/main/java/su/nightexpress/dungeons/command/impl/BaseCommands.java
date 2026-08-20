@@ -1,7 +1,7 @@
 package su.nightexpress.dungeons.command.impl;
 
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.api.type.GameState;
@@ -17,19 +17,19 @@ import su.nightexpress.dungeons.dungeon.spot.SpotState;
 import su.nightexpress.dungeons.dungeon.stage.Stage;
 import su.nightexpress.dungeons.kit.impl.Kit;
 import su.nightexpress.dungeons.selection.SelectionType;
-import su.nightexpress.nightcore.commands.Arguments;
-import su.nightexpress.nightcore.commands.Commands;
-import su.nightexpress.nightcore.commands.builder.HubNodeBuilder;
-import su.nightexpress.nightcore.commands.context.CommandContext;
-import su.nightexpress.nightcore.commands.context.ParsedArguments;
-import su.nightexpress.nightcore.core.config.CoreLang;
+import su.nightexpress.dungeons.nightcore.commands.Arguments;
+import su.nightexpress.dungeons.nightcore.commands.Commands;
+import su.nightexpress.dungeons.nightcore.commands.builder.HubNodeBuilder;
+import su.nightexpress.dungeons.nightcore.commands.context.CommandContext;
+import su.nightexpress.dungeons.nightcore.commands.context.ParsedArguments;
+import su.nightexpress.dungeons.nightcore.core.config.CoreLang;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
 public class BaseCommands {
 
-    public static void load(@NotNull DungeonPlugin plugin, @NotNull HubNodeBuilder root) {
+    public static void load(@NonNull DungeonPlugin plugin, @NonNull HubNodeBuilder root) {
         root.branch(Commands.literal("reload")
             .description(CoreLang.COMMAND_RELOAD_DESC)
             .permission(Perms.COMMAND_RELOAD)
@@ -77,7 +77,7 @@ public class BaseCommands {
             .playerOnly()
             .description(Lang.COMMAND_LEAVE_DESC)
             .permission(Perms.COMMAND_LEAVE)
-            .executes((context, arguments) -> leaveDungeon(plugin, context))
+            .executes((context, _) -> leaveDungeon(plugin, context))
         );
 
         root.branch(Commands.literal("setstage")
@@ -85,7 +85,7 @@ public class BaseCommands {
             .description(Lang.COMMAND_SET_STAGE_DESC)
             .permission(Perms.COMMAND_SET_STAGE)
             .withArguments(Arguments.string(CommandArguments.STAGE).localized(Lang.COMMAND_ARGUMENT_NAME_STAGE)
-                .suggestions((reader, context) -> {
+                .suggestions((_, context) -> {
                     DungeonInstance instance = CommandArguments.getDungeonInstance(plugin, context);
                     return instance == null ? Collections.emptyList() : new ArrayList<>(instance.getConfig().getStageByIdMap().keySet());
                 }))
@@ -97,7 +97,7 @@ public class BaseCommands {
             .description(Lang.COMMAND_SET_LEVEL_DESC)
             .permission(Perms.COMMAND_SET_LEVEL)
             .withArguments(Arguments.string(CommandArguments.LEVEL).localized(Lang.COMMAND_ARGUMENT_NAME_LEVEL)
-                .suggestions((reader, context) -> {
+                .suggestions((_, context) -> {
                     DungeonInstance instance = CommandArguments.getDungeonInstance(plugin, context);
                     return instance == null ? Collections.emptyList() : new ArrayList<>(instance.getConfig().getLevelByIdMap().keySet());
                 }))
@@ -110,12 +110,12 @@ public class BaseCommands {
             .withArguments(
                 CommandArguments.forDungeon(plugin),
                 Arguments.string(CommandArguments.SPOT).localized(Lang.COMMAND_ARGUMENT_NAME_SPOT)
-                    .suggestions((reader, context) -> {
+                    .suggestions((_, context) -> {
                         DungeonConfig config = CommandArguments.getDungeonConfig(plugin, context);
                         return config == null ? Collections.emptyList() : new ArrayList<>(config.getSpotByIdMap().keySet());
                     }),
                 Arguments.string(CommandArguments.STATE).localized(Lang.COMMAND_ARGUMENT_NAME_STATE)
-                    .suggestions((reader, context) -> {
+                    .suggestions((_, context) -> {
                         Spot spot = CommandArguments.getSpot(plugin, context);
                         return spot == null ? Collections.emptyList() : new ArrayList<>(spot.getStateByIdMap().keySet());
                     })
@@ -138,7 +138,7 @@ public class BaseCommands {
         );
     }
 
-    private static boolean getWand(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean getWand(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         Player player = context.getPlayerOrThrow();
         SelectionType type = arguments.get(CommandArguments.TYPE, SelectionType.class);
 
@@ -146,7 +146,7 @@ public class BaseCommands {
         return true;
     }
 
-    private static boolean setStage(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean setStage(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         Player player = context.getPlayerOrThrow();
         DungeonInstance instance = plugin.getDungeonManager().getInstance(player);
         if (instance == null) {
@@ -166,7 +166,7 @@ public class BaseCommands {
         return true;
     }
 
-    private static boolean setLevel(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean setLevel(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         Player player = context.getPlayerOrThrow();
         DungeonInstance instance = plugin.getDungeonManager().getInstance(player);
         if (instance == null) {
@@ -186,7 +186,7 @@ public class BaseCommands {
         return true;
     }
 
-    private static boolean setSpotState(@NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean setSpotState(@NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         DungeonConfig config = arguments.get(CommandArguments.DUNGEON, DungeonConfig.class);
 
         String spotId = arguments.getString(CommandArguments.SPOT);
@@ -220,7 +220,7 @@ public class BaseCommands {
         return true;
     }
 
-    private static boolean browseDungeons(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean browseDungeons(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         if (!arguments.contains(CommandArguments.PLAYER) && !context.isPlayer()) {
             context.errorPlayerOnly();
             return false;
@@ -231,7 +231,7 @@ public class BaseCommands {
         return true;
     }
 
-    private static boolean joinDungeon(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean joinDungeon(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         if (!arguments.contains(CommandArguments.PLAYER) && !context.isPlayer()) {
             context.errorPlayerOnly();
             return false;
@@ -243,7 +243,7 @@ public class BaseCommands {
         return true;
     }
 
-    private static boolean sendToDungeon(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean sendToDungeon(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         Player player = arguments.getPlayer(CommandArguments.PLAYER);
         DungeonConfig config = arguments.get(CommandArguments.DUNGEON, DungeonConfig.class);
         Kit kit = arguments.contains(CommandArguments.KIT) ? arguments.get(CommandArguments.KIT, Kit.class) : null;
@@ -258,14 +258,14 @@ public class BaseCommands {
         return true;
     }
 
-    private static boolean leaveDungeon(@NotNull DungeonPlugin plugin, @NotNull CommandContext context) {
+    private static boolean leaveDungeon(@NonNull DungeonPlugin plugin, @NonNull CommandContext context) {
         Player player = context.getPlayerOrThrow();
 
         plugin.getDungeonManager().leaveInstance(player);
         return true;
     }
 
-    private static boolean startGame(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean startGame(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         DungeonInstance dungeon;
 
         if (arguments.contains(CommandArguments.DUNGEON)) {
@@ -296,7 +296,7 @@ public class BaseCommands {
         return true;
     }
 
-    private static boolean stopGame(@NotNull DungeonPlugin plugin, @NotNull CommandContext context, @NotNull ParsedArguments arguments) {
+    private static boolean stopGame(@NonNull DungeonPlugin plugin, @NonNull CommandContext context, @NonNull ParsedArguments arguments) {
         DungeonInstance dungeon;
 
         if (arguments.contains(CommandArguments.DUNGEON)) {

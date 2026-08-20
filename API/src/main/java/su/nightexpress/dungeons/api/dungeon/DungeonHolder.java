@@ -1,18 +1,18 @@
 package su.nightexpress.dungeons.api.dungeon;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.type.MobFaction;
 
 import java.util.UUID;
 
 public interface DungeonHolder {
 
-    @NotNull
+    @NonNull
     default Dungeon getDungeon() {
         return this.getEntity().getDungeon();
     }
 
-    @NotNull
+    @NonNull
     default MobFaction getFaction() {
         return this.getEntity().getFaction();
     }

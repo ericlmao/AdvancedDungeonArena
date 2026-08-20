@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.config.Lang;
 import su.nightexpress.dungeons.dungeon.config.DungeonConfig;
 import su.nightexpress.dungeons.dungeon.feature.LevelRequirement;
@@ -15,19 +15,19 @@ import su.nightexpress.dungeons.dungeon.spot.SpotState;
 import su.nightexpress.dungeons.dungeon.stage.Stage;
 import su.nightexpress.dungeons.kit.impl.Kit;
 import su.nightexpress.dungeons.util.UIUtils;
-import su.nightexpress.nightcore.bridge.currency.Currency;
-import su.nightexpress.nightcore.core.config.CoreLang;
-import su.nightexpress.nightcore.integration.currency.EconomyBridge;
-import su.nightexpress.nightcore.util.NumberUtil;
-import su.nightexpress.nightcore.util.placeholder.PlaceholderList;
-import su.nightexpress.nightcore.util.time.TimeFormatType;
-import su.nightexpress.nightcore.util.time.TimeFormats;
+import su.nightexpress.dungeons.nightcore.bridge.currency.Currency;
+import su.nightexpress.dungeons.nightcore.core.config.CoreLang;
+import su.nightexpress.dungeons.nightcore.integration.currency.EconomyBridge;
+import su.nightexpress.dungeons.nightcore.util.NumberUtil;
+import su.nightexpress.dungeons.nightcore.util.placeholder.PlaceholderList;
+import su.nightexpress.dungeons.nightcore.util.time.TimeFormatType;
+import su.nightexpress.dungeons.nightcore.util.time.TimeFormats;
 
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class Placeholders extends su.nightexpress.nightcore.util.Placeholders {
+public class Placeholders extends su.nightexpress.dungeons.nightcore.util.Placeholders {
 
     public static final String LINK_WIKI         = "https://nightexpressdev.com/dungeon-arena/";
     public static final String LINK_PLACEHOLDERS = LINK_WIKI + "placeholders";
@@ -118,13 +118,13 @@ public class Placeholders extends su.nightexpress.nightcore.util.Placeholders {
     public static final String LEVEL_NAME        = "%level_name%";
     public static final String LEVEL_DESCRIPTION = "%level_description%";
 
-    @NotNull
+    @NonNull
     public static final PlaceholderList<DungeonConfig> DUNGEON_CONFIG = PlaceholderList.create(list -> list
         .add(DUNGEON_ID, DungeonConfig::getId)
         .add(DUNGEON_NAME, DungeonConfig::getName)
     );
 
-    @NotNull
+    @NonNull
     public static final PlaceholderList<DungeonInstance> DUNGEON_INSTANCE = PlaceholderList.create(list -> list
             .add(DUNGEON_ID, DungeonInstance::getId)
             .add(DUNGEON_ACTIVE, instance -> CoreLang.STATE_YES_NO.get(instance.isActive()))
@@ -160,8 +160,8 @@ public class Placeholders extends su.nightexpress.nightcore.util.Placeholders {
                 LevelRequirement requirement = instance.getConfig().features().getLevelRequirement();
                 if (!requirement.isRequired()) return CoreLang.OTHER_ANY.text();
 
-                int min = requirement.getMinLevel();
-                int max = requirement.getMaxLevel();
+                int min = requirement.minLevel();
+                int max = requirement.maxLevel();
                 String result = Lang.UI_LEVEL_RANGE.text();
 
                 if (!requirement.hasMaxValue()) {

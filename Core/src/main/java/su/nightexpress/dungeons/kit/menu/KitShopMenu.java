@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.MenuType;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.config.Config;
@@ -13,22 +13,22 @@ import su.nightexpress.dungeons.config.Lang;
 import su.nightexpress.dungeons.user.DungeonUser;
 import su.nightexpress.dungeons.kit.KitUtils;
 import su.nightexpress.dungeons.kit.impl.Kit;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.ui.UIUtils;
-import su.nightexpress.nightcore.ui.menu.MenuViewer;
-import su.nightexpress.nightcore.ui.menu.confirmation.Confirmation;
-import su.nightexpress.nightcore.ui.menu.data.ConfigBased;
-import su.nightexpress.nightcore.ui.menu.data.Filled;
-import su.nightexpress.nightcore.ui.menu.data.MenuFiller;
-import su.nightexpress.nightcore.ui.menu.data.MenuLoader;
-import su.nightexpress.nightcore.ui.menu.item.ItemHandler;
-import su.nightexpress.nightcore.ui.menu.item.ItemOptions;
-import su.nightexpress.nightcore.ui.menu.item.MenuItem;
-import su.nightexpress.nightcore.ui.menu.type.LinkedMenu;
-import su.nightexpress.nightcore.util.Lists;
-import su.nightexpress.nightcore.util.bukkit.NightItem;
-import su.nightexpress.nightcore.util.placeholder.Replacer;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.ui.UIUtils;
+import su.nightexpress.dungeons.nightcore.ui.menu.MenuViewer;
+import su.nightexpress.dungeons.nightcore.ui.menu.confirmation.Confirmation;
+import su.nightexpress.dungeons.nightcore.ui.menu.data.ConfigBased;
+import su.nightexpress.dungeons.nightcore.ui.menu.data.Filled;
+import su.nightexpress.dungeons.nightcore.ui.menu.data.MenuFiller;
+import su.nightexpress.dungeons.nightcore.ui.menu.data.MenuLoader;
+import su.nightexpress.dungeons.nightcore.ui.menu.item.ItemHandler;
+import su.nightexpress.dungeons.nightcore.ui.menu.item.ItemOptions;
+import su.nightexpress.dungeons.nightcore.ui.menu.item.MenuItem;
+import su.nightexpress.dungeons.nightcore.ui.menu.type.LinkedMenu;
+import su.nightexpress.dungeons.nightcore.util.Lists;
+import su.nightexpress.dungeons.nightcore.util.bukkit.NightItem;
+import su.nightexpress.dungeons.nightcore.util.placeholder.Replacer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,7 +36,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static su.nightexpress.dungeons.Placeholders.*;
-import static su.nightexpress.nightcore.util.text.tag.Tags.*;
+import static su.nightexpress.dungeons.nightcore.util.text.night.wrapper.TagWrappers.*;
 
 @SuppressWarnings("UnstableApiUsage")
 public class KitShopMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> implements Filled<Kit>, ConfigBased {
@@ -58,25 +58,25 @@ public class KitShopMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> impl
     protected List<String> kitInfoPermission;
     protected List<String> kitInfoPurchase;
 
-    public KitShopMenu(@NotNull DungeonPlugin plugin) {
+    public KitShopMenu(@NonNull DungeonPlugin plugin) {
         super(plugin, MenuType.GENERIC_9X4, BLACK.wrap("Kit Shop"));
 
         this.load(FileConfig.loadOrExtract(plugin, Config.DIR_MENU, FILE_NAME));
     }
 
     @Override
-    public void onPrepare(@NotNull MenuViewer viewer, @NotNull InventoryView view) {
+    public void onPrepare(@NonNull MenuViewer viewer, @NonNull InventoryView view) {
         this.autoFill(viewer);
     }
 
     @Override
-    protected void onReady(@NotNull MenuViewer viewer, @NotNull Inventory inventory) {
+    protected void onReady(@NonNull MenuViewer viewer, @NonNull Inventory inventory) {
 
     }
 
     @Override
-    @NotNull
-    public MenuFiller<Kit> createFiller(@NotNull MenuViewer viewer) {
+    @NonNull
+    public MenuFiller<Kit> createFiller(@NonNull MenuViewer viewer) {
         Player player = viewer.getPlayer();
         DungeonUser user = plugin.getUserManager().getOrFetch(player);
         DungeonInstance dungeon = this.getLink(player);
@@ -142,12 +142,12 @@ public class KitShopMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> impl
                 if (event.isLeftClick()) {
                     if (!kit.hasPermission(player)) return;
 
-                    this.runNextTick(() -> {
+                    this.runNextTick(player, () -> {
                         if (KitUtils.isPurchaseMode()) {
                             UIUtils.openConfirmation(player, Confirmation.builder()
                                 .setIcon(kit.getIcon().localized(Lang.UI_CONFIRMATION_KIT_PURCHASE).replacement(replacer -> replacer.replace(kit.replacePlaceholders())))
-                                .onAccept((viewer2, event1) -> plugin.getKitManager().purchase(player, kit))
-                                .onReturn((viewer2, event1) -> this.runNextTick(() -> plugin.getKitManager().openShop(player, dungeon)))
+                                .onAccept((_, _) -> plugin.getKitManager().purchase(player, kit))
+                                .onReturn((_, _) -> this.runNextTick(player, () -> plugin.getKitManager().openShop(player, dungeon)))
                                 .returnOnAccept(true)
                                 .build());
                         }
@@ -156,22 +156,22 @@ public class KitShopMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> impl
                                 .setIcon(dungeon.getConfig().getIcon()
                                     .localized(Lang.UI_CONFIRMATION_DUNGEON_ENTER_RENT_KIT)
                                     .replacement(replacer -> replacer.replace(dungeon.replacePlaceholders()).replace(kit.replacePlaceholders())))
-                                .onAccept((viewer2, event1) -> plugin.getDungeonManager().enterInstance(player, dungeon, kit))
-                                .onReturn((viewer2, event1) -> this.runNextTick(() -> plugin.getKitManager().openShop(player, dungeon)))
+                                .onAccept((_, _) -> plugin.getDungeonManager().enterInstance(player, dungeon, kit))
+                                .onReturn((_, _) -> this.runNextTick(player, () -> plugin.getKitManager().openShop(player, dungeon)))
                                 .returnOnAccept(false)
                                 .build());
                         }
                     });
                 }
                 else if (event.isRightClick()) {
-                    this.runNextTick(() -> plugin.getKitManager().openPreview(player, kit, dungeon));
+                    this.runNextTick(player, () -> plugin.getKitManager().openPreview(player, kit, dungeon));
                 }
             })
             .build();
     }
 
     @Override
-    public void loadConfiguration(@NotNull FileConfig config, @NotNull MenuLoader loader) {
+    public void loadConfiguration(@NonNull FileConfig config, @NonNull MenuLoader loader) {
         this.kitName = ConfigValue.create("Kit.Name", KIT_NAME).read(config);
 
         this.kitLore = ConfigValue.create("Kit.Lore", Lists.newList(
@@ -231,8 +231,8 @@ public class KitShopMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> impl
             .toMenuItem()
             .setPriority(10)
             .setSlots(33)
-            .setHandler(new ItemHandler("kit_selection", (viewer, event) -> {
-                this.runNextTick(() -> plugin.getKitManager().openSelector(viewer.getPlayer(), this.getLink(viewer)));
+            .setHandler(new ItemHandler("kit_selection", (viewer, _) -> {
+                this.runNextTick(viewer.getPlayer(), () -> plugin.getKitManager().openSelector(viewer.getPlayer(), this.getLink(viewer)));
             }, ItemOptions.builder().setVisibilityPolicy(viewer -> KitUtils.isPurchaseMode()).build())));
 
         loader.addDefaultItem(NightItem.asCustomHead("76d126affd03def502bfaa91a34e7c1562421490002a85c2b5815bdd4248e12")
@@ -243,8 +243,8 @@ public class KitShopMenu extends LinkedMenu<DungeonPlugin, DungeonInstance> impl
             .toMenuItem()
             .setPriority(10)
             .setSlots(29)
-            .setHandler(new ItemHandler("dungeons", (viewer, event) -> {
-                this.runNextTick(() -> plugin.getDungeonManager().browseDungeons(viewer.getPlayer()));
+            .setHandler(new ItemHandler("dungeons", (viewer, _) -> {
+                this.runNextTick(viewer.getPlayer(), () -> plugin.getDungeonManager().browseDungeons(viewer.getPlayer()));
             })));
     }
 }

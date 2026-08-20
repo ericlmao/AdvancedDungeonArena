@@ -1,11 +1,11 @@
 package su.nightexpress.dungeons.registry.level;
 
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public interface LevelProvider {
 
-    @NotNull String getName();
+    @NonNull String getName();
 
-    int getLevel(@NotNull Player player);
+    int getLevel(@NonNull Player player);
 }

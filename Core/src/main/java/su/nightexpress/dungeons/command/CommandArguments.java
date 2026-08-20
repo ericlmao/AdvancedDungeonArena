@@ -1,8 +1,8 @@
 package su.nightexpress.dungeons.command;
 
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.config.Lang;
 import su.nightexpress.dungeons.dungeon.config.DungeonConfig;
@@ -10,12 +10,12 @@ import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.spot.Spot;
 import su.nightexpress.dungeons.kit.impl.Kit;
 import su.nightexpress.dungeons.selection.SelectionType;
-import su.nightexpress.nightcore.commands.Commands;
-import su.nightexpress.nightcore.commands.builder.ArgumentNodeBuilder;
-import su.nightexpress.nightcore.commands.context.CommandContext;
-import su.nightexpress.nightcore.commands.exceptions.CommandSyntaxException;
-import su.nightexpress.nightcore.core.config.CoreLang;
-import su.nightexpress.nightcore.util.Enums;
+import su.nightexpress.dungeons.nightcore.commands.Commands;
+import su.nightexpress.dungeons.nightcore.commands.builder.ArgumentNodeBuilder;
+import su.nightexpress.dungeons.nightcore.commands.context.CommandContext;
+import su.nightexpress.dungeons.nightcore.commands.exceptions.CommandSyntaxException;
+import su.nightexpress.dungeons.nightcore.core.config.CoreLang;
+import su.nightexpress.dungeons.nightcore.util.Enums;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -36,46 +36,46 @@ public class CommandArguments {
     public static final String WEIGHT     = "weight";
     public static final String STATE      = "state";
 
-    @NotNull
-    public static ArgumentNodeBuilder<SelectionType> forSelectionType(@NotNull DungeonPlugin plugin) {
+    @NonNull
+    public static ArgumentNodeBuilder<SelectionType> forSelectionType(@NonNull DungeonPlugin plugin) {
         return Commands.argument(TYPE, (context, string) -> Enums.parse(string, SelectionType.class)
                 .orElseThrow(() -> CommandSyntaxException.custom(Lang.ERROR_COMMAND_INVALID_SELECTION_ARGUMENT))
             )
             .localized(CoreLang.COMMAND_ARGUMENT_NAME_TYPE)
-            .suggestions((reader, context) -> Enums.getNames(SelectionType.class));
+            .suggestions((_, context) -> Enums.getNames(SelectionType.class));
     }
 
-    @NotNull
-    public static ArgumentNodeBuilder<DungeonConfig> forDungeon(@NotNull DungeonPlugin plugin) {
+    @NonNull
+    public static ArgumentNodeBuilder<DungeonConfig> forDungeon(@NonNull DungeonPlugin plugin) {
         return Commands.argument(DUNGEON, (context, string) -> Optional.ofNullable(plugin.getDungeonManager().getDungeonById(string))
                 .orElseThrow(() -> CommandSyntaxException.custom(Lang.ERROR_COMMAND_INVALID_DUNGEON_ARGUMENT))
             )
             .localized(Lang.COMMAND_ARGUMENT_NAME_DUNGEON)
-            .suggestions((reader, context) -> new ArrayList<>(plugin.getDungeonManager().getDungeonIds()));
+            .suggestions((_, context) -> new ArrayList<>(plugin.getDungeonManager().getDungeonIds()));
     }
 
-    @NotNull
-    public static ArgumentNodeBuilder<Kit> forKit(@NotNull DungeonPlugin plugin) {
+    @NonNull
+    public static ArgumentNodeBuilder<Kit> forKit(@NonNull DungeonPlugin plugin) {
         return Commands.argument(KIT, (context, string) -> Optional.ofNullable(plugin.getKitManager().getKitById(string))
                 .orElseThrow(() -> CommandSyntaxException.custom(Lang.ERROR_COMMAND_INVALID_KIT_ARGUMENT))
             )
             .localized(Lang.COMMAND_ARGUMENT_NAME_KIT)
-            .suggestions((reader, context) -> new ArrayList<>(plugin.getKitManager().getKitIds()));
+            .suggestions((_, context) -> new ArrayList<>(plugin.getKitManager().getKitIds()));
     }
 
     @Nullable
-    public static DungeonInstance getDungeonInstance(@NotNull DungeonPlugin plugin, @NotNull CommandContext context) {
+    public static DungeonInstance getDungeonInstance(@NonNull DungeonPlugin plugin, @NonNull CommandContext context) {
         Player player = context.getPlayerOrThrow();
         return plugin.getDungeonManager().getInstance(player);
     }
 
     @Nullable
-    public static DungeonConfig getDungeonConfig(@NotNull DungeonPlugin plugin, @NotNull CommandContext context) {
+    public static DungeonConfig getDungeonConfig(@NonNull DungeonPlugin plugin, @NonNull CommandContext context) {
         return context.getArguments().contains(DUNGEON) ? context.getArguments().get(DUNGEON, DungeonConfig.class) : null;
     }
 
     @Nullable
-    public static Spot getSpot(@NotNull DungeonPlugin plugin, @NotNull CommandContext context) {
+    public static Spot getSpot(@NonNull DungeonPlugin plugin, @NonNull CommandContext context) {
         DungeonConfig config = getDungeonConfig(plugin, context);
         if (config == null) return null;
 

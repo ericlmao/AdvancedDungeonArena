@@ -1,7 +1,7 @@
 package su.nightexpress.dungeons.dungeon.feature.board;
 
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.api.dungeon.Board;
 import su.nightexpress.dungeons.api.type.GameState;
@@ -9,34 +9,42 @@ import su.nightexpress.dungeons.config.Config;
 import su.nightexpress.dungeons.config.Lang;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.player.DungeonGamer;
-import su.nightexpress.nightcore.locale.entry.TextLocale;
-import su.nightexpress.nightcore.util.Players;
-import su.nightexpress.nightcore.util.placeholder.Replacer;
+import su.nightexpress.dungeons.nightcore.locale.entry.TextLocale;
+import su.nightexpress.dungeons.nightcore.util.Players;
+import su.nightexpress.dungeons.nightcore.util.placeholder.Replacer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractBoard<T> implements Board {
 
-    protected final BoardLayout          layout;
-    protected final DungeonGamer         gamer;
-    protected final Player               player;
-    protected final String               identifier;
-    protected final Map<Integer, String> scores;
+    protected final BoardLayout  layout;
+    protected final DungeonGamer gamer;
+    protected final Player       player;
+    protected final String       identifier;
 
-    public AbstractBoard(@NotNull DungeonGamer gamer, @NotNull BoardLayout layout) {
+    /**
+     * The lines currently on the player's screen, as a whole-value snapshot.
+     * <p>
+     * Rendering reads this to work out which lines the previous frame left behind and have to be reset.
+     * It used to be a mutable map cleared and refilled in place at the end of {@link #update()}, which
+     * meant a reader between those two statements saw an empty scoreboard and reset every line - a visible
+     * flicker at best. The reference is swapped for a new immutable map instead, so every read sees one
+     * complete frame or the other.
+     */
+    private volatile Map<Integer, String> scores = Map.of();
+
+    public AbstractBoard(@NonNull DungeonGamer gamer, @NonNull BoardLayout layout) {
         this.layout = layout;
         this.gamer = gamer;
         this.player = gamer.getPlayer();
         this.identifier = createIdentifier(this.player).substring(0, 16);
-        this.scores = new ConcurrentHashMap<>();
     }
 
-    @NotNull
-    public static String createIdentifier(@NotNull Player player) {
+    @NonNull
+    public static String createIdentifier(@NonNull Player player) {
         String uuid = player.getUniqueId().toString();
 
         // Bedrock players have UUIDs leading with zeros.
@@ -47,12 +55,12 @@ public abstract class AbstractBoard<T> implements Board {
         return uuid;
     }
 
-    @NotNull
+    @NonNull
     public final BoardLayout getLayout() {
         return this.gamer.getDungeon().getState() == GameState.INGAME ? this.layout : Config.SCOREBOARD_LOBBY_LAYOUT.get();
     }
 
-    @NotNull
+    @NonNull
     private String getScoreIdentifier(int score) {
         return "line_" + score;
     }
@@ -63,18 +71,18 @@ public abstract class AbstractBoard<T> implements Board {
         UPDATE
     }
 
-    protected abstract void sendPacket(@NotNull Player player, @NotNull T packet);
+    protected abstract void sendPacket(@NonNull Player player, @NonNull T packet);
 
-    @NotNull
-    protected abstract T createObjectivePacket(ObjectiveMode mode, @NotNull String displayName);
+    @NonNull
+    protected abstract T createObjectivePacket(ObjectiveMode mode, @NonNull String displayName);
 
-    @NotNull
-    protected abstract T createResetScorePacket(@NotNull String scoreId);
+    @NonNull
+    protected abstract T createResetScorePacket(@NonNull String scoreId);
 
-    @NotNull
-    protected abstract T createScorePacket(@NotNull String scoreId, int score, @NotNull String text);
+    @NonNull
+    protected abstract T createScorePacket(@NonNull String scoreId, int score, @NonNull String text);
 
-    @NotNull
+    @NonNull
     protected abstract T createDisplayPacket();
 
     @Override
@@ -87,15 +95,14 @@ public abstract class AbstractBoard<T> implements Board {
     public void remove() {
         this.sendPacket(this.player, this.createObjectivePacket(ObjectiveMode.REMOVE, ""));
 
-        this.scores.forEach((score, text) -> {
-            this.sendPacket(this.player, this.createResetScorePacket(this.getScoreIdentifier(score)));
-        });
+        Map<Integer, String> previous = this.scores;
+        this.scores = Map.of();
 
-        this.scores.clear();
+        previous.keySet().forEach(score -> this.sendPacket(this.player, this.createResetScorePacket(this.getScoreIdentifier(score))));
     }
 
-    @NotNull
-    private String replacePlaceholders(@NotNull String string) {
+    @NonNull
+    private String replacePlaceholders(@NonNull String string) {
         return Replacer.create()
             .replace(Placeholders.forPlayerWithPAPI(this.player))
             .replace(this.gamer.replacePlaceholders())
@@ -103,7 +110,7 @@ public abstract class AbstractBoard<T> implements Board {
             .apply(string);
     }
 
-    @NotNull
+    @NonNull
     private List<String> getFormattedTasks() {
         DungeonInstance dungeon = this.gamer.getDungeon();
         List<String> list = new ArrayList<>();
@@ -116,7 +123,7 @@ public abstract class AbstractBoard<T> implements Board {
         dungeon.getTaskProgress().forEach((stageTask, progress) -> {
             TextLocale format = progress.isCompleted() ? Lang.UI_TASK_COMPLETED : Lang.UI_TASK_INCOMPLETED;
             list.add(format.text()
-                .replace(Placeholders.GENERIC_NAME, stageTask.getParams().getDisplay())
+                .replace(Placeholders.GENERIC_NAME, stageTask.getParams().display())
                 .replace(Placeholders.GENERIC_VALUE, progress.format(this.gamer.getPlayer()))
             );
         });
@@ -124,26 +131,24 @@ public abstract class AbstractBoard<T> implements Board {
         return list;
     }
 
-    @NotNull
+    /**
+     * Peer lines are read pre-rendered rather than formatted here: producing them would mean reading every
+     * other participant's display name and state from this player's thread, which on a regionised server is
+     * exactly the cross-region access that publishing them per-player avoids. See
+     * {@link DungeonGamer#getBoardEntry()}.
+     */
+    @NonNull
     private List<String> getFormattedPlayers() {
-        DungeonInstance dungeon = this.gamer.getDungeon();
-        List<String> list = new ArrayList<>();
-
-        dungeon.getPlayers().forEach(gamer -> {
-            TextLocale format = gamer.isReady() ? Lang.UI_BOARD_PLAYER_READY : Lang.UI_BOARD_PLAYER_NOT_READY;
-            list.add(gamer.replacePlaceholders().apply(format.text()));
-        });
-
-        return list;
+        return this.gamer.getDungeon().getPlayers().stream().map(DungeonGamer::getBoardEntry).toList();
     }
 
     @Override
     public void update() {
         BoardLayout layout = this.getLayout();
-        String title = layout.getTitle();
+        String title = layout.title();
         List<String> lines = new ArrayList<>();
 
-        for (String line : layout.getLines()) {
+        for (String line : layout.lines()) {
             if (line.equalsIgnoreCase(Placeholders.GENERIC_TASKS)) {
                 lines.addAll(this.getFormattedTasks());
                 continue;
@@ -155,31 +160,27 @@ public abstract class AbstractBoard<T> implements Board {
             lines.add(line);
         }
 
-        Map<Integer, String> scores = new HashMap<>();
+        Map<Integer, String> frame = new HashMap<>();
         int index = lines.size();
 
         for (String line : lines) {
-            scores.put(index--, this.replacePlaceholders(line));
+            frame.put(index--, this.replacePlaceholders(line));
         }
         title = this.replacePlaceholders(title);
 
+        // Read once. The field can be reassigned by another render of this same board between here and the
+        // reset loop below, and diffing the new frame against half of the old one and half of a newer one
+        // leaves stale lines on screen.
+        Map<Integer, String> previous = this.scores;
 
         this.sendPacket(this.player, this.createObjectivePacket(ObjectiveMode.UPDATE, title));
 
-        scores.forEach((score, text) -> {
-            String scoreId = this.getScoreIdentifier(score);
+        frame.forEach((score, text) -> this.sendPacket(this.player, this.createScorePacket(this.getScoreIdentifier(score), score, text)));
 
-            this.sendPacket(this.player, this.createScorePacket(scoreId, score, text));
-        });
+        previous.keySet().stream()
+            .filter(score -> !frame.containsKey(score))
+            .forEach(score -> this.sendPacket(this.player, this.createResetScorePacket(this.getScoreIdentifier(score))));
 
-        this.scores.entrySet().stream().filter(entry -> !scores.containsKey(entry.getKey())).forEach(entry -> {
-            int score = entry.getKey();
-            String scoreId = this.getScoreIdentifier(score);
-
-            this.sendPacket(this.player, this.createResetScorePacket(scoreId));
-        });
-
-        this.scores.clear();
-        this.scores.putAll(scores);
+        this.scores = Map.copyOf(frame);
     }
 }

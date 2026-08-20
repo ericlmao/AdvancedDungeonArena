@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.script.condition.impl;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.criteria.CriteriaProvider;
 import su.nightexpress.dungeons.api.criteria.CriterionMob;
 import su.nightexpress.dungeons.api.type.MobFaction;
@@ -9,33 +9,33 @@ import su.nightexpress.dungeons.dungeon.script.condition.ConditionId;
 import su.nightexpress.dungeons.dungeon.script.condition.type.MobsCondition;
 import su.nightexpress.dungeons.dungeon.script.number.NumberComparator;
 import su.nightexpress.dungeons.dungeon.stage.Stage;
-import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
 public class MobsSpawnedCondition extends MobsCondition {
 
-    public MobsSpawnedCondition(@NotNull NumberComparator comparator,
+    public MobsSpawnedCondition(@NonNull NumberComparator comparator,
                                 double compareValue,
-                               @NotNull CriteriaProvider<CriterionMob> mobCriterias,
-                               @NotNull CriteriaProvider<Stage> stageCriterias) {
+                               @NonNull CriteriaProvider<CriterionMob> mobCriterias,
+                               @NonNull CriteriaProvider<Stage> stageCriterias) {
         super(comparator, compareValue, mobCriterias, stageCriterias);
     }
 
-    @NotNull
-    public static MobsSpawnedCondition read(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static MobsSpawnedCondition read(@NonNull FileConfig config, @NonNull String path) {
         NumberData data = readNumberData(config, path);
         CriteriaData criteriaData = readCriteriaData(config, path);
 
         return new MobsSpawnedCondition(data.comparator(), data.compareValue(), criteriaData.mobCriterias(), criteriaData.stageCriterias());
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return ConditionId.MOBS_SPAWNED;
     }
 
     @Override
-    protected double getDungeonValue(@NotNull DungeonInstance dungeon) {
+    protected double getDungeonValue(@NonNull DungeonInstance dungeon) {
         return dungeon.getStats().countMobSpawns(this.stageCriterias.getPredicate(), this.mobCriterias.getPredicate(mob -> mob.isFaction(MobFaction.ENEMY)));
     }
 }

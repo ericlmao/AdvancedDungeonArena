@@ -1,12 +1,12 @@
 package su.nightexpress.dungeons.dungeon.script.condition.type;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.api.criteria.CriterionMob;
 import su.nightexpress.dungeons.api.type.MobFaction;
 import su.nightexpress.dungeons.dungeon.script.number.NumberComparator;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
 import java.util.function.Predicate;
 
@@ -18,18 +18,18 @@ public abstract class MobsAmountCondition extends NumberCompareCondition {
 
     public record MobsData(NumberComparator comparator, double compareValue, boolean checkFaction, MobFaction faction){}
 
-    protected MobsAmountCondition(@NotNull MobsData data) {
+    protected MobsAmountCondition(@NonNull MobsData data) {
         this(data.comparator, data.compareValue, data.checkFaction, data.faction);
     }
 
-    public MobsAmountCondition(@NotNull NumberComparator comparator, double compareValue, boolean checkFaction, @Nullable MobFaction faction) {
+    public MobsAmountCondition(@NonNull NumberComparator comparator, double compareValue, boolean checkFaction, @Nullable MobFaction faction) {
         super(comparator, compareValue);
         this.checkFaction = checkFaction;
         this.faction = faction;
     }
 
-    @NotNull
-    public static MobsData readMobsData(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static MobsData readMobsData(@NonNull FileConfig config, @NonNull String path) {
         NumberData numberData = readNumberData(config, path);
         boolean checkFaction = ConfigValue.create(path + ".CheckFaction", false).read(config);
         MobFaction faction = ConfigValue.create(path + ".Faction", MobFaction.class, MobFaction.ENEMY).read(config);
@@ -38,7 +38,7 @@ public abstract class MobsAmountCondition extends NumberCompareCondition {
     }
 
     @Override
-    protected void writeAdditional(@NotNull FileConfig config, @NotNull String path) {
+    protected void writeAdditional(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".CheckFaction", this.checkFaction);
         config.set(path + ".Faction", this.faction == null ? null : this.faction.name());
     }

@@ -10,8 +10,8 @@ import org.bukkit.entity.*;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.api.dungeon.DungeonPos;
 import su.nightexpress.dungeons.api.type.GameState;
@@ -35,18 +35,19 @@ import su.nightexpress.dungeons.kit.KitUtils;
 import su.nightexpress.dungeons.kit.impl.Kit;
 import su.nightexpress.dungeons.user.DungeonUser;
 import su.nightexpress.dungeons.util.MobUitls;
-import su.nightexpress.nightcore.manager.AbstractManager;
-import su.nightexpress.nightcore.ui.UIUtils;
-import su.nightexpress.nightcore.ui.menu.confirmation.Confirmation;
-import su.nightexpress.nightcore.util.BlockUtil;
-import su.nightexpress.nightcore.util.FileUtil;
-import su.nightexpress.nightcore.util.LocationUtil;
-import su.nightexpress.nightcore.util.TimeUtil;
-import su.nightexpress.nightcore.util.geodata.Cuboid;
-import su.nightexpress.nightcore.util.geodata.pos.ChunkPos;
+import su.nightexpress.dungeons.nightcore.manager.AbstractManager;
+import su.nightexpress.dungeons.nightcore.ui.UIUtils;
+import su.nightexpress.dungeons.nightcore.ui.menu.confirmation.Confirmation;
+import su.nightexpress.dungeons.nightcore.util.BlockUtil;
+import su.nightexpress.dungeons.nightcore.util.FileUtil;
+import su.nightexpress.dungeons.nightcore.util.LocationUtil;
+import su.nightexpress.dungeons.nightcore.util.TimeUtil;
+import su.nightexpress.dungeons.nightcore.util.geodata.Cuboid;
+import su.nightexpress.dungeons.nightcore.util.geodata.pos.ChunkPos;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DungeonManager extends AbstractManager<DungeonPlugin> {
 
@@ -57,12 +58,16 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
 
     private DungeonBrowseMenu browseMenu;
 
-    public DungeonManager(@NotNull DungeonPlugin plugin) {
+    public DungeonManager(@NonNull DungeonPlugin plugin) {
         super(plugin);
-        this.dungeonByIdMap = new HashMap<>();
-        this.dungeonByPosMap = new HashMap<>();
-        this.instanceByIdMap = new HashMap<>();
-        this.playerByIdMap = new HashMap<>();
+        // Read from the async chat listener, from PAPI's caller thread, and from every region thread that
+        // runs a dungeon listener; written from joins, leaves and the instance clock. Concurrent is the
+        // minimum bar here - the previous plain HashMaps were already racy on Paper, just narrowly enough
+        // that it rarely showed.
+        this.dungeonByIdMap = new ConcurrentHashMap<>();
+        this.dungeonByPosMap = new ConcurrentHashMap<>();
+        this.instanceByIdMap = new ConcurrentHashMap<>();
+        this.playerByIdMap = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -70,6 +75,10 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
         this.loadDungeons();
         this.loadUI();
 
+        // The game loop. Note the `int` overload: this is 1 SECOND (20 ticks), not 1 tick - the dungeon
+        // clock counts down in whole seconds (DungeonInstance#tickGame does `countdown--` once per call).
+        // It runs on the global region scheduler, which is the only scheduler guaranteed to tick regardless
+        // of which chunks happen to be loaded. See tickInstances for how the per-region work gets out.
         this.addTask(this::tickInstances, 1);
 
         this.addListener(new DungeonGenericListener(this.plugin, this));
@@ -99,7 +108,7 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
         this.plugin.info("Loaded " + this.instanceByIdMap.size() + " dungeons.");
     }
 
-    public void loadDungeon(@NotNull DungeonConfig dungeonConfig) {
+    public void loadDungeon(@NonNull DungeonConfig dungeonConfig) {
         if (!dungeonConfig.load()) {
             this.plugin.error("Dungeon not loaded: '" + dungeonConfig.getFile().getPath() + "'.");
             return;
@@ -119,23 +128,41 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
         this.browseMenu = new DungeonBrowseMenu(this.plugin);
     }
 
-    public void updateDungeonPositions(@NotNull DungeonConfig dungeonConfig) {
+    public void updateDungeonPositions(@NonNull DungeonConfig dungeonConfig) {
         dungeonConfig.getDungeonPositions().forEach(dungeonPos -> this.dungeonByPosMap.put(dungeonPos, dungeonConfig));
     }
 
-    public void removeDungeonPositions(@NotNull DungeonConfig dungeonConfig) {
+    public void removeDungeonPositions(@NonNull DungeonConfig dungeonConfig) {
         dungeonConfig.getDungeonPositions().forEach(this.dungeonByPosMap::remove);
     }
 
+    /**
+     * Drives every dungeon instance, once per second, from the global region scheduler.
+     * <p>
+     * The instance clock itself is pure state arithmetic - countdowns, timers, task progress. Every piece of
+     * work that touches the world reaches its owning thread from inside {@link DungeonInstance#tick()}:
+     * players via their entity schedulers, blocks and chunk tickets via the region scheduler, mobs and
+     * ground items via their own entity schedulers. Keeping the clock global rather than giving each
+     * instance a region-anchored timer is deliberate; see the PR description for the reasoning.
+     */
     public void tickInstances() {
         this.getInstances().forEach(DungeonInstance::tick);
     }
 
-    public void browseDungeons(@NotNull Player player) {
-        this.browseMenu.open(player);
+    // Both entry points below gate on resident user data. Everything they reach - the browse icons, the kit
+    // menus, the join checks, the cooldown write - reads DungeonUser, and each of those reads used to be
+    // able to fall through to a blocking database query on whichever region thread happened to be running
+    // it. Loading once here, off-thread, means every read behind them is a cache hit.
+
+    public void browseDungeons(@NonNull Player player) {
+        this.plugin.getUserManager().ensureLoaded(player, () -> this.browseMenu.open(player));
     }
 
-    public void prepareForInstance(@NotNull Player player, @NotNull DungeonInstance dungeon) {
+    public void prepareForInstance(@NonNull Player player, @NonNull DungeonInstance dungeon) {
+        this.plugin.getUserManager().ensureLoaded(player, () -> this.prepareForInstanceLoaded(player, dungeon));
+    }
+
+    private void prepareForInstanceLoaded(@NonNull Player player, @NonNull DungeonInstance dungeon) {
         if (!dungeon.isActive()) {
             dungeon.sendMessage(player, Lang.DUNGEON_ENTER_ERROR_INACTIVE, replacer -> replacer.replace(dungeon.replacePlaceholders()));
             return;
@@ -157,17 +184,17 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
                     .localized(Lang.UI_CONFIRMATION_DUNGEON_ENTER_NO_KITS)
                     .hideAllComponents()
                     .replacement(replacer -> replacer.replace(dungeon.replacePlaceholders())))
-                .onAccept((viewer, event) -> this.enterInstance(player, dungeon,null))
-                .onReturn((viewer, event) -> plugin.runTask(task -> player.closeInventory()))
+                .onAccept((_, _) -> this.enterInstance(player, dungeon,null))
+                .onReturn((_, _) -> plugin.runTask(player, player::closeInventory))
                 .build());
         }
     }
 
-    public boolean enterInstance(@NotNull Player player, @NotNull DungeonInstance dungeon, @Nullable Kit kit) {
+    public boolean enterInstance(@NonNull Player player, @NonNull DungeonInstance dungeon, @Nullable Kit kit) {
         return this.enterInstance(player, dungeon, kit, false);
     }
 
-    public boolean enterInstance(@NotNull Player player, @NotNull DungeonInstance dungeon, @Nullable Kit kit, boolean force) {
+    public boolean enterInstance(@NonNull Player player, @NonNull DungeonInstance dungeon, @Nullable Kit kit, boolean force) {
         if (this.isPlaying(player)) {
             Lang.DUNGEON_ERROR_MUST_BE_OUT.message().send(player);
             return false;
@@ -222,16 +249,17 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
         }
 
         this.playerByIdMap.put(player.getUniqueId(), gamer);
-        dungeon.handlePlayerJoin(gamer, force);
 
-        // Call joined event after everything.
-        DungeonJoinedEvent joinedEvent = new DungeonJoinedEvent(dungeon, gamer);
-        this.plugin.getPluginManager().callEvent(joinedEvent);
+        // Joining teleports, and teleports finish asynchronously, so this event has to be handed to the
+        // arrival callback rather than fired here - otherwise listeners see a player who is nominally in the
+        // dungeon but still standing where they clicked, with their old inventory and game mode.
+        dungeon.handlePlayerJoin(gamer, force, () ->
+            this.plugin.getPluginManager().callEvent(new DungeonJoinedEvent(dungeon, gamer)));
 
         return true;
     }
 
-    public boolean leaveInstance(@NotNull Player player) {
+    public boolean leaveInstance(@NonNull Player player) {
         DungeonGamer gamer = this.getDungeonPlayer(player);
         if (gamer == null) {
             Lang.DUNGEON_ERROR_MUST_BE_IN.message().send(player);
@@ -241,7 +269,7 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
         return this.leaveInstance(gamer);
     }
 
-    public boolean leaveInstance(@NotNull DungeonGamer gamer) {
+    public boolean leaveInstance(@NonNull DungeonGamer gamer) {
         Player player = gamer.getPlayer();
         DungeonInstance dungeon = gamer.getDungeon();
 
@@ -256,7 +284,7 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
         return true;
     }
 
-    public void setJoinCooldown(@NotNull Player player, @NotNull DungeonInstance dungeon) {
+    public void setJoinCooldown(@NonNull Player player, @NonNull DungeonInstance dungeon) {
         int cooldown = dungeon.getConfig().features().getEntranceCooldown().getSmallest(player).intValue();
         if (cooldown == 0) return;
 
@@ -265,44 +293,44 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
         this.plugin.getUserManager().save(user);
     }
 
-    public boolean isDungeonLocation(@NotNull Block block) {
+    public boolean isDungeonLocation(@NonNull Block block) {
         return this.isDungeonLocation(block.getLocation());
     }
 
-    public boolean isDungeonLocation(@NotNull Location location) {
+    public boolean isDungeonLocation(@NonNull Location location) {
         return this.getDungeonByLocation(location) != null;
     }
 
-    public boolean containsDungeons(@NotNull World world, @NotNull Cuboid cuboid) {
+    public boolean containsDungeons(@NonNull World world, @NonNull Cuboid cuboid) {
         return this.containsDungeons(world, cuboid, null);
     }
 
-    public boolean containsDungeons(@NotNull World world, @NotNull Cuboid cuboid, @Nullable DungeonConfig source) {
+    public boolean containsDungeons(@NonNull World world, @NonNull Cuboid cuboid, @Nullable DungeonConfig source) {
         return this.getDungeons().stream().anyMatch(dungeon -> dungeon != source && dungeon.isWorld(world) && cuboid.isIntersectingWith(dungeon.getCuboid()));
     }
 
-    @NotNull
+    @NonNull
     public Set<String> getDungeonIds() {
         return new HashSet<>(this.dungeonByIdMap.keySet());
     }
 
-    @NotNull
+    @NonNull
     public Set<DungeonConfig> getDungeons() {
         return new HashSet<>(this.dungeonByIdMap.values());
     }
 
     @Nullable
-    public DungeonConfig getDungeonById(@NotNull String id) {
+    public DungeonConfig getDungeonById(@NonNull String id) {
         return this.dungeonByIdMap.get(id.toLowerCase());
     }
 
     @Nullable
-    public DungeonConfig getDungeonByLocation(@NotNull Block block) {
+    public DungeonConfig getDungeonByLocation(@NonNull Block block) {
         return this.getDungeonByLocation(block.getLocation());
     }
 
     @Nullable
-    public DungeonConfig getDungeonByLocation(@NotNull Location location) {
+    public DungeonConfig getDungeonByLocation(@NonNull Location location) {
         World world = location.getWorld();
         if (world == null) return null;
 
@@ -312,13 +340,13 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
         return this.dungeonByPosMap.get(dungeonPos);
     }
 
-    @NotNull
+    @NonNull
     public Set<DungeonInstance> getInstances() {
         return new HashSet<>(this.instanceByIdMap.values());
     }
 
     @Nullable
-    public DungeonInstance getInstance(@NotNull Player player) {
+    public DungeonInstance getInstance(@NonNull Player player) {
         DungeonGamer dungeonPlayer = this.getDungeonPlayer(player);
         if (dungeonPlayer == null) return null;
 
@@ -326,29 +354,29 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
     }
 
     @Nullable
-    public DungeonInstance getInstanceById(@NotNull String id) {
+    public DungeonInstance getInstanceById(@NonNull String id) {
         return this.instanceByIdMap.get(id.toLowerCase());
     }
 
     @Nullable
-    public DungeonInstance getInstanceByMob(@NotNull LivingEntity entity) {
+    public DungeonInstance getInstanceByMob(@NonNull LivingEntity entity) {
         DungeonMob mob = this.getDungeonMob(entity);
         return mob == null ? null : mob.getDungeon();
     }
 
     @Nullable
-    public DungeonInstance getInstanceByLocation(@NotNull Block block) {
+    public DungeonInstance getInstanceByLocation(@NonNull Block block) {
         return this.getInstanceByLocation(block.getLocation());
     }
 
     @Nullable
-    public DungeonInstance getInstanceByLocation(@NotNull Location location) {
+    public DungeonInstance getInstanceByLocation(@NonNull Location location) {
         DungeonConfig dungeonConfig = this.getDungeonByLocation(location);
         return dungeonConfig == null ? null : dungeonConfig.getInstance();
     }
 
     @Nullable
-    public DungeonMob getDungeonMob(@NotNull LivingEntity entity) {
+    public DungeonMob getDungeonMob(@NonNull LivingEntity entity) {
         String id = MobUitls.getDungeonId(entity);
         if (id == null) return null;
 
@@ -358,31 +386,31 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
         return instance.getMob(entity);
     }
 
-    @NotNull
+    @NonNull
     public Set<DungeonGamer> getDungeonPlayers() {
         return new HashSet<>(this.playerByIdMap.values());
     }
 
     @Nullable
-    public DungeonGamer getDungeonPlayer(@NotNull Player player) {
+    public DungeonGamer getDungeonPlayer(@NonNull Player player) {
         return this.getDungeonPlayer(player.getUniqueId());
     }
 
     @Nullable
-    public DungeonGamer getDungeonPlayer(@NotNull UUID playerId) {
+    public DungeonGamer getDungeonPlayer(@NonNull UUID playerId) {
         return this.playerByIdMap.get(playerId);
     }
 
-    public boolean isPlaying(@NotNull Player player) {
+    public boolean isPlaying(@NonNull Player player) {
         return this.isPlaying(player.getUniqueId());
     }
 
-    public boolean isPlaying(@NotNull UUID playerId) {
+    public boolean isPlaying(@NonNull UUID playerId) {
         return this.playerByIdMap.containsKey(playerId);
     }
 
     @Nullable
-    public MobFaction getFaction(@NotNull LivingEntity entity) {
+    public MobFaction getFaction(@NonNull LivingEntity entity) {
         if (entity instanceof Player player) {
             if (!this.isPlaying(player)) return null;
             return MobFaction.ALLY;
@@ -392,7 +420,7 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
         return mob == null ? null : mob.getFaction();
     }
 
-    public boolean canDamage(@NotNull LivingEntity damager, @NotNull LivingEntity victim) {
+    public boolean canDamage(@NonNull LivingEntity damager, @NonNull LivingEntity victim) {
         if (damager instanceof Player player) {
             return this.canPlayerDamageMob(player, victim);
         }
@@ -403,7 +431,7 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
         return this.canMobDamageMob(damager, victim);
     }
 
-    private boolean canPlayerDamageMob(@NotNull Player damagerPlayer, @NotNull LivingEntity victim) {
+    private boolean canPlayerDamageMob(@NonNull Player damagerPlayer, @NonNull LivingEntity victim) {
         DungeonGamer damagerGamer = this.getDungeonPlayer(damagerPlayer);
 
         if (victim instanceof Player victimPlayer) {
@@ -423,7 +451,7 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
         return victimMob == null;
     }
 
-    private boolean canMobDamagePlayer(@NotNull LivingEntity damager, @NotNull Player victim) {
+    private boolean canMobDamagePlayer(@NonNull LivingEntity damager, @NonNull Player victim) {
         DungeonGamer victimGamer = this.getDungeonPlayer(victim);
         DungeonMob mob = this.getDungeonMob(damager);
 
@@ -436,7 +464,7 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
         return victimGamer == null;
     }
 
-    private boolean canMobDamageMob(@NotNull LivingEntity damager, @NotNull LivingEntity victim) {
+    private boolean canMobDamageMob(@NonNull LivingEntity damager, @NonNull LivingEntity victim) {
         DungeonMob damagerMob = this.getDungeonMob(damager);
         DungeonMob victimMob = this.getDungeonMob(victim);
 
@@ -449,7 +477,7 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
         return victimMob == null;
     }
 
-    public boolean canPlace(@NotNull Player player, @NotNull Block block, @NotNull ItemStack itemStack) {
+    public boolean canPlace(@NonNull Player player, @NonNull Block block, @NonNull ItemStack itemStack) {
 //        DungeonGamer gamer = this.getDungeonPlayer(player);
 //        if (gamer != null && itemStack.getType() == Material.TNT && Config.ITEMS_TNT_ALLOW_PLACEMENT.get()) {
 //            World world = player.getWorld();
@@ -466,14 +494,14 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
         return this.canBuild(player, block);
     }
 
-    public boolean canBuild(@NotNull Player player, @NotNull Block block) {
+    public boolean canBuild(@NonNull Player player, @NonNull Block block) {
         if (this.isPlaying(player)) return false;
         if (player.hasPermission(Perms.CREATOR)) return true;
 
         return !this.isDungeonLocation(block);
     }
 
-    public boolean canBreakDecoration(@Nullable Entity damager, @NotNull Entity entity) {
+    public boolean canBreakDecoration(@Nullable Entity damager, @NonNull Entity entity) {
         if (damager instanceof Player player && this.isPlaying(player)) {
             return false;
         }
@@ -484,7 +512,7 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
         return !this.isDungeonLocation(entity.getLocation());
     }
 
-    public boolean canInteract(@NotNull Player player, @NotNull Entity entity) {
+    public boolean canInteract(@NonNull Player player, @NonNull Entity entity) {
         DungeonGamer gamer = this.getDungeonPlayer(player);
         if (gamer == null) return true;
 
@@ -498,11 +526,11 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
         return false;
     }
 
-    public boolean canUseItem(@NotNull Player player,
-                              @NotNull ItemStack itemStack,
+    public boolean canUseItem(@NonNull Player player,
+                              @NonNull ItemStack itemStack,
                               @Nullable Block block,
-                              @NotNull BlockFace face,
-                              @NotNull Action action,
+                              @NonNull BlockFace face,
+                              @NonNull Action action,
                               @Nullable EquipmentSlot slot) {
         DungeonGamer gamer = this.getDungeonPlayer(player);
         if (gamer == null) return true;
@@ -520,7 +548,7 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
             }
         }
 
-        EntityType entityType = plugin.getInternals().getSpawnEggType(itemStack);
+        EntityType entityType = MobUitls.getSpawnEggType(itemStack);
         if (entityType != null && block != null && action == Action.RIGHT_CLICK_BLOCK) {
             DungeonInstance dungeon = gamer.getDungeon();
             Location location = LocationUtil.setCenter2D(block.getRelative(face).getLocation());

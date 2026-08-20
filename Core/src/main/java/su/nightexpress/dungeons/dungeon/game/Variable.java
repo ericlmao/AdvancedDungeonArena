@@ -1,7 +1,7 @@
 package su.nightexpress.dungeons.dungeon.game;
 
-import org.jetbrains.annotations.NotNull;
-import su.nightexpress.nightcore.util.NumberUtil;
+import org.jspecify.annotations.NonNull;
+import su.nightexpress.dungeons.nightcore.util.NumberUtil;
 
 import java.util.function.Function;
 
@@ -23,7 +23,7 @@ public class Variable {
         this.setValue(initial);
     }
 
-    public void modify(@NotNull Function<Double, Double> function) {
+    public void modify(@NonNull Function<Double, Double> function) {
         this.setValue(function.apply(this.value));
     }
 

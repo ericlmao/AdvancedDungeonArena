@@ -1,29 +1,29 @@
 package su.nightexpress.dungeons.api.criteria;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.mob.MobIdentifier;
 import su.nightexpress.dungeons.api.mob.MobProvider;
 import su.nightexpress.dungeons.api.type.MobFaction;
 
 public interface CriterionMob {
 
-    boolean isMob(@NotNull MobProvider provider, @NotNull String mobId);
+    boolean isMob(@NonNull MobProvider provider, @NonNull String mobId);
 
-    boolean isMob(@NotNull MobIdentifier identifier);
+    boolean isMob(@NonNull MobIdentifier identifier);
 
-    boolean isId(@NotNull String mobId);
+    boolean isId(@NonNull String mobId);
 
-    boolean isProvider(@NotNull MobProvider provider);
+    boolean isProvider(@NonNull MobProvider provider);
 
-    boolean isProvider(@NotNull String providerId);
+    boolean isProvider(@NonNull String providerId);
 
-    boolean isFaction(@NotNull MobFaction faction);
+    boolean isFaction(@NonNull MobFaction faction);
 
-    @NotNull String getProviderId();
+    @NonNull String getProviderId();
 
-    @NotNull String getMobId();
+    @NonNull String getMobId();
 
-    @NotNull MobFaction getFaction();
+    @NonNull MobFaction getFaction();
 
-    @NotNull String getBornStageId();
+    @NonNull String getBornStageId();
 }

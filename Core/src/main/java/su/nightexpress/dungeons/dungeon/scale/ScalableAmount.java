@@ -1,13 +1,13 @@
 package su.nightexpress.dungeons.dungeon.scale;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.util.ErrorHandler;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.config.Writeable;
-import su.nightexpress.nightcore.util.NumberUtil;
-import su.nightexpress.nightcore.util.random.Rnd;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.Writeable;
+import su.nightexpress.dungeons.nightcore.util.NumberUtil;
+import su.nightexpress.dungeons.nightcore.util.random.Rnd;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -21,7 +21,7 @@ public class ScalableAmount implements Writeable {
     private final boolean initialInteger;
     private final Map<String, Scaler> scalers;
 
-    public ScalableAmount(/*@NotNull UniInt initialValue, */String initialMin, String initialMax, boolean initialInteger, @NotNull Map<String, Scaler> scalers) {
+    public ScalableAmount(/*@NonNull UniInt initialValue, */String initialMin, String initialMax, boolean initialInteger, @NonNull Map<String, Scaler> scalers) {
         //this.initialValue = initialValue;
         this.initialMin = initialMin;
         this.initialMax = initialMax;
@@ -29,8 +29,8 @@ public class ScalableAmount implements Writeable {
         this.scalers = scalers;
     }
 
-    @NotNull
-    public static ScalableAmount read(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static ScalableAmount read(@NonNull FileConfig config, @NonNull String path) {
         //UniInt intialValue = UniInt.read(config, path + ".Initial");
 
         String initialMin = ConfigValue.create(path + ".Initial.Min", "0").read(config);
@@ -53,7 +53,7 @@ public class ScalableAmount implements Writeable {
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         //this.initialValue.write(config, path + ".Initial");
 
         config.set(path + ".Initial.Min", this.initialMin);
@@ -64,11 +64,11 @@ public class ScalableAmount implements Writeable {
         this.scalers.forEach((id, scaler) -> config.set(path + ".Scalers." + id.toUpperCase(), scaler));
     }
 
-    public int getScaledInt(@NotNull DungeonInstance instance) {
+    public int getScaledInt(@NonNull DungeonInstance instance) {
         return (int) Math.floor(this.getScaled(instance));
     }
 
-    public double getScaled(@NotNull DungeonInstance instance) {
+    public double getScaled(@NonNull DungeonInstance instance) {
         double min = NumberUtil.getAnyDouble(instance.replaceVariables().apply(this.initialMin), 0D);
         double max = NumberUtil.getAnyDouble(instance.replaceVariables().apply(this.initialMax), 0D);
 
@@ -85,23 +85,23 @@ public class ScalableAmount implements Writeable {
         return value;
     }
 
-//    @NotNull
+//    @NonNull
 //    public UniInt getInitialValue() {
 //        return this.initialValue;
 //    }
 
 
-    @NotNull
+    @NonNull
     public String getInitialMin() {
         return this.initialMin;
     }
 
-    @NotNull
+    @NonNull
     public String getInitialMax() {
         return this.initialMax;
     }
 
-    @NotNull
+    @NonNull
     public Map<String, Scaler> getScalers() {
         return this.scalers;
     }

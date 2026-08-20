@@ -1,16 +1,17 @@
 package su.nightexpress.dungeons.dungeon.feature;
 
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.player.DungeonGamer;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.config.Writeable;
-import su.nightexpress.nightcore.language.message.LangMessage;
-import su.nightexpress.nightcore.util.Players;
-import su.nightexpress.nightcore.util.placeholder.Replacer;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.Writeable;
+import su.nightexpress.dungeons.nightcore.locale.message.LangMessage;
+import su.nightexpress.dungeons.nightcore.locale.message.MessageData;
+import su.nightexpress.dungeons.nightcore.util.Players;
+import su.nightexpress.dungeons.nightcore.util.placeholder.Replacer;
 
 import java.util.List;
 
@@ -24,17 +25,21 @@ public class KillStreak implements Writeable {
 
     private final LangMessage message;
 
-    public KillStreak(@NotNull String id, int kills, boolean repeatable, @NotNull String rawMessage, @NotNull List<String> commands) {
+    public KillStreak(@NonNull String id, int kills, boolean repeatable, @NonNull String rawMessage, @NonNull List<String> commands) {
         this.id = id.toLowerCase();
         this.kills = kills;
         this.repeatable = repeatable;
         this.rawMessage = rawMessage;
-        this.message = LangMessage.parse(rawMessage, null);
+        // Was the legacy language system's LangMessage.parse(raw, null); the modern equivalent splits
+        // the '[...]' bracket-data prefix off the text first.
+        MessageData.Builder builder = MessageData.chat();
+        String text = MessageData.extractAndParse(rawMessage, builder);
+        this.message = LangMessage.createFromData(text, builder.build());
         this.commands = commands;
     }
 
-    @NotNull
-    public static KillStreak read(@NotNull FileConfig config, @NotNull String path, @NotNull String id) {
+    @NonNull
+    public static KillStreak read(@NonNull FileConfig config, @NonNull String path, @NonNull String id) {
         int kills = ConfigValue.create(path + ".Kills", 0).read(config);
         boolean repeatable = ConfigValue.create(path + ".Repeatable", false).read(config);
         String rawMessage = config.getString(path + ".Message", "");
@@ -44,14 +49,14 @@ public class KillStreak implements Writeable {
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".Kills", this.kills);
         config.set(path + ".Repeatable", this.repeatable);
         config.set(path + ".Message", this.rawMessage);
         config.set(path + ".Commands", this.commands);
     }
 
-    @NotNull
+    @NonNull
     public String getId() {
         return this.id;
     }
@@ -64,12 +69,12 @@ public class KillStreak implements Writeable {
         return this.repeatable;
     }
 
-    @NotNull
+    @NonNull
     public LangMessage getMessage() {
         return this.message;
     }
 
-    @NotNull
+    @NonNull
     public List<String> getCommands() {
         return this.commands;
     }
@@ -78,7 +83,7 @@ public class KillStreak implements Writeable {
         return this.kills == streak || (this.isRepeatable() && streak % this.kills == 0);
     }
 
-    public void run(@NotNull DungeonInstance dungeon, @NotNull DungeonGamer gamer) {
+    public void run(@NonNull DungeonInstance dungeon, @NonNull DungeonGamer gamer) {
         Player player = gamer.getPlayer();
 
         this.message.send(player, replacer -> this.replacement(dungeon, gamer, replacer));
@@ -86,8 +91,8 @@ public class KillStreak implements Writeable {
         Players.dispatchCommands(player, this.replacement(dungeon, gamer, Replacer.create()).apply(this.commands));
     }
 
-    @NotNull
-    private Replacer replacement(@NotNull DungeonInstance dungeon, @NotNull DungeonGamer gamer, @NotNull Replacer replacer) {
+    @NonNull
+    private Replacer replacement(@NonNull DungeonInstance dungeon, @NonNull DungeonGamer gamer, @NonNull Replacer replacer) {
         return replacer
             .replace(dungeon.replaceVariables())
             .replace(gamer.replacePlaceholders())

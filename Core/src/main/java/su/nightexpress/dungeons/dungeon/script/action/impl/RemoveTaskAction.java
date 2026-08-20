@@ -1,6 +1,6 @@
 package su.nightexpress.dungeons.dungeon.script.action.impl;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
 import su.nightexpress.dungeons.dungeon.script.action.Action;
@@ -8,29 +8,23 @@ import su.nightexpress.dungeons.dungeon.script.action.ActionId;
 import su.nightexpress.dungeons.dungeon.stage.Stage;
 import su.nightexpress.dungeons.dungeon.stage.StageTask;
 import su.nightexpress.dungeons.util.ErrorHandler;
-import su.nightexpress.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
 
-public class RemoveTaskAction implements Action {
+public record RemoveTaskAction(@NonNull String taskId) implements Action {
 
-    private final String taskId;
-
-    public RemoveTaskAction(@NotNull String taskId) {
-        this.taskId = taskId;
-    }
-
-    @NotNull
-    public static RemoveTaskAction load(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static RemoveTaskAction load(@NonNull FileConfig config, @NonNull String path) {
         String taskId = config.getString(path + ".TaskId", "null");
         return new RemoveTaskAction(taskId);
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".TaskId", this.taskId);
     }
 
     @Override
-    public void perform(@NotNull DungeonInstance dungeon, @NotNull DungeonGameEvent event) {
+    public void perform(@NonNull DungeonInstance dungeon, @NonNull DungeonGameEvent event) {
         Stage stage = dungeon.getStage();
         StageTask stageTask = stage.getTaskById(this.taskId);
         if (stageTask == null) {
@@ -41,7 +35,7 @@ public class RemoveTaskAction implements Action {
         dungeon.removeTask(stageTask);
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String getName() {
         return ActionId.REMOVE_TASK;

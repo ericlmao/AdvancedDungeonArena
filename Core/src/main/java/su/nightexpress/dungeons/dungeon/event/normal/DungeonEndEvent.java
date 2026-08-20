@@ -1,7 +1,7 @@
 package su.nightexpress.dungeons.dungeon.event.normal;
 
 import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.api.type.GameResult;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.AbstractDungeonEvent;
@@ -12,23 +12,23 @@ public class DungeonEndEvent extends AbstractDungeonEvent {
 
     private final GameResult result;
 
-    public DungeonEndEvent(@NotNull DungeonInstance dungeon, @NotNull GameResult result) {
+    public DungeonEndEvent(@NonNull DungeonInstance dungeon, @NonNull GameResult result) {
         super(dungeon);
         this.result = result;
     }
 
-    @NotNull
+    @NonNull
     public GameResult getResult() {
         return this.result;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public HandlerList getHandlers() {
         return HANDLER_LIST;
     }
 
-    @NotNull
+    @NonNull
     public static HandlerList getHandlerList() {
         return HANDLER_LIST;
     }

@@ -4,28 +4,28 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.MenuType;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.config.Config;
 import su.nightexpress.dungeons.dungeon.config.DungeonConfig;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.module.Features;
 import su.nightexpress.dungeons.user.DungeonUser;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.config.Writeable;
-import su.nightexpress.nightcore.core.config.CoreLang;
-import su.nightexpress.nightcore.ui.menu.MenuViewer;
-import su.nightexpress.nightcore.ui.menu.data.ConfigBased;
-import su.nightexpress.nightcore.ui.menu.data.Filled;
-import su.nightexpress.nightcore.ui.menu.data.MenuFiller;
-import su.nightexpress.nightcore.ui.menu.data.MenuLoader;
-import su.nightexpress.nightcore.ui.menu.item.MenuItem;
-import su.nightexpress.nightcore.ui.menu.type.NormalMenu;
-import su.nightexpress.nightcore.util.Lists;
-import su.nightexpress.nightcore.util.bukkit.NightItem;
-import su.nightexpress.nightcore.util.time.TimeFormatType;
-import su.nightexpress.nightcore.util.time.TimeFormats;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.Writeable;
+import su.nightexpress.dungeons.nightcore.core.config.CoreLang;
+import su.nightexpress.dungeons.nightcore.ui.menu.MenuViewer;
+import su.nightexpress.dungeons.nightcore.ui.menu.data.ConfigBased;
+import su.nightexpress.dungeons.nightcore.ui.menu.data.Filled;
+import su.nightexpress.dungeons.nightcore.ui.menu.data.MenuFiller;
+import su.nightexpress.dungeons.nightcore.ui.menu.data.MenuLoader;
+import su.nightexpress.dungeons.nightcore.ui.menu.item.MenuItem;
+import su.nightexpress.dungeons.nightcore.ui.menu.type.NormalMenu;
+import su.nightexpress.dungeons.nightcore.util.Lists;
+import su.nightexpress.dungeons.nightcore.util.bukkit.NightItem;
+import su.nightexpress.dungeons.nightcore.util.time.TimeFormatType;
+import su.nightexpress.dungeons.nightcore.util.time.TimeFormats;
 
 import java.util.Comparator;
 import java.util.List;
@@ -34,7 +34,7 @@ import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
 import static su.nightexpress.dungeons.Placeholders.*;
-import static su.nightexpress.nightcore.util.text.tag.Tags.*;
+import static su.nightexpress.dungeons.nightcore.util.text.night.wrapper.TagWrappers.*;
 
 public class DungeonBrowseMenu extends NormalMenu<DungeonPlugin> implements Filled<DungeonConfig>, ConfigBased {
 
@@ -52,15 +52,15 @@ public class DungeonBrowseMenu extends NormalMenu<DungeonPlugin> implements Fill
     private int                      gridCustomPages;
     private Map<String, DungeonSlot> gridCustomSlots;
 
-    public DungeonBrowseMenu(@NotNull DungeonPlugin plugin) {
+    public DungeonBrowseMenu(@NonNull DungeonPlugin plugin) {
         super(plugin, MenuType.GENERIC_9X4, BLACK.wrap("Dungeons"));
 
         this.load(FileConfig.loadOrExtract(plugin, Config.DIR_MENU, FILE_NAME));
     }
 
     @Override
-    @NotNull
-    public MenuFiller<DungeonConfig> createFiller(@NotNull MenuViewer viewer) {
+    @NonNull
+    public MenuFiller<DungeonConfig> createFiller(@NonNull MenuViewer viewer) {
         Player player = viewer.getPlayer();
 
         return MenuFiller.builder(this)
@@ -75,7 +75,7 @@ public class DungeonBrowseMenu extends NormalMenu<DungeonPlugin> implements Fill
     }
 
     @Override
-    public void autoFill(@NotNull MenuViewer viewer) {
+    public void autoFill(@NonNull MenuViewer viewer) {
         if (this.gridAutoEnabled) {
             Filled.super.autoFill(viewer);
             return;
@@ -99,13 +99,13 @@ public class DungeonBrowseMenu extends NormalMenu<DungeonPlugin> implements Fill
         });
     }
 
-    private void onDungeonClick(MenuViewer viewer, @NotNull DungeonConfig dungeonConfig) {
+    private void onDungeonClick(MenuViewer viewer, @NonNull DungeonConfig dungeonConfig) {
         Player player = viewer.getPlayer();
-        this.runNextTick(() -> this.plugin.getDungeonManager().prepareForInstance(player, dungeonConfig.getInstance()));
+        this.runNextTick(player, () -> this.plugin.getDungeonManager().prepareForInstance(player, dungeonConfig.getInstance()));
     }
 
-    @NotNull
-    private NightItem getDungeonIcon(@NotNull Player player, @NotNull DungeonConfig config) {
+    @NonNull
+    private NightItem getDungeonIcon(@NonNull Player player, @NonNull DungeonConfig config) {
         DungeonInstance dungeon = config.getInstance();
         DungeonUser user = plugin.getUserManager().getOrFetch(player);
         boolean onCooldown = user.isOnCooldown(dungeon);
@@ -131,7 +131,7 @@ public class DungeonBrowseMenu extends NormalMenu<DungeonPlugin> implements Fill
     }
 
     @Override
-    protected void onPrepare(@NotNull MenuViewer viewer, @NotNull InventoryView view) {
+    protected void onPrepare(@NonNull MenuViewer viewer, @NonNull InventoryView view) {
         if (!this.gridAutoEnabled) {
             viewer.setPages(this.gridCustomPages);
         }
@@ -140,12 +140,12 @@ public class DungeonBrowseMenu extends NormalMenu<DungeonPlugin> implements Fill
     }
 
     @Override
-    protected void onReady(@NotNull MenuViewer viewer, @NotNull Inventory inventory) {
+    protected void onReady(@NonNull MenuViewer viewer, @NonNull Inventory inventory) {
 
     }
 
     @Override
-    public void loadConfiguration(@NotNull FileConfig config, @NotNull MenuLoader loader) {
+    public void loadConfiguration(@NonNull FileConfig config, @NonNull MenuLoader loader) {
         int[] defSlots = IntStream.range(10, 17).toArray();
 
         this.gridAutoEnabled = ConfigValue.create("Dungeon.Grid.Auto.Enabled", true).read(config);
@@ -202,8 +202,8 @@ public class DungeonBrowseMenu extends NormalMenu<DungeonPlugin> implements Fill
             this.slots = slots;
         }
 
-        @NotNull
-        public static DungeonSlot read(@NotNull FileConfig config, @NotNull String path) {
+        @NonNull
+        public static DungeonSlot read(@NonNull FileConfig config, @NonNull String path) {
             int page = ConfigValue.create(path + ".Page", 1).read(config);
             int[] slots = ConfigValue.create(path + ".Slots", new int[0]).read(config);
 
@@ -211,7 +211,7 @@ public class DungeonBrowseMenu extends NormalMenu<DungeonPlugin> implements Fill
         }
 
         @Override
-        public void write(@NotNull FileConfig config, @NotNull String path) {
+        public void write(@NonNull FileConfig config, @NonNull String path) {
             config.set(path + ".Page", this.page);
             config.setIntArray(path + ".Slots", this.slots);
         }

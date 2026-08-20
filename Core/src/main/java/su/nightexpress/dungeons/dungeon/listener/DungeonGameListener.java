@@ -14,7 +14,7 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.Placeholders;
 import su.nightexpress.dungeons.api.type.GameState;
@@ -27,16 +27,16 @@ import su.nightexpress.dungeons.dungeon.mob.DungeonMob;
 import su.nightexpress.dungeons.dungeon.module.GameSettings;
 import su.nightexpress.dungeons.dungeon.player.DungeonGamer;
 import su.nightexpress.dungeons.util.MobUitls;
-import su.nightexpress.nightcore.manager.AbstractListener;
-import su.nightexpress.nightcore.util.CommandUtil;
-import su.nightexpress.nightcore.util.Lists;
-import su.nightexpress.nightcore.util.placeholder.Replacer;
+import su.nightexpress.dungeons.nightcore.manager.AbstractListener;
+import su.nightexpress.dungeons.nightcore.util.CommandUtil;
+import su.nightexpress.dungeons.nightcore.util.Lists;
+import su.nightexpress.dungeons.nightcore.util.placeholder.Replacer;
 
 public class DungeonGameListener extends AbstractListener<DungeonPlugin> {
 
     private final DungeonManager manager;
 
-    public DungeonGameListener(@NotNull DungeonPlugin plugin, @NotNull DungeonManager manager) {
+    public DungeonGameListener(@NonNull DungeonPlugin plugin, @NonNull DungeonManager manager) {
         super(plugin);
         this.manager = manager;
     }
@@ -84,15 +84,21 @@ public class DungeonGameListener extends AbstractListener<DungeonPlugin> {
         event.setCancelled(true);
 
         DungeonInstance dungeon = gamer.getDungeon();
+        String message = event.getMessage();
 
-        String format = Replacer.create()
-            .replace(dungeon.replacePlaceholders())
-            .replace(gamer.replacePlaceholders())
-            .replace(Placeholders.forPlayerWithPAPI(player))
-            .replace(Placeholders.GENERIC_MESSAGE, event.getMessage())
-            .apply(Config.CHAT_FORMAT.get());
+        // This handler runs on a Netty thread. Resolving PAPI placeholders re-enters arbitrary third-party
+        // expansions, and broadcasting walks the instance's player set - neither is safe from here. Hop onto
+        // the speaker's own scheduler to build the line, then let broadcast() fan out per recipient.
+        this.plugin.runTask(player, () -> {
+            String format = Replacer.create()
+                .replace(dungeon.replacePlaceholders())
+                .replace(gamer.replacePlaceholders())
+                .replace(Placeholders.forPlayerWithPAPI(player))
+                .replace(Placeholders.GENERIC_MESSAGE, message)
+                .apply(Config.CHAT_FORMAT.get());
 
-        dungeon.broadcast(format);
+            dungeon.broadcast(format);
+        });
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -149,7 +155,7 @@ public class DungeonGameListener extends AbstractListener<DungeonPlugin> {
 
         dungeon.handlePlayerDeath(gamer);
 
-        this.plugin.runTask(task -> player.spigot().respawn());
+        this.plugin.runTask(player, () -> player.spigot().respawn());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -305,8 +311,10 @@ public class DungeonGameListener extends AbstractListener<DungeonPlugin> {
             return;
         }
 
-        // One tick delay, because custom mob's plugins don't have a way to distinguish an entity until it is spawned.
-        this.plugin.runTask(() -> dungeon.handleMobSpawn(entity));
+        // One tick delay, because custom mob's plugins don't have a way to distinguish an entity until it is
+        // spawned. Scheduling on the entity preserves that intent (its scheduler runs no earlier than the
+        // entity's next tick) and additionally guarantees we inspect the mob from the thread that owns it.
+        this.plugin.runTask(entity, () -> dungeon.handleMobSpawn(entity));
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -334,15 +342,6 @@ public class DungeonGameListener extends AbstractListener<DungeonPlugin> {
 
         mob.getDungeon().handleMobDeath(mob, event);
     }
-
-//    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-//    public void onDungeonMobHealthBarDamage(EntityDamageEvent event) {
-//        if (!(event.getEntity() instanceof LivingEntity entity)) return;
-//
-//        this.plugin.runTask(task -> {
-//            this.plugin.getMobManager().updateMobBar(entity);
-//        });
-//    }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onDungeonMobCombust(EntityCombustEvent event) {

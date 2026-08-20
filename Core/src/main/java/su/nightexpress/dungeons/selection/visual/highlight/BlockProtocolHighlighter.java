@@ -11,11 +11,11 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Team;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.joml.Vector3f;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.selection.visual.FakeEntity;
-import su.nightexpress.nightcore.util.Lists;
+import su.nightexpress.dungeons.nightcore.util.Lists;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -24,14 +24,14 @@ public class BlockProtocolHighlighter extends BlockHighlighter {
 
     private final ProtocolManager manager;
 
-    public BlockProtocolHighlighter(@NotNull DungeonPlugin plugin) {
+    public BlockProtocolHighlighter(@NonNull DungeonPlugin plugin) {
         super(plugin);
         this.manager = ProtocolLibrary.getProtocolManager();
     }
 
     @Override
-    @NotNull
-    protected FakeEntity spawnVisualBlock(int entityID, @NotNull Player player, @NotNull Location location, @NotNull BlockData blockData, @NotNull ChatColor color, float size) {
+    @NonNull
+    protected FakeEntity spawnVisualBlock(int entityID, @NonNull Player player, @NonNull Location location, @NonNull BlockData blockData, @NonNull ChatColor color, float size) {
         EntityType type = EntityType.BLOCK_DISPLAY;
         UUID uuid = UUID.randomUUID();
         String entityUID = uuid.toString();
@@ -70,9 +70,9 @@ public class BlockProtocolHighlighter extends BlockHighlighter {
     }
 
     @Override
-    protected void destroyEntity(@NotNull Player player, @NotNull List<FakeEntity> entities) {
+    protected void destroyEntity(@NonNull Player player, @NonNull List<FakeEntity> entities) {
         entities.forEach(fakeEntity -> {
-            String entityUID = fakeEntity.getUUID().toString();
+            String entityUID = fakeEntity.uuid().toString();
 
             PacketContainer teamPacket = new PacketContainer(PacketType.Play.Server.SCOREBOARD_TEAM);
             teamPacket.getStrings().write(0, entityUID); // Name
@@ -83,14 +83,14 @@ public class BlockProtocolHighlighter extends BlockHighlighter {
             this.manager.sendServerPacket(player, teamPacket);
         });
 
-        List<Integer> idList = entities.stream().mapToInt(FakeEntity::getId).boxed().toList();
+        List<Integer> idList = entities.stream().mapToInt(FakeEntity::id).boxed().toList();
         PacketContainer destroyPacket = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
         destroyPacket.getIntLists().write(0, idList);
         this.manager.sendServerPacket(player, destroyPacket);
     }
 
-    @NotNull
-    private PacketContainer createSpawnPacket(@NotNull EntityType entityType, @NotNull Location location, int entityID, @NotNull UUID uuid) {
+    @NonNull
+    private PacketContainer createSpawnPacket(@NonNull EntityType entityType, @NonNull Location location, int entityID, @NonNull UUID uuid) {
         PacketContainer spawnPacket = new PacketContainer(PacketType.Play.Server.SPAWN_ENTITY);
         spawnPacket.getIntegers().write(0, entityID);
         spawnPacket.getUUIDs().write(0, uuid);
@@ -101,8 +101,8 @@ public class BlockProtocolHighlighter extends BlockHighlighter {
         return spawnPacket;
     }
 
-    @NotNull
-    private PacketContainer createMetadataPacket(int entityID, @NotNull Consumer<WrappedDataWatcher> consumer) {
+    @NonNull
+    private PacketContainer createMetadataPacket(int entityID, @NonNull Consumer<WrappedDataWatcher> consumer) {
         PacketContainer dataPacket = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
         WrappedDataWatcher metadata = new WrappedDataWatcher();
 

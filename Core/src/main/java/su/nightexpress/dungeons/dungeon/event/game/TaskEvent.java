@@ -1,12 +1,12 @@
 package su.nightexpress.dungeons.dungeon.event.game;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.stage.StageTask;
 import su.nightexpress.dungeons.dungeon.stage.task.TaskProgress;
 
 public interface TaskEvent {
 
-    @NotNull StageTask getStageTask();
+    @NonNull StageTask getStageTask();
 
-    @NotNull TaskProgress getProgress();
+    @NonNull TaskProgress getProgress();
 }

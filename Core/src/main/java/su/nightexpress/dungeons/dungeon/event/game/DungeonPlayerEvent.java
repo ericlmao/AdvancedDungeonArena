@@ -1,16 +1,16 @@
 package su.nightexpress.dungeons.dungeon.event.game;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.dungeon.player.DungeonGamer;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.DungeonEventType;
 
-public abstract class DungeonPlayerEvent extends DungeonGameEvent implements GamerEvent {
+public abstract sealed class DungeonPlayerEvent extends DungeonGameEvent implements GamerEvent permits DungeonPlayerDeathEvent {
 
     protected DungeonGamer player;
 
-    public DungeonPlayerEvent(@NotNull DungeonEventType type, @NotNull DungeonInstance dungeon, @Nullable DungeonGamer player) {
+    public DungeonPlayerEvent(@NonNull DungeonEventType type, @NonNull DungeonInstance dungeon, @Nullable DungeonGamer player) {
         super(type, dungeon);
         this.player = player;
     }

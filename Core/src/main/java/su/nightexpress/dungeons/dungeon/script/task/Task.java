@@ -1,23 +1,23 @@
 package su.nightexpress.dungeons.dungeon.script.task;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.event.game.DungeonGameEvent;
 import su.nightexpress.dungeons.dungeon.stage.StageTask;
 import su.nightexpress.dungeons.dungeon.stage.task.TaskProgress;
-import su.nightexpress.nightcore.config.Writeable;
+import su.nightexpress.dungeons.nightcore.config.Writeable;
 
 public interface Task extends Writeable {
 
-    @NotNull String getName();
+    @NonNull String getName();
 
-    @NotNull ProgressFormatter getFormatter();
+    @NonNull ProgressFormatter getFormatter();
 
     boolean canBePerPlayer();
 
-    void onTaskAdd(@NotNull DungeonInstance dungeon, @NotNull StageTask stageTask, @NotNull TaskProgress progress);
+    void onTaskAdd(@NonNull DungeonInstance dungeon, @NonNull StageTask stageTask, @NonNull TaskProgress progress);
 
-    void onTaskRemove(@NotNull DungeonInstance dungeon, @NotNull StageTask stageTask, @NotNull TaskProgress progress);
+    void onTaskRemove(@NonNull DungeonInstance dungeon, @NonNull StageTask stageTask, @NonNull TaskProgress progress);
 
-    void progress(@NotNull DungeonGameEvent event, @NotNull DungeonInstance dungeon, @NotNull StageTask stageTask, @NotNull TaskProgress progress);
+    void progress(@NonNull DungeonGameEvent event, @NonNull DungeonInstance dungeon, @NonNull StageTask stageTask, @NonNull TaskProgress progress);
 }

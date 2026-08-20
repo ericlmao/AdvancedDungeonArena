@@ -2,8 +2,8 @@ package su.nightexpress.dungeons.api.mob;
 
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.api.dungeon.Dungeon;
 import su.nightexpress.dungeons.api.type.MobFaction;
 
@@ -12,14 +12,14 @@ import java.util.function.Consumer;
 
 public interface MobProvider {
 
-    @NotNull String getName();
+    @NonNull String getName();
 
-    @Nullable LivingEntity spawn(@NotNull Dungeon arena, @NotNull String mobId, @NotNull MobFaction faction, @NotNull Location location, int level, @Nullable Consumer<LivingEntity> prespawn);
+    @Nullable LivingEntity spawn(@NonNull Dungeon arena, @NonNull String mobId, @NonNull MobFaction faction, @NonNull Location location, int level, @Nullable Consumer<LivingEntity> prespawn);
 
     @Deprecated
-    @NotNull List<String> getMobNames();
+    @NonNull List<String> getMobNames();
 
-    boolean isProducedBy(@NotNull LivingEntity entity);
+    boolean isProducedBy(@NonNull LivingEntity entity);
 
-    @Nullable String getMobId(@NotNull LivingEntity entity);
+    @Nullable String getMobId(@NonNull LivingEntity entity);
 }

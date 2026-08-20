@@ -1,27 +1,21 @@
 package su.nightexpress.dungeons.dungeon.feature;
 
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import su.nightexpress.dungeons.registry.level.LevelProvider;
 import su.nightexpress.dungeons.registry.level.LevelRegistry;
-import su.nightexpress.nightcore.config.ConfigValue;
-import su.nightexpress.nightcore.config.FileConfig;
-import su.nightexpress.nightcore.config.Writeable;
+import su.nightexpress.dungeons.nightcore.config.ConfigValue;
+import su.nightexpress.dungeons.nightcore.config.FileConfig;
+import su.nightexpress.dungeons.nightcore.config.Writeable;
 
-public class LevelRequirement implements Writeable {
+public record LevelRequirement(@NonNull String provider, int minLevel, int maxLevel) implements Writeable {
 
-    private final String provider;
-    private final int minLevel;
-    private final int maxLevel;
-
-    public LevelRequirement(@NotNull String provider, int minLevel, int maxLevel) {
-        this.provider = provider.toLowerCase();
-        this.minLevel = minLevel;
-        this.maxLevel = maxLevel;
+    public LevelRequirement {
+        provider = provider.toLowerCase();
     }
 
-    @NotNull
-    public static LevelRequirement read(@NotNull FileConfig config, @NotNull String path) {
+    @NonNull
+    public static LevelRequirement read(@NonNull FileConfig config, @NonNull String path) {
         String provider = ConfigValue.create(path + ".Provider", "null").read(config);
         int minLevel = ConfigValue.create(path + ".MinLevel", -1).read(config);
         int maxLevel = ConfigValue.create(path + ".MaxLevel", -1).read(config);
@@ -30,13 +24,13 @@ public class LevelRequirement implements Writeable {
     }
 
     @Override
-    public void write(@NotNull FileConfig config, @NotNull String path) {
+    public void write(@NonNull FileConfig config, @NonNull String path) {
         config.set(path + ".Provider", this.provider);
         config.set(path + ".MinLevel", this.minLevel);
         config.set(path + ".MaxLevel", this.maxLevel);
     }
 
-    public boolean isGoodLevel(@NotNull Player player) {
+    public boolean isGoodLevel(@NonNull Player player) {
         LevelProvider levelProvider = LevelRegistry.getProvider(this.provider);
         if (levelProvider == null) return true;
 
@@ -57,18 +51,5 @@ public class LevelRequirement implements Writeable {
 
     public boolean hasMaxValue() {
         return this.maxLevel > 0;
-    }
-
-    @NotNull
-    public String getProvider() {
-        return this.provider;
-    }
-
-    public int getMinLevel() {
-        return this.minLevel;
-    }
-
-    public int getMaxLevel() {
-        return this.maxLevel;
     }
 }
