@@ -7,6 +7,7 @@ import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.stage.Stage;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -19,7 +20,8 @@ public class DungeonStats {
 
     public DungeonStats(@NotNull DungeonInstance dungeon) {
         this.dungeon = dungeon;
-        this.stats = new HashMap<>();
+        // Mob spawn and kill bookkeeping arrives from region and entity threads, not just the clock.
+        this.stats = new ConcurrentHashMap<>();
     }
 
     public void clear() {

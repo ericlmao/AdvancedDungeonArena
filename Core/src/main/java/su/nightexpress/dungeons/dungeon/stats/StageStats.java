@@ -6,6 +6,7 @@ import su.nightexpress.dungeons.api.dungeon.DungeonEntity;
 import su.nightexpress.dungeons.api.mob.MobSnapshot;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -16,7 +17,7 @@ public class StageStats {
     private final Map<MobSnapshot, MobStats> mobStats;
 
     public StageStats() {
-        this.mobStats = new HashMap<>();
+        this.mobStats = new ConcurrentHashMap<>();
     }
 
     public void clear() {

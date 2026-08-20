@@ -962,8 +962,11 @@ public class DungeonInstance implements Dungeon {
 
         this.stats.addMobKill(mob);
         this.removeMob(mob);
-        this.broadcastEvent(new DungeonMobEliminatedEvent(this, mob));
         DungeonEntityBridge.removeHolder(mob);
+
+        // Same reasoning as spawnMob: elimination is reached from the mob's own scheduler and from
+        // listeners, but the script actions this event triggers belong on the instance clock.
+        this.plugin.runTask(() -> this.broadcastEvent(new DungeonMobEliminatedEvent(this, mob)));
     }
 
     public boolean spawnAllyMob(@NotNull EntityType entityType, @NotNull Location location, int level) {
@@ -1010,8 +1013,14 @@ public class DungeonInstance implements Dungeon {
 
             DungeonMob dungeonMob = new DungeonMob(this, mob, faction, provider, mobId);
 
+            // addMob tags and configures the freshly spawned entity, so it belongs here, on the region that
+            // just created it and therefore owns it.
             this.addMob(dungeonMob);
-            this.broadcastEvent(new DungeonMobSpawnedEvent(this, dungeonMob));
+
+            // The event fan-out does not. broadcastEvent walks the stage tasks and runs script actions, and
+            // those expect the same context as every other event this instance emits. Hand it back to the
+            // clock so the instance keeps exactly one thread driving its event chain.
+            this.plugin.runTask(() -> this.broadcastEvent(new DungeonMobSpawnedEvent(this, dungeonMob)));
         });
     }
 
