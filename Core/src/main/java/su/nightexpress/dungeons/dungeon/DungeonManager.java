@@ -149,11 +149,20 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
         this.getInstances().forEach(DungeonInstance::tick);
     }
 
+    // Both entry points below gate on resident user data. Everything they reach - the browse icons, the kit
+    // menus, the join checks, the cooldown write - reads DungeonUser, and each of those reads used to be
+    // able to fall through to a blocking database query on whichever region thread happened to be running
+    // it. Loading once here, off-thread, means every read behind them is a cache hit.
+
     public void browseDungeons(@NotNull Player player) {
-        this.browseMenu.open(player);
+        this.plugin.getUserManager().ensureLoaded(player, () -> this.browseMenu.open(player));
     }
 
     public void prepareForInstance(@NotNull Player player, @NotNull DungeonInstance dungeon) {
+        this.plugin.getUserManager().ensureLoaded(player, () -> this.prepareForInstanceLoaded(player, dungeon));
+    }
+
+    private void prepareForInstanceLoaded(@NotNull Player player, @NotNull DungeonInstance dungeon) {
         if (!dungeon.isActive()) {
             dungeon.sendMessage(player, Lang.DUNGEON_ENTER_ERROR_INACTIVE, replacer -> replacer.replace(dungeon.replacePlaceholders()));
             return;
@@ -240,11 +249,12 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
         }
 
         this.playerByIdMap.put(player.getUniqueId(), gamer);
-        dungeon.handlePlayerJoin(gamer, force);
 
-        // Call joined event after everything.
-        DungeonJoinedEvent joinedEvent = new DungeonJoinedEvent(dungeon, gamer);
-        this.plugin.getPluginManager().callEvent(joinedEvent);
+        // Joining teleports, and teleports finish asynchronously, so this event has to be handed to the
+        // arrival callback rather than fired here - otherwise listeners see a player who is nominally in the
+        // dungeon but still standing where they clicked, with their old inventory and game mode.
+        dungeon.handlePlayerJoin(gamer, force, () ->
+            this.plugin.getPluginManager().callEvent(new DungeonJoinedEvent(dungeon, gamer)));
 
         return true;
     }

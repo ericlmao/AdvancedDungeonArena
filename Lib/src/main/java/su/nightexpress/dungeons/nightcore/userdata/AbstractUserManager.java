@@ -10,9 +10,10 @@ import su.nightexpress.dungeons.nightcore.util.Players;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public abstract class AbstractUserManager<P extends NightPlugin, U extends AbstractUser> extends AbstractManager<P> {
 
@@ -22,12 +23,33 @@ public abstract class AbstractUserManager<P extends NightPlugin, U extends Abstr
     private final Map<UUID, U>   loadedByIdMap;
     private final Map<String, U> loadedByNameMap;
 
+    /**
+     * In-flight database reads, keyed by player id.
+     * <p>
+     * Without this, a player whose data is not resident can have several fetches racing for the same row -
+     * one per menu render, one per join check - and the losers overwrite the winner's cache entry with a
+     * second, distinct user object. Callers share the first future instead.
+     */
+    private final Map<UUID, CompletableFuture<U>> pendingFetches;
+
+    /**
+     * Carries the blocking JDBC reads.
+     * <p>
+     * Virtual threads rather than the async scheduler: these tasks are pure block-on-socket, they can be
+     * numerous (one per joining player during a restart storm), and parking a virtual thread costs nothing
+     * where occupying a scheduler worker would starve every other async task the plugin owns.
+     */
+    private final ExecutorService fetchExecutor;
+
     public AbstractUserManager(@NonNull P plugin, @NonNull UserDataStore<U> dataManager) {
         super(plugin);
         this.config = UserdataConfig.read(plugin);
         this.dataManager = dataManager;
         this.loadedByIdMap = new ConcurrentHashMap<>();
         this.loadedByNameMap = new ConcurrentHashMap<>();
+        this.pendingFetches = new ConcurrentHashMap<>();
+        this.fetchExecutor = Executors.newThreadPerTaskExecutor(
+            Thread.ofVirtual().name(plugin.getName() + "-userdata-", 0).factory());
     }
 
     @Override
@@ -44,6 +66,8 @@ public abstract class AbstractUserManager<P extends NightPlugin, U extends Abstr
 
     @Override
     protected void onShutdown() {
+        this.fetchExecutor.shutdownNow();
+        this.pendingFetches.clear();
         this.saveLoaded();
         this.loadedByIdMap.clear();
         this.loadedByNameMap.clear();
@@ -57,11 +81,17 @@ public abstract class AbstractUserManager<P extends NightPlugin, U extends Abstr
 
     }
 
+    /**
+     * Warms the cache for everyone already connected, off the server threads.
+     * <p>
+     * This runs at post-load, which on a {@code /reload} or a hot plugin enable happens while players are
+     * online and their regions are ticking. Reading their rows inline would stall every one of those
+     * regions for the duration of the query.
+     */
     public void loadOnline() {
-        Players.getOnline().forEach(player -> {
-            U user = this.getOrFetch(player.getUniqueId());
+        Players.getOnline().forEach(player -> this.fetchAsync(player.getUniqueId()).thenAccept(user -> {
             if (user != null) this.cachePermanent(user);
-        });
+        }));
     }
 
     public void unloadExpired() {
@@ -74,7 +104,19 @@ public abstract class AbstractUserManager<P extends NightPlugin, U extends Abstr
 
     public final void handleJoin(@NonNull Player player) {
         U user = this.getLoaded(player);
-        if (user == null) return;
+        if (user == null) {
+            // The pre-login fetch is what normally puts the user here. It can be missed - a login that
+            // raced a plugin reload, a database blip - and every later read would then find nothing and
+            // fall back to empty data. Close the window off-thread rather than blocking the join.
+            String name = player.getName();
+            this.fetchAsync(player.getUniqueId()).thenAccept(fetched -> {
+                if (fetched == null || !player.isOnline()) return;
+
+                fetched.setName(name);
+                this.cachePermanent(fetched);
+            });
+            return;
+        }
 
         user.setName(player.getName()); // Update name
 
@@ -99,9 +141,7 @@ public abstract class AbstractUserManager<P extends NightPlugin, U extends Abstr
     }
 
     public void saveScheduled() {
-        Set<U> users = this.getLoaded().stream().filter(AbstractUser::isAutoSaveReady).collect(Collectors.toCollection(
-            HashSet::new));
-        this.saveScheduled(users);
+        this.saveScheduled(this.getLoaded().stream().filter(AbstractUser::isAutoSaveReady).toList());
     }
 
     private void saveScheduled(@NonNull Collection<U> users) {
@@ -189,6 +229,19 @@ public abstract class AbstractUserManager<P extends NightPlugin, U extends Abstr
         return this.dataManager.getUser(uuid);
     }
 
+    /**
+     * Resident user data for an online player, without ever touching the database.
+     * <p>
+     * Callers are render and decision paths - menu fillers, join checks - that run on the region thread
+     * owning the player and have no continuation to hand a result to. A blocking read here freezes that
+     * region, and with it every other player in it, for a full query round trip.
+     * <p>
+     * Data is resident for the whole of a session: the pre-login listener fetches it before the player is
+     * spawned, {@link #handleJoin(Player)} pins it, and {@link #unloadExpired()} never evicts an online
+     * player. A miss therefore means something already went wrong upstream, and the recovery is to warm
+     * the cache off-thread and let this call proceed on a blank user rather than stall the region. Route
+     * anything that must see real data through {@link #ensureLoaded(Player, Runnable)} first.
+     */
     @NonNull
     public final U getOrFetch(@NonNull Player player) {
         UUID uuid = player.getUniqueId();
@@ -197,16 +250,61 @@ public abstract class AbstractUserManager<P extends NightPlugin, U extends Abstr
         if (user != null) return user;
 
         if (player.isOnline()) {
-            user = this.getOrFetch(uuid);
-            if (user != null) {
-                this.plugin.warn("Main thread user data load for '" + uuid + "' aka '" + player.getName() + "'.");
-                return user;
-            }
+            this.plugin.warn("User data for '" + uuid + "' aka '" + player.getName()
+                + "' was not resident; serving blank data and reloading it in the background.");
+            this.fetchAsync(uuid).thenAccept(fetched -> {
+                if (fetched != null && player.isOnline()) this.cachePermanent(fetched);
+            });
         }
 
         return this.create(uuid, player.getName());
     }
 
+    /**
+     * Runs {@code action} with this player's data guaranteed resident.
+     * <p>
+     * Runs inline when the data is already cached, which is the normal case and keeps the action on the
+     * caller's tick. Otherwise the read happens on a virtual thread and the action is handed back to the
+     * player's own scheduler, so it stays legal to touch the player from it. The action is dropped if the
+     * player leaves before the read finishes.
+     */
+    public final void ensureLoaded(@NonNull Player player, @NonNull Runnable action) {
+        if (this.isLoaded(player)) {
+            action.run();
+            return;
+        }
+
+        this.fetchAsync(player.getUniqueId()).thenAccept(user -> {
+            if (user != null) this.cachePermanent(user);
+            if (player.isOnline()) this.plugin.runTask(player, action, () -> {});
+        });
+    }
+
+    /**
+     * Reads a user off the server threads, sharing one database round trip between concurrent callers.
+     * <p>
+     * The result is <b>not</b> cached by this method - {@link #getOrFetch(UUID)} caches only what it loads
+     * itself, and a fetch whose result is discarded should not resurrect a user the caller never asked to
+     * keep. Callers that want residency say so explicitly.
+     */
+    @NonNull
+    public final CompletableFuture<U> fetchAsync(@NonNull UUID uuid) {
+        U loaded = this.getLoaded(uuid);
+        if (loaded != null) return CompletableFuture.completedFuture(loaded);
+        if (this.fetchExecutor.isShutdown()) return CompletableFuture.completedFuture(null);
+
+        CompletableFuture<U> future = this.pendingFetches.computeIfAbsent(uuid, id ->
+            CompletableFuture.supplyAsync(() -> this.getFromDatabase(id), this.fetchExecutor));
+
+        // Registered after the put, never from inside the mapping function: a fetch that finishes before
+        // computeIfAbsent returns would otherwise clean up an entry that is not in the map yet, and the
+        // real entry would then be stuck there for the rest of the session.
+        future.whenComplete((user, error) -> this.pendingFetches.remove(uuid, future));
+
+        return future;
+    }
+
+    /** Blocking. Call from a virtual thread or the async scheduler only - never from a region thread. */
     @Nullable
     public final U getOrFetch(@NonNull String name) {
         U user = this.getLoaded(name);
@@ -220,6 +318,7 @@ public abstract class AbstractUserManager<P extends NightPlugin, U extends Abstr
         return user;
     }
 
+    /** Blocking. Call from a virtual thread or the async scheduler only - never from a region thread. */
     @Nullable
     public final U getOrFetch(@NonNull UUID uuid) {
         U user = this.getLoaded(uuid);
@@ -234,11 +333,11 @@ public abstract class AbstractUserManager<P extends NightPlugin, U extends Abstr
     }
 
     public final CompletableFuture<U> getUserDataAsync(@NonNull String name) {
-        return CompletableFuture.supplyAsync(() -> this.getOrFetch(name));
+        return CompletableFuture.supplyAsync(() -> this.getOrFetch(name), this.fetchExecutor);
     }
 
     public final CompletableFuture<U> getUserDataAsync(@NonNull UUID uuid) {
-        return CompletableFuture.supplyAsync(() -> this.getOrFetch(uuid));
+        return CompletableFuture.supplyAsync(() -> this.getOrFetch(uuid), this.fetchExecutor);
     }
 
     /**

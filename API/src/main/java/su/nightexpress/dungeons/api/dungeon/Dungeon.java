@@ -25,6 +25,19 @@ public interface Dungeon {
 
     void handlePlayerJoin(@NotNull DungeonPlayer player, boolean forced);
 
+    /**
+     * As {@link #handlePlayerJoin(DungeonPlayer, boolean)}, but reports when the player has physically
+     * arrived in the dungeon.
+     * <p>
+     * Entering a dungeon teleports the player, and teleports complete asynchronously - the player is still
+     * standing wherever they were when {@code handlePlayerJoin} returns. {@code onArrival} runs on the
+     * player's own scheduler once the move has landed and their state has been set up, which is the first
+     * point at which reading their position or inventory tells you anything about the dungeon.
+     *
+     * @param onArrival runs after arrival; not run at all if the player leaves mid-teleport.
+     */
+    void handlePlayerJoin(@NotNull DungeonPlayer player, boolean forced, @NotNull Runnable onArrival);
+
     void handlePlayerLeave(@NotNull DungeonPlayer player);
 
 

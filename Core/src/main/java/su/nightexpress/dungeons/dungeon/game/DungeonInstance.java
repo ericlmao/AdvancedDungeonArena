@@ -651,6 +651,11 @@ public class DungeonInstance implements Dungeon {
 
     @Override
     public void handlePlayerJoin(@NotNull DungeonPlayer dungeonPlayer, boolean forced) {
+        this.handlePlayerJoin(dungeonPlayer, forced, () -> {});
+    }
+
+    @Override
+    public void handlePlayerJoin(@NotNull DungeonPlayer dungeonPlayer, boolean forced, @NotNull Runnable onArrival) {
         Player player = dungeonPlayer.getPlayer();
         DungeonGamer gamer = (DungeonGamer) dungeonPlayer;
         Kit kit = gamer.getKit();
@@ -699,6 +704,8 @@ public class DungeonInstance implements Dungeon {
             if (this.config.gameSettings().isScoreboardEnabled() && DungeonUtils.hasPacketLibrary()) {
                 gamer.addBoard();
             }
+
+            onArrival.run();
         });
 
         this.broadcast(Lang.DUNGEON_JOIN_NOTIFY, replacer -> replacer.replace(this.replacePlaceholders()).replace(gamer.replacePlaceholders()));

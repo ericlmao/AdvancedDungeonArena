@@ -7,10 +7,15 @@ import su.nightexpress.dungeons.nightcore.userdata.AbstractUser;
 import su.nightexpress.dungeons.nightcore.util.TimeUtil;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DungeonUser extends AbstractUser {
 
-    private final Set<String> purchasedKits;
+    // Both collections are written from region threads (a kit purchase, a dungeon entrance) and read from
+    // the async save and synchronization tasks, which serialize them to JSON while the owning player is
+    // still playing. Plain HashMap/HashSet resize under a concurrent read is how you get a torn payload or
+    // a spinning save thread, so both are concurrent.
+    private final Set<String>       purchasedKits;
     private final Map<String, Long> cooldownMap;
 
     // TODO Dungeon Keys like crate keys
@@ -35,8 +40,9 @@ public class DungeonUser extends AbstractUser {
                        @NotNull Map<String, Long> cooldownMap) {
         super(uuid, name, dateCreated, lastLogin);
 
-        this.purchasedKits = new HashSet<>(purchasedKits);
-        this.cooldownMap = new HashMap<>(cooldownMap);
+        this.purchasedKits = ConcurrentHashMap.newKeySet();
+        this.purchasedKits.addAll(purchasedKits);
+        this.cooldownMap = new ConcurrentHashMap<>(cooldownMap);
         this.cooldownMap.values().removeIf(TimeUtil::isPassed);
     }
 

@@ -17,22 +17,30 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractBoard<T> implements Board {
 
-    protected final BoardLayout          layout;
-    protected final DungeonGamer         gamer;
-    protected final Player               player;
-    protected final String               identifier;
-    protected final Map<Integer, String> scores;
+    protected final BoardLayout  layout;
+    protected final DungeonGamer gamer;
+    protected final Player       player;
+    protected final String       identifier;
+
+    /**
+     * The lines currently on the player's screen, as a whole-value snapshot.
+     * <p>
+     * Rendering reads this to work out which lines the previous frame left behind and have to be reset.
+     * It used to be a mutable map cleared and refilled in place at the end of {@link #update()}, which
+     * meant a reader between those two statements saw an empty scoreboard and reset every line - a visible
+     * flicker at best. The reference is swapped for a new immutable map instead, so every read sees one
+     * complete frame or the other.
+     */
+    protected volatile Map<Integer, String> scores = Map.of();
 
     public AbstractBoard(@NotNull DungeonGamer gamer, @NotNull BoardLayout layout) {
         this.layout = layout;
         this.gamer = gamer;
         this.player = gamer.getPlayer();
         this.identifier = createIdentifier(this.player).substring(0, 16);
-        this.scores = new ConcurrentHashMap<>();
     }
 
     @NotNull
@@ -87,11 +95,10 @@ public abstract class AbstractBoard<T> implements Board {
     public void remove() {
         this.sendPacket(this.player, this.createObjectivePacket(ObjectiveMode.REMOVE, ""));
 
-        this.scores.forEach((score, text) -> {
-            this.sendPacket(this.player, this.createResetScorePacket(this.getScoreIdentifier(score)));
-        });
+        Map<Integer, String> previous = this.scores;
+        this.scores = Map.of();
 
-        this.scores.clear();
+        previous.keySet().forEach(score -> this.sendPacket(this.player, this.createResetScorePacket(this.getScoreIdentifier(score))));
     }
 
     @NotNull
@@ -124,17 +131,15 @@ public abstract class AbstractBoard<T> implements Board {
         return list;
     }
 
+    /**
+     * Peer lines are read pre-rendered rather than formatted here: producing them would mean reading every
+     * other participant's display name and state from this player's thread, which on a regionised server is
+     * exactly the cross-region access that publishing them per-player avoids. See
+     * {@link DungeonGamer#getBoardEntry()}.
+     */
     @NotNull
     private List<String> getFormattedPlayers() {
-        DungeonInstance dungeon = this.gamer.getDungeon();
-        List<String> list = new ArrayList<>();
-
-        dungeon.getPlayers().forEach(gamer -> {
-            TextLocale format = gamer.isReady() ? Lang.UI_BOARD_PLAYER_READY : Lang.UI_BOARD_PLAYER_NOT_READY;
-            list.add(gamer.replacePlaceholders().apply(format.text()));
-        });
-
-        return list;
+        return this.gamer.getDungeon().getPlayers().stream().map(DungeonGamer::getBoardEntry).toList();
     }
 
     @Override
@@ -155,31 +160,27 @@ public abstract class AbstractBoard<T> implements Board {
             lines.add(line);
         }
 
-        Map<Integer, String> scores = new HashMap<>();
+        Map<Integer, String> frame = new HashMap<>();
         int index = lines.size();
 
         for (String line : lines) {
-            scores.put(index--, this.replacePlaceholders(line));
+            frame.put(index--, this.replacePlaceholders(line));
         }
         title = this.replacePlaceholders(title);
 
+        // Read once. The field can be reassigned by another render of this same board between here and the
+        // reset loop below, and diffing the new frame against half of the old one and half of a newer one
+        // leaves stale lines on screen.
+        Map<Integer, String> previous = this.scores;
 
         this.sendPacket(this.player, this.createObjectivePacket(ObjectiveMode.UPDATE, title));
 
-        scores.forEach((score, text) -> {
-            String scoreId = this.getScoreIdentifier(score);
+        frame.forEach((score, text) -> this.sendPacket(this.player, this.createScorePacket(this.getScoreIdentifier(score), score, text)));
 
-            this.sendPacket(this.player, this.createScorePacket(scoreId, score, text));
-        });
+        previous.keySet().stream()
+            .filter(score -> !frame.containsKey(score))
+            .forEach(score -> this.sendPacket(this.player, this.createResetScorePacket(this.getScoreIdentifier(score))));
 
-        this.scores.entrySet().stream().filter(entry -> !scores.containsKey(entry.getKey())).forEach(entry -> {
-            int score = entry.getKey();
-            String scoreId = this.getScoreIdentifier(score);
-
-            this.sendPacket(this.player, this.createResetScorePacket(scoreId));
-        });
-
-        this.scores.clear();
-        this.scores.putAll(scores);
+        this.scores = Map.copyOf(frame);
     }
 }

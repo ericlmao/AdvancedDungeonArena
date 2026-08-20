@@ -51,6 +51,16 @@ public class DungeonGamer implements DungeonPlayer {
     /** Snapshot of {@link #player}'s position, taken on the player's own scheduler. See {@link #tick()}. */
     private volatile Location lastKnownLocation;
 
+    /**
+     * This player's line on <i>other</i> players' scoreboards, rendered on this player's own scheduler.
+     * <p>
+     * Same reasoning as {@link #lastKnownLocation}: every board in the instance lists every participant, so
+     * each render would otherwise read every peer's display name and state from a thread that does not own
+     * them. Each player renders their own line instead and publishes the finished string. At most one
+     * instance tick stale, which is the rate the boards refresh at anyway.
+     */
+    private volatile String boardEntry;
+
     private boolean dead;
     private long    deathTime;
     private int     lives;
@@ -73,6 +83,23 @@ public class DungeonGamer implements DungeonPlayer {
 
         this.godPlugin = GodPluginRegistry.getGodProvider(player);
         this.boardPlugin = BoardPluginRegistry.getBoardProvider(player);
+
+        // Published up front so a peer rendering between this player joining and their first tick still has
+        // a line for them. The constructor runs on the joining player's own thread, like tick() does.
+        this.refreshBoardEntry();
+    }
+
+    private void refreshBoardEntry() {
+        this.boardEntry = this.replacePlaceholders()
+            .apply((this.isReady() ? Lang.UI_BOARD_PLAYER_READY : Lang.UI_BOARD_PLAYER_NOT_READY).text());
+    }
+
+    /**
+     * This player's pre-rendered scoreboard line. Safe to read from any thread. See {@link #boardEntry}.
+     */
+    @NotNull
+    public String getBoardEntry() {
+        return this.boardEntry;
     }
 
     @NotNull
@@ -103,6 +130,7 @@ public class DungeonGamer implements DungeonPlayer {
         // thread allowed to read it, and consumers take the snapshot instead. It is at most one instance
         // tick (one second) stale, which is the same resolution the area tasks evaluate at anyway.
         this.lastKnownLocation = this.player.getLocation();
+        this.refreshBoardEntry();
 
         if (this.isDead() && !this.dungeon.isAboutToEnd()) {
             (this.hasExtraLives() ? Lang.DUNGEON_STATUS_DEAD_LIVES : Lang.DUNGEON_STATUS_DEAD_NO_LIVES).message().send(this.player, replacer -> replacer

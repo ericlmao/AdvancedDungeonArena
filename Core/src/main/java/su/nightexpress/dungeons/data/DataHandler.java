@@ -162,16 +162,30 @@ public class DataHandler extends SimpleManager<DungeonPlugin> implements UserDat
         return this.isSQLite() ? -1 : this.settings.getSyncInterval();
     }
 
+    /**
+     * Pulls cooldowns written by other servers into the resident copy of each user.
+     * <p>
+     * Only runs on MySQL, where the row is genuinely shared - see {@link #getSyncInterval()}.
+     * <p>
+     * Merged by latest expiry rather than replaced wholesale. A straight overwrite in either direction
+     * loses a cooldown: taking the database copy discards an entrance this server just recorded and has
+     * not saved yet, and taking the resident copy discards one another server recorded. Keeping the later
+     * timestamp cannot lose either, and cannot resurrect an expired cooldown, because
+     * {@link DungeonUser#getCooldownMap()} drops passed entries on the way through.
+     * <p>
+     * The merge happens on {@code AbstractUserManager}'s async task thread while the owning player's region
+     * thread may be reading the same map, which is why {@code DungeonUser} holds it in a concurrent map.
+     */
     @Override
     public void onSynchronize() {
         this.plugin.getUserManager().getLoaded().forEach(user -> {
             if (!user.isAutoSyncReady() || user.isAutoSavePlanned()) return;
 
-            DungeonUser fetch = this.getUser(user.getId());
-            if (fetch == null) return;
+            DungeonUser stored = this.getUser(user.getId());
+            if (stored == null) return;
 
-            fetch.getCooldownMap().clear();
-            fetch.getCooldownMap().putAll(user.getCooldownMap());
+            Map<String, Long> cooldowns = user.getCooldownMap();
+            stored.getCooldownMap().forEach((dungeonId, expiry) -> cooldowns.merge(dungeonId, expiry, Math::max));
         });
     }
 
