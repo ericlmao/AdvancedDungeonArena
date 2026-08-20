@@ -63,9 +63,21 @@ public class DungeonPlugin extends NightPlugin {
     }
 
     @Override
-    public void enable() {
-        if (!this.loadInternals()) return;
+    protected void onStartup() {
+        // NMS + NBT provider must exist before CoreBootstrap.enable() runs, because CurrencyManager
+        // serializes item currencies through ItemTag on every load. onStartup() runs once, before
+        // loadManagers(), so the provider also survives /reload cycles.
+        this.loadInternals();
+    }
 
+    @Override
+    protected void onShutdown() {
+        NbtBridge.clear();
+        this.internals = null;
+    }
+
+    @Override
+    public void enable() {
         this.loadEngine();
 
         this.dataHandler = new DataHandler(this);
@@ -124,16 +136,13 @@ public class DungeonPlugin extends NightPlugin {
         BoardPluginRegistry.clear();
         Keys.clear();
         DungeonsAPI.clear();
-        NbtBridge.clear();
     }
 
-    private boolean loadInternals() {
+    private void loadInternals() {
         // Single-version build: the module tree only contains MC_1_21_11, so there is nothing to switch on.
         MC_1_21_11 internals = new MC_1_21_11();
         this.internals = internals;
         NbtBridge.register(internals);
-
-        return true;
     }
 
     private void loadEngine() {
