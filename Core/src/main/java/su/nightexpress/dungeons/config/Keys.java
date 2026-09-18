@@ -12,6 +12,9 @@ public class Keys {
     public static NamespacedKey kitItem;
     public static NamespacedKey mobFaction;
     public static NamespacedKey mobDungeonId;
+    public static NamespacedKey mobRoundId;
+    public static NamespacedKey projectileDungeonId;
+    public static NamespacedKey projectileRoundId;
 
     public static void load(@NonNull DungeonPlugin plugin) {
         dummyItem = new NamespacedKey(plugin, "dummy_item");
@@ -20,6 +23,9 @@ public class Keys {
         kitItem = new NamespacedKey(plugin, "kit_item");
         mobFaction = new NamespacedKey(plugin, "mob_faction");
         mobDungeonId = new NamespacedKey(plugin, "mob_dungeon_id");
+        mobRoundId = new NamespacedKey(plugin, "mob_round_id");
+        projectileDungeonId = new NamespacedKey(plugin, "projectile_dungeon_id");
+        projectileRoundId = new NamespacedKey(plugin, "projectile_round_id");
     }
 
     public static void clear() {
@@ -29,5 +35,8 @@ public class Keys {
         kitItem = null;
         mobFaction = null;
         mobDungeonId = null;
+        mobRoundId = null;
+        projectileDungeonId = null;
+        projectileRoundId = null;
     }
 }

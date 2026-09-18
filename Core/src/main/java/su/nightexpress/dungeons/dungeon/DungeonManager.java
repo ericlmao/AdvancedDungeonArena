@@ -26,6 +26,7 @@ import su.nightexpress.dungeons.dungeon.event.normal.DungeonLeftEvent;
 import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.listener.DungeonGameListener;
 import su.nightexpress.dungeons.dungeon.listener.DungeonGenericListener;
+import su.nightexpress.dungeons.dungeon.listener.DungeonProjectileListener;
 import su.nightexpress.dungeons.dungeon.listener.DungeonPotionListener;
 import su.nightexpress.dungeons.dungeon.listener.DungeonProtectionListener;
 import su.nightexpress.dungeons.dungeon.menu.DungeonBrowseMenu;
@@ -82,6 +83,7 @@ public class DungeonManager extends AbstractManager<DungeonPlugin> {
         this.addTask(this::tickInstances, 1);
 
         this.addListener(new DungeonGenericListener(this.plugin, this));
+        this.addListener(new DungeonProjectileListener(this.plugin, this));
         this.addListener(new DungeonGameListener(this.plugin, this));
         this.addListener(new DungeonProtectionListener(this.plugin, this));
         this.addListener(new DungeonPotionListener(this.plugin, this));

@@ -20,6 +20,7 @@ import su.nightexpress.dungeons.api.type.GameState;
 import su.nightexpress.dungeons.api.type.MobFaction;
 import su.nightexpress.dungeons.config.Config;
 import su.nightexpress.dungeons.config.Lang;
+import su.nightexpress.dungeons.config.Keys;
 import su.nightexpress.dungeons.config.Perms;
 import su.nightexpress.dungeons.dungeon.config.DungeonConfig;
 import su.nightexpress.dungeons.dungeon.criteria.registry.mob.MobCriterias;
@@ -57,6 +58,7 @@ import su.nightexpress.dungeons.nightcore.locale.message.LangMessage;
 import su.nightexpress.dungeons.nightcore.util.EntityUtil;
 import su.nightexpress.dungeons.nightcore.util.ItemUtil;
 import su.nightexpress.dungeons.nightcore.util.Players;
+import su.nightexpress.dungeons.nightcore.util.PDCUtil;
 import su.nightexpress.dungeons.nightcore.util.geodata.pos.BlockPos;
 import su.nightexpress.dungeons.nightcore.util.placeholder.Replacer;
 import su.nightexpress.dungeons.nightcore.util.random.Rnd;
@@ -80,6 +82,7 @@ public class DungeonInstance implements Dungeon {
     private final DungeonConfig    config;
     private final DungeonStats     stats;
     private final DungeonVariables variables;
+    private final DungeonProjectiles projectiles;
 
     private final List<DungeonEventReceiver>   eventReceivers;
     private final Map<StageTask, TaskProgress> taskProgress;
@@ -109,6 +112,7 @@ public class DungeonInstance implements Dungeon {
         this.config = config;
         this.stats = new DungeonStats(this);
         this.variables = new DungeonVariables();
+        this.projectiles = new DungeonProjectiles(plugin, config.getId());
         // Concurrency note: the tick loop owns these, but listeners (mob death, item spawn, player quit) and
         // the async chat handler all mutate them from whatever thread their event arrived on. On Paper that
         // was one thread and the races were invisible; on Folia they are routine. Hence concurrent
@@ -136,6 +140,7 @@ public class DungeonInstance implements Dungeon {
     }
 
     private void reset() {
+        this.projectiles.clear();
         this.killGroundItems();
         this.killMobs();
         this.removeTasks();
@@ -161,6 +166,8 @@ public class DungeonInstance implements Dungeon {
     }
 
     public void stop() {
+        // Invalidate the run before end callbacks or chunk tickets can release its entities.
+        this.projectiles.clear();
         if (this.state == GameState.INGAME) {
             DungeonEndEvent event = new DungeonEndEvent(this, this.gameResult);
             this.plugin.getPluginManager().callEvent(event);
@@ -215,6 +222,11 @@ public class DungeonInstance implements Dungeon {
 
     public boolean isActive() {
         return this.world != null && !this.config.isBroken();
+    }
+
+    @NonNull
+    public DungeonProjectiles getProjectiles() {
+        return this.projectiles;
     }
 
     @NonNull
@@ -295,17 +307,24 @@ public class DungeonInstance implements Dungeon {
         }
 
         if (this.countdown <= 0) {
-            this.holdChunks();
+            try {
+                this.projectiles.startRound();
+                this.holdChunks();
 
-            this.state = GameState.INGAME;
-            this.setLevel(this.config.getStartLevel());
-            this.setStage(this.config.getStartStage());
-            players.forEach(this::spawnPlayer);
-            this.countdown = -1;
-            this.setTimeLeft(this.config.gameSettings().hasTimeleft() ? this.config.gameSettings().getTimeleft() * 60L : -1L);
+                this.state = GameState.INGAME;
+                this.setLevel(this.config.getStartLevel());
+                this.setStage(this.config.getStartStage());
+                players.forEach(this::spawnPlayer);
+                this.countdown = -1;
+                this.setTimeLeft(this.config.gameSettings().hasTimeleft() ? this.config.gameSettings().getTimeleft() * 60L : -1L);
 
-            DungeonStartedEvent event = new DungeonStartedEvent(this);
-            this.plugin.getPluginManager().callEvent(event);
+                DungeonStartedEvent event = new DungeonStartedEvent(this);
+                this.plugin.getPluginManager().callEvent(event);
+            }
+            catch (RuntimeException exception) {
+                this.projectiles.clear();
+                throw exception;
+            }
             return;
         }
 
@@ -1041,6 +1060,7 @@ public class DungeonInstance implements Dungeon {
         LivingEntity entity = mob.getBukkitEntity();
 
         MobUitls.setDungeonId(entity, this);
+        PDCUtil.set(entity, Keys.mobRoundId, ((DungeonMob) mob).getRoundId().toString());
         entity.setPersistent(true);
         entity.setRemoveWhenFarAway(false);
         DungeonEntityBridge.addHolder(mob);
