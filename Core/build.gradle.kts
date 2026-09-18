@@ -9,6 +9,12 @@ dependencies {
     implementation(project(":NMS"))
     implementation(project(":MC_1_21_11"))
 
+    testImplementation(platform("org.junit:junit-bom:5.11.4"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.mockito:mockito-core:5.20.0")
+    testImplementation(libs.paper.api)
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
     compileOnly(libs.jspecify)
 
     compileOnly(libs.paper.api)
@@ -70,4 +76,8 @@ tasks.shadowJar {
 
 tasks.assemble {
     dependsOn(tasks.shadowJar)
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
