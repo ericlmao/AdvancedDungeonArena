@@ -182,8 +182,8 @@ public class DungeonGameListener extends AbstractListener<DungeonPlugin> {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onDungeonPlayerTeleport(PlayerTeleportEvent event) {
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onDungeonPlayerTeleport(@NonNull PlayerTeleportEvent event) {
         Player player = event.getPlayer();
         if (player.hasPermission(Perms.CREATOR)) return;
 
@@ -191,17 +191,22 @@ public class DungeonGameListener extends AbstractListener<DungeonPlugin> {
         if (to == null) return;
 
         DungeonInstance toDungeon = this.manager.getInstanceByLocation(to);
-        DungeonInstance fromDungeon = this.manager.getInstanceByLocation(event.getFrom());
-        if (fromDungeon == toDungeon) return;
-
         DungeonGamer gamer = this.manager.getDungeonPlayer(player);
-        if (gamer != null && !gamer.isTeleporting() && !gamer.getDungeon().isAboutToEnd() && toDungeon != gamer.getDungeon()) {
+
+        // Check the actual destination in every state, including the lobby countdown. A pending TPA
+        // can complete after its target joins. Being in another dungeon (or already inside this one)
+        // does not authorize entry; normal joins register the gamer before their teleport starts.
+        if (toDungeon != null && (gamer == null || gamer.getDungeon() != toDungeon)) {
             event.setCancelled(true);
             return;
         }
 
-        if (gamer == null && toDungeon != null && toDungeon.getState() == GameState.INGAME) {
+        DungeonInstance fromDungeon = this.manager.getInstanceByLocation(event.getFrom());
+        if (fromDungeon == toDungeon) return;
+
+        if (gamer != null && !gamer.isTeleporting() && !gamer.getDungeon().isAboutToEnd() && toDungeon != gamer.getDungeon()) {
             event.setCancelled(true);
+            return;
         }
     }
 
