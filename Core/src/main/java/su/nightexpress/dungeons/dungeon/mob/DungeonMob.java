@@ -20,6 +20,7 @@ public class DungeonMob implements DungeonEntity {
     private final String          mobId;
     private final MobIdentifier   identifier;
     private final MobSnapshot snapshot;
+    private final UUID roundId;
 
     public DungeonMob(@NonNull DungeonInstance dungeon,
                       @NonNull LivingEntity bukkitEntity,
@@ -27,12 +28,18 @@ public class DungeonMob implements DungeonEntity {
                       @NonNull MobProvider provider,
                       @NonNull String mobId) {
         this.dungeon = dungeon;
+        this.roundId = dungeon.getProjectiles().getRoundId();
         this.bukkitEntity = bukkitEntity;
         this.faction = faction;
         this.provider = provider;
         this.mobId = mobId;
         this.identifier = MobIdentifier.from(this.provider, this.mobId);
         this.snapshot = new MobSnapshot(this.getProviderId(), this.getMobId(), this.faction, this.dungeon.getStage().getId());
+    }
+
+    @NonNull
+    public UUID getRoundId() {
+        return this.roundId;
     }
 
     @NonNull
