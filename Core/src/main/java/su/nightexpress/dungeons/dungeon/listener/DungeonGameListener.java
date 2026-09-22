@@ -183,7 +183,7 @@ public class DungeonGameListener extends AbstractListener<DungeonPlugin> {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onDungeonPlayerTeleport(PlayerTeleportEvent event) {
+    public void onDungeonPlayerTeleport(@NonNull PlayerTeleportEvent event) {
         Player player = event.getPlayer();
         if (player.hasPermission(Perms.CREATOR)) return;
 
