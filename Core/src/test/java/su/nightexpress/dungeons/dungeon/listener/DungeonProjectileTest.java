@@ -105,6 +105,18 @@ class DungeonProjectileTest {
     }
 
     @Test
+    void previousRoundsMobCannotLaunchIntoNewRound() {
+        clearOnOwningThread(projectiles);
+        projectiles.startRound();
+        ShulkerBullet late = projectile(ShulkerBullet.class);
+        assertTrue(launch(late).isCancelled());
+        verify(late).remove();
+        Arrow current = projectile(Arrow.class);
+        assertTrue(projectiles.track(current, projectiles.getRoundId()));
+        verify(current, never()).remove();
+    }
+
+    @Test
     void newRoundProjectilesSurviveRepeatedOldCleanupAndOtherInstanceReset() {
         ShulkerBullet old = projectile(ShulkerBullet.class);
         launch(old);

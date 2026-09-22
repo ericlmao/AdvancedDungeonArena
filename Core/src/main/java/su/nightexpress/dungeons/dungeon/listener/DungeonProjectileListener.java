@@ -12,7 +12,6 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.EntitiesLoadEvent;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import su.nightexpress.dungeons.DungeonPlugin;
 import su.nightexpress.dungeons.config.Keys;
 import su.nightexpress.dungeons.dungeon.DungeonManager;
@@ -20,6 +19,8 @@ import su.nightexpress.dungeons.dungeon.game.DungeonInstance;
 import su.nightexpress.dungeons.dungeon.mob.DungeonMob;
 import su.nightexpress.dungeons.nightcore.manager.AbstractListener;
 import su.nightexpress.dungeons.nightcore.util.PDCUtil;
+
+import java.util.Optional;
 
 public class DungeonProjectileListener extends AbstractListener<DungeonPlugin> {
 
@@ -31,7 +32,7 @@ public class DungeonProjectileListener extends AbstractListener<DungeonPlugin> {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onLaunch(ProjectileLaunchEvent event) {
+    public void onLaunch(@NonNull ProjectileLaunchEvent event) {
         Projectile projectile = event.getEntity();
         if (!(projectile.getShooter() instanceof LivingEntity shooter) || shooter instanceof Player) return;
 
@@ -54,7 +55,7 @@ public class DungeonProjectileListener extends AbstractListener<DungeonPlugin> {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onHit(ProjectileHitEvent event) {
+    public void onHit(@NonNull ProjectileHitEvent event) {
         Projectile projectile = event.getEntity();
         if (!this.isExpired(projectile)) return;
 
@@ -64,21 +65,20 @@ public class DungeonProjectileListener extends AbstractListener<DungeonPlugin> {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onRemove(EntityRemoveFromWorldEvent event) {
+    public void onRemove(@NonNull EntityRemoveFromWorldEvent event) {
         if (!(event.getEntity() instanceof Projectile projectile)) return;
-        DungeonInstance dungeon = this.getOwner(projectile);
-        if (dungeon != null) dungeon.getProjectiles().forget(projectile);
+        this.getOwner(projectile).ifPresent(dungeon -> dungeon.getProjectiles().forget(projectile));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onChunkUnload(ChunkUnloadEvent event) {
+    public void onChunkUnload(@NonNull ChunkUnloadEvent event) {
         for (Entity entity : event.getChunk().getEntities()) {
             if (entity instanceof Projectile projectile && this.isOwned(projectile)) projectile.remove();
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onEntitiesLoad(EntitiesLoadEvent event) {
+    public void onEntitiesLoad(@NonNull EntitiesLoadEvent event) {
         for (Entity entity : event.getEntities()) {
             if (entity instanceof Projectile projectile && this.isExpired(projectile)) projectile.remove();
         }
@@ -90,13 +90,13 @@ public class DungeonProjectileListener extends AbstractListener<DungeonPlugin> {
 
     private boolean isExpired(@NonNull Projectile projectile) {
         if (!this.isOwned(projectile)) return false;
-        DungeonInstance dungeon = this.getOwner(projectile);
-        return dungeon == null || !dungeon.getProjectiles().isCurrent(projectile);
+        return this.getOwner(projectile)
+            .map(dungeon -> !dungeon.getProjectiles().isCurrent(projectile)).orElse(true);
     }
 
-    @Nullable
-    private DungeonInstance getOwner(@NonNull Projectile projectile) {
+    @NonNull
+    private Optional<DungeonInstance> getOwner(@NonNull Projectile projectile) {
         return PDCUtil.getString(projectile, Keys.projectileDungeonId)
-            .map(this.manager::getInstanceById).orElse(null);
+            .map(this.manager::getInstanceById);
     }
 }
